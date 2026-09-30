@@ -1,0 +1,15 @@
+prefix_rule(
+    pattern = ["xcrun", "simctl", ["list", "boot", "bootstatus", "shutdown"]],
+    decision = "allow",
+    justification = "Allow listing and controlling Simulator devices for this project",
+    match = [
+        "xcrun simctl list devices available",
+        "xcrun simctl boot DEVICE_ID",
+        "xcrun simctl bootstatus DEVICE_ID",
+        "xcrun simctl shutdown DEVICE_ID",
+    ],
+    not_match = [
+        "xcrun simctl erase DEVICE_ID",
+        "xcrun simctl delete DEVICE_ID",
+    ],
+)
