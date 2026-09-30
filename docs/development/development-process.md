@@ -32,7 +32,7 @@ HIG / Accessibilityレビュー（AI）
 
 作業ごとに`origin/develop`の最新状態を取得し、それを起点に専用の作業ブランチを作成する。そのブランチをチェックアウトしたGit Worktreeを作成し、ファイル変更、ビルド、テストはそのWorktree内で行う。共有の作業ディレクトリや基点ブランチを直接変更しない。
 
-作業完了時は作業ブランチをpushし、GitHubの`develop`ブランチをbaseとするPull Requestを作成する。
+作業完了時は作業ブランチをpushし、GitHubの`develop`ブランチをbaseとするPull Requestを作成する。PRのタイトルと本文は日本語で記述する。
 
 ## AIの調査出力
 

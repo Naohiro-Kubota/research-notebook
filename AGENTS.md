@@ -180,6 +180,6 @@ Web APIアクセスでは以下を守る。
 - HIG確認
 - Accessibility確認
 - Definition of Done確認
-- 作業ブランチをpushし、GitHubの`develop`ブランチをbaseとするPull Requestを作成する。
+- 作業ブランチをpushし、GitHubの`develop`ブランチをbaseとするPull Requestを作成する。PRのタイトルと本文は日本語で記述する。
 
 満たせない項目がある場合、完了と報告せず理由と残課題を明記する。
