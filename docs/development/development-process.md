@@ -36,6 +36,8 @@ Xcode の Build / Test では、作業中の Worktree 内の `DerivedData/` を 
 
 作業完了時は作業ブランチをpushし、GitHubの`develop`ブランチをbaseとするPull Requestを作成する。PRのタイトルと本文は日本語で記述する。
 
+このプロジェクトでは `.codex/rules/github.rules` により、`gh pr` と `gh api` のサンドボックス外実行を承認なしで許可する。PR の編集や任意の GitHub API 操作もこの許可に含まれる。
+
 ## AIの調査出力
 
 Apple固有事項では、実装前に必要に応じて以下を提示する。

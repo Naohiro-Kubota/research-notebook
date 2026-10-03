@@ -1,0 +1,28 @@
+prefix_rule(
+    pattern = ["gh", "pr"],
+    decision = "allow",
+    justification = "Allow GitHub CLI pull request commands for this project without approval",
+    match = [
+        "gh pr view 5 --json comments,reviews",
+        "gh pr edit 5 --body-file DerivedData/pr-body.md",
+        "gh pr create --base develop --head codex/example --title Example --body Example",
+    ],
+    not_match = [
+        "git pr view 5",
+        "gh repo view",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "api"],
+    decision = "allow",
+    justification = "Allow GitHub CLI API calls for this project without approval",
+    match = [
+        "gh api repos/Naohiro-Kubota/research-notebook/pulls/5/comments",
+        "gh api -X POST repos/Naohiro-Kubota/research-notebook/pulls/5/comments/4171698586/replies -F body=@DerivedData/review-reply.txt",
+    ],
+    not_match = [
+        "git api repos/Naohiro-Kubota/research-notebook/pulls/5/comments",
+        "gh auth status",
+    ],
+)
