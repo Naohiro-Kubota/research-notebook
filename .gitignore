@@ -1,0 +1,5 @@
+*.xcuserstate
+*.xcresult
+xcuserdata/
+DerivedData/
+.DS_Store

@@ -1,0 +1,7 @@
+default_permissions = "research-notebook-git"
+
+[permissions.research-notebook-git]
+extends = ":workspace"
+
+[permissions.research-notebook-git.filesystem]
+"/Users/nao/Project/ai/research-notebook/.git" = "write"
