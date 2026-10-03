@@ -68,4 +68,4 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 - 生成されたアプリの Info.plist で Bundle Identifier `com.tabfav`、MinimumOSVersion `17.0`、UIDeviceFamily `2`（iPad）を確認した。
 - `xcodebuild test` は `Scheme ResearchNotebook is not currently configured for the test action` で終了した。テスト Target は計画の Task 2 で追加する。
 - CoreSimulatorService に接続できないため、iPad Simulator での起動と画面確認は未実施。Phase 0 の Acceptance Criteria と Definition of Done は未達のままとする。
-- Git の実データが書き込み許可のない別ディレクトリにあるため、`git add` は `index.lock: Operation not permitted` で失敗した。変更は作業ツリーに残し、コミットは未実施。
+- 当初、Git の実データが書き込み許可のない別ディレクトリにあり、`git add` は `index.lock: Operation not permitted` で失敗した。その後、Task 1 の成果物は作業ブランチ `codex/phase-0-task-1` のコミット `0e0e613` として記録され、`develop` にコミット `cebe9e6` として反映された。Task 2 以降と Phase 0 の Acceptance Criteria は引き続き未完了。
