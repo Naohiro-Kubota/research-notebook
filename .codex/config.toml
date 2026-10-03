@@ -6,4 +6,3 @@ extends = ":workspace"
 [permissions.research-notebook-git.filesystem]
 "/Users/nao/Project/ai/research-notebook/.git" = "write"
 "/Users/nao/Library/Developer/Xcode/DerivedData" = "write"
-"/Users/nao/.codex/worktrees/phase-0-task-1-records/research-notebook/DerivedData" = "write"
