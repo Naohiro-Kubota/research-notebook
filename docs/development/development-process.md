@@ -32,6 +32,8 @@ HIG / Accessibilityレビュー（AI）
 
 作業ごとに`origin/develop`の最新状態を取得し、それを起点に専用の作業ブランチを作成する。そのブランチをチェックアウトしたGit Worktreeを作成し、ファイル変更、ビルド、テストはそのWorktree内で行う。共有の作業ディレクトリや基点ブランチを直接変更しない。
 
+Xcode の Build / Test では、作業中の Worktree 内の `DerivedData/` を `-derivedDataPath` に指定する。Codex の設定に個別の Worktree の絶対パスを追加しない。
+
 作業完了時は作業ブランチをpushし、GitHubの`develop`ブランチをbaseとするPull Requestを作成する。PRのタイトルと本文は日本語で記述する。
 
 ## AIの調査出力
