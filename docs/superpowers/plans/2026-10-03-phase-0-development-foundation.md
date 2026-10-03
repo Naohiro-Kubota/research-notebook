@@ -41,11 +41,13 @@
 **Interfaces:**
 - Produces: `ResearchNotebook` アプリ Target と同名の共有 Scheme、画面上で識別できる静的な `ResearchNotebook` 表示。
 
-- [ ] **Step 1: Xcode の iOS App テンプレートから Project を作成する。** Interface は SwiftUI、言語は Swift。アプリ Target の Supported Destinations を iPad のみにし、Deployment Target を iPadOS 17、`PRODUCT_BUNDLE_IDENTIFIER` を文字列 `com.tabfav` に設定する。SwiftData テンプレートを選ばない。
-- [ ] **Step 2: 最小画面を作る。** `ContentView` は `Text("ResearchNotebook")` を表示し、その Text に `accessibilityIdentifier("app-title")` を与える。ナビゲーションや状態管理は加えない。
-- [ ] **Step 3: Project 設定を検証する。** `xcodebuild -list -project ResearchNotebook.xcodeproj` で Target / Scheme を確認し、`xcodebuild -showBuildSettings -project ResearchNotebook.xcodeproj -scheme ResearchNotebook` で `PRODUCT_BUNDLE_IDENTIFIER = com.tabfav`、`IPHONEOS_DEPLOYMENT_TARGET = 17.0`、iPad のみのデバイス指定を確認する。
-- [ ] **Step 4: Build する。** `xcodebuild -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`。期待結果は exit 0、`BUILD SUCCEEDED`、新規コンパイラ警告なし。
-- [ ] **Step 5: この作業単位をコミットする。** メッセージ例: `feat: create iPad app foundation`。
+- [x] **Step 1: Xcode の iOS App テンプレートから Project を作成する。** Interface は SwiftUI、言語は Swift。アプリ Target の Supported Destinations を iPad のみにし、Deployment Target を iPadOS 17、`PRODUCT_BUNDLE_IDENTIFIER` を文字列 `com.tabfav` に設定する。SwiftData テンプレートを選ばない。
+- [x] **Step 2: 最小画面を作る。** `ContentView` は `Text("ResearchNotebook")` を表示し、その Text に `accessibilityIdentifier("app-title")` を与える。ナビゲーションや状態管理は加えない。
+- [x] **Step 3: Project 設定を検証する。** `xcodebuild -list -project ResearchNotebook.xcodeproj` で Target / Scheme を確認し、`xcodebuild -showBuildSettings -project ResearchNotebook.xcodeproj -scheme ResearchNotebook` で `PRODUCT_BUNDLE_IDENTIFIER = com.tabfav`、`IPHONEOS_DEPLOYMENT_TARGET = 17.0`、iPad のみのデバイス指定を確認する。
+- [x] **Step 4: Build する。** `xcodebuild -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`。期待結果は exit 0、`BUILD SUCCEEDED`、新規コンパイラ警告なし。
+- [x] **Step 5: この作業単位をコミットする。** メッセージ例: `feat: create iPad app foundation`。
+
+Task 1 は 2026-10-03 にコミット `0e0e613` として記録され、`develop` にコミット `cebe9e6` として反映された。Xcode UI を操作できなかったため、Step 1 では Xcode 27 同梱の雛形を利用した。Step 4 の Build には書き込み可能な `-derivedDataPath /private/tmp/research-notebook-phase0-derived` を追加した。Simulator での起動確認とテスト Target の追加は Task 2 以降に残る。
 
 ### Task 2: Swift Testing と XCTest のテスト基盤
 
