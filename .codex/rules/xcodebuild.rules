@@ -1,0 +1,36 @@
+prefix_rule(
+    pattern = [
+        "xcodebuild", "-showBuildSettings", "-project", "ResearchNotebook.xcodeproj",
+        "-scheme", "ResearchNotebook", "-destination", "generic/platform=iOS Simulator",
+        "-derivedDataPath",
+        "/Users/nao/.codex/worktrees/phase-0-task-1-records/research-notebook/DerivedData",
+    ],
+    decision = "allow",
+    justification = "Allow the recorded ResearchNotebook build-settings check outside the sandbox",
+    match = [
+        "xcodebuild -showBuildSettings -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -destination 'generic/platform=iOS Simulator' -derivedDataPath /Users/nao/.codex/worktrees/phase-0-task-1-records/research-notebook/DerivedData",
+    ],
+    not_match = [
+        "xcodebuild -showBuildSettings -project Another.xcodeproj -scheme ResearchNotebook -destination 'generic/platform=iOS Simulator' -derivedDataPath /Users/nao/.codex/worktrees/phase-0-task-1-records/research-notebook/DerivedData",
+        "xcodebuild -showBuildSettings -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -destination 'generic/platform=iOS Simulator' -derivedDataPath /private/tmp/other-derived-data",
+    ],
+)
+
+prefix_rule(
+    pattern = [
+        "xcodebuild", "-quiet", "-project", "ResearchNotebook.xcodeproj",
+        "-scheme", "ResearchNotebook", "-configuration", "Debug",
+        "-destination", "generic/platform=iOS Simulator", "-derivedDataPath",
+        "/Users/nao/.codex/worktrees/phase-0-task-1-records/research-notebook/DerivedData",
+        "CODE_SIGNING_ALLOWED=NO", "build",
+    ],
+    decision = "allow",
+    justification = "Allow the recorded unsigned ResearchNotebook simulator build outside the sandbox",
+    match = [
+        "xcodebuild -quiet -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath /Users/nao/.codex/worktrees/phase-0-task-1-records/research-notebook/DerivedData CODE_SIGNING_ALLOWED=NO build",
+    ],
+    not_match = [
+        "xcodebuild -quiet -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -configuration Release -destination 'generic/platform=iOS Simulator' -derivedDataPath /Users/nao/.codex/worktrees/phase-0-task-1-records/research-notebook/DerivedData CODE_SIGNING_ALLOWED=NO build",
+        "xcodebuild -quiet -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath /Users/nao/.codex/worktrees/phase-0-task-1-records/research-notebook/DerivedData build",
+    ],
+)
