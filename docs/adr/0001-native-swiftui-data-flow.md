@@ -1,6 +1,6 @@
 # ADR-0001: SwiftUIネイティブなデータフローを初期方針とする
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-29
 - Decision Owner: Human
 
@@ -42,4 +42,4 @@ Option Aを提案する。
 
 ## Human Decision
 
-未承認。
+2026-10-03、Option Aを承認。
