@@ -1,6 +1,6 @@
 # ADR-0004: Notebook の 3 列 Navigation 構造
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-04
 - Decision Owner: Human
 
@@ -48,7 +48,7 @@ AI は A を提案する。Project／Note の選択をそれぞれ保持し、Pr
 
 ## Human Decision
 
-2026-10-04、人間は 3 列案を Phase 1 の Navigation 構造として承認した。本 ADR の内容はドラフトであり、最終承認後に Status を Accepted とする。
+2026-10-04、人間は 3 列案を Phase 1 の Navigation 構造として承認した。同日、本 ADR を最終承認した。
 
 ## Consequences and Verification
 
