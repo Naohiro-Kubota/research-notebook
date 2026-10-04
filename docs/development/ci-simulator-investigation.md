@@ -27,3 +27,9 @@
 ただし、起動完了後に状態を再表示するための `simctl list devices available` が約51秒かかった。この確認コマンドはテストの成否に不要なので除去し、同じ起動待ち条件で再測定する。1回の成功だけで起動失敗の再発防止は判断しない。
 
 [再測定 run 37191182824](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37191182824) も Build / Test は成功したが、ジョブ全体は8分48秒、起動待ちは1分09秒、Test は6分08秒だった。1回目より大幅に遅く、起動待ちだけで安定した時間短縮が得られたとはいえない。次は既存の共通 `scripts/test.sh` に `-parallel-testing-enabled NO` のみ追加して比較する。
+
+## 第2段階の結果
+
+[run 37191725775](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37191725775) は Build / Test とも成功し、ジョブ全体は6分35秒、起動待ちは1分18秒、Test は3分59秒だった。直列実行で UI Test 起動失敗は起きなかった。Test は直前の再測定より短いが、起動待ちを導入した最初の run より長い。これらの測定だけでは直列化による速度・安定性の改善を確定できない。
+
+次は失敗時の診断収集を抑制する。成功 run では失敗時の時間短縮を実測できないため、その効果は未検証として記録する。
