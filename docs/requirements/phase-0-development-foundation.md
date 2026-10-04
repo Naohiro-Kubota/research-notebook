@@ -98,5 +98,5 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 - 最新の `origin/develop` を起点とする専用 worktree で Xcode 27.0 (27A266a) の `scripts/build.sh` を実行し、exit 0、`BUILD SUCCEEDED` を確認した。`SIMULATOR_UDID=33CA3AC8-9A60-42F4-A25A-14DBF86375DA scripts/test.sh` は exit 0、Swift Testing と XCTest UI Test が各 1 件成功した。
 - iPad Pro (11-inch) (4th generation) と iPad mini (6th generation) の iPadOS 17.2 Simulator にアプリをインストールして起動し、全画面の異なる幅でタイトルを画像確認した。iPad Pro では Dark Mode と最大のアクセシビリティ文字サイズでもタイトルが表示され、見切れないことを確認した。
 - 同一ウインドウのリサイズ操作と VoiceOver の実際の読み上げは未実施。異なる iPad の全画面と UI Test の要素存在だけでは、その 2 項目を確認済みとはみなさない。
-- Apple 公式資料と学習内容は `docs/learning/phase-0.md` に、再現手順は `README.md` に記録した。現行 Workflow は Task 4 後の承認済み変更で Pull Request 起動のみになった。Task 4 当時の push / Pull Request run は履歴であり、Task 5 の最終版 CI run は Pull Request 作成後に確認する。
-- **Definition of Done:** Build、既存の 2 件の Test、最小アプリ起動、Dark Mode、Dynamic Type、異なる iPad の全画面、文書更新は確認済み。Xcode UI で Project を開く操作、可変ウインドウ幅と VoiceOver の実操作、および最終版 CI の確認が残るため、Phase 0 全体は未完了とする。既出の App Intents メタデータ抽出警告は残る。
+- Apple 公式資料と学習内容は `docs/learning/phase-0.md` に、再現手順は `README.md` に記録した。現行 Workflow は Task 4 後の承認済み変更で Pull Request 起動のみになった。Task 4 当時の push / Pull Request run は履歴である。Task 5 の [Pull Request run](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37187058386) は Build / Test とも成功した。
+- **Definition of Done:** Build、既存の 2 件の Test、最小アプリ起動、Dark Mode、Dynamic Type、異なる iPad の全画面、文書更新、Pull Request CI は確認済み。Xcode UI で作業 worktree の Project を開く操作、可変ウインドウ幅と VoiceOver の実操作が残るため、Phase 0 全体は未完了とする。既出の App Intents メタデータ抽出警告は残る。
