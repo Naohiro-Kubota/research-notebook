@@ -33,3 +33,11 @@
 [run 37191725775](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37191725775) は Build / Test とも成功し、ジョブ全体は6分35秒、起動待ちは1分18秒、Test は3分59秒だった。直列実行で UI Test 起動失敗は起きなかった。Test は直前の再測定より短いが、起動待ちを導入した最初の run より長い。これらの測定だけでは直列化による速度・安定性の改善を確定できない。
 
 次は失敗時の診断収集を抑制する。成功 run では失敗時の時間短縮を実測できないため、その効果は未検証として記録する。
+
+## 第3段階の結果
+
+`-collect-test-diagnostics never` を追加した [run 37192120950](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37192120950) は Build / Test とも成功し、ジョブ全体は6分06秒、起動待ちは56秒、Test は4分11秒だった。ローカルでも同じ設定で Build と全テストが成功した。失敗時の診断収集は発生していないため、600秒の診断待ちを短縮できるかは未検証。Xcode が収集する失敗時の詳細診断を失う点は、この設定のトレードオフである。
+
+## 第4段階の確認
+
+Workflow の `concurrency` は Workflow 名と PR の ref をグループキーにして、同じ PR への連続 push で古い実行を取り消す。異なる PR の run は別グループになる。これは個々の run の Test 時間を短縮しない。
