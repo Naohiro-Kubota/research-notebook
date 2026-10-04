@@ -10,17 +10,15 @@ struct ContentView: View {
       ProjectSidebarView(notebook: $notebook)
     } content: {
       if let project = notebook.projects.first(where: { $0.id == notebook.selectedProjectID }) {
-        ContentUnavailableView(
-          "Noteがありません", systemImage: "note.text",
-          description: Text("\(project.title)のNoteをここに表示します。")
-        )
-        .navigationTitle(project.title)
-        .toolbar {
-          ToolbarItem(placement: .primaryAction) {
-            Button("Projectを編集") { editedProject = project }
-              .accessibilityIdentifier("project-edit")
+        NoteListView(notebook: $notebook, projectID: project.id)
+          .id(project.id)
+          .navigationTitle(project.title)
+          .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+              Button("Projectを編集") { editedProject = project }
+                .accessibilityIdentifier("project-edit")
+            }
           }
-        }
       } else {
         ContentUnavailableView(
           "Projectを選択", systemImage: "folder", description: Text("Projectを選択すると、所属するNoteを表示します。")
@@ -28,12 +26,23 @@ struct ContentView: View {
         .navigationTitle("Notes")
       }
     } detail: {
-      ContentUnavailableView(
-        "Noteを選択", systemImage: "square.and.pencil", description: Text("Noteを選択すると、タイトルと本文を編集できます。")
-      )
-      .navigationTitle("Note")
+      if let noteID = notebook.selectedNoteID {
+        NoteEditorView(notebook: $notebook, noteID: noteID)
+          .id(noteID)
+      } else {
+        ContentUnavailableView {
+          Label("Noteを選択", systemImage: "square.and.pencil")
+            .accessibilityIdentifier("note-selection-empty")
+        } description: {
+          Text("Noteを選択すると、タイトルと本文を編集できます。")
+        }
+        .navigationTitle("Note")
+      }
     }
     .navigationSplitViewStyle(.balanced)
+    .onChange(of: notebook.selectedNoteID) { _, noteID in
+      columnVisibility = noteID == nil ? .all : .doubleColumn
+    }
     .sheet(item: $editedProject) { project in
       ProjectFormView(notebook: $notebook, projectID: project.id)
     }
