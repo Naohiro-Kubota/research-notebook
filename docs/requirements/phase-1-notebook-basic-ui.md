@@ -14,6 +14,7 @@ Project ごとに Note を整理し、iPad 上で一覧から編集へ進める�
 - 入力中の変更を画面上のデータへ即時反映する。永続化のための保存操作は Phase 2 で設ける。
 - Project を削除したときは、その Project の Note も削除する。
 - Navigation は Project 一覧、Note 一覧、Note 編集の 3 列を採用する。人間は 2026-10-04 に構成案と ADR-0004 を承認した。実機相当の幅での確認は実装後に行う。
+- iPadOS 17 の Deployment Target を維持し、Xcode 27.0 で利用可能な最新の Swift 6 言語モードを使う。人間は 2026-10-04 にこの条件付き方針を決定した。Apple の [Xcode 対応表](https://developer.apple.com/xcode/system-requirements)で両条件の両立を同日に確認した。
 
 ## Acceptance Criteria
 

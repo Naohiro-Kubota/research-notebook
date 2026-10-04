@@ -6,14 +6,14 @@
 
 **Architecture:** `ContentView` が値型の `NotebookState` を `@State` で所有し、必要な子 View に Binding を渡す。Project 一覧、Note 一覧、Note 編集を `NavigationSplitView` の sidebar、content、detail に置く。永続化は Phase 2 に残す。
 
-**Tech Stack:** Xcode 27.0 同梱の Swift 6.4 コンパイラ、SwiftUI、Swift Testing、XCTest UI Test、iPadOS 17 以降。既存 Target は Swift 5 言語モード (`SWIFT_VERSION = 5.0`) だが、Phase 1 での言語モードは未決定。外部依存なし。
+**Tech Stack:** Xcode 27.0 同梱の Swift 6.4 コンパイラ、Swift 6 言語モード、SwiftUI、Swift Testing、XCTest UI Test、iPadOS 17 以降。外部依存なし。
 
 **Spec:** `docs/requirements/phase-1-notebook-basic-ui.md`、`docs/adr/0004-three-column-notebook-navigation.md`
 
 ## Global Constraints
 
 - 対象は iPad、Deployment Target は iPadOS 17、Bundle Identifier は `com.tabfav`。
-- 実装前に人間が Swift 言語モードを決める。Phase 0 から続く `SWIFT_VERSION = 5.0` の採用理由は要求文書・ADR に記録されていない。Swift 6.4 コンパイラと Swift 5 言語モードは併用できる（[Swift 公式の互換性説明](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/compatibility/)、2026-10-04 確認）。
+- Swift 言語モードは Xcode 27.0 で利用可能な最新の Swift 6 を使う。人間が 2026-10-04 に、iPadOS 17 を維持できることを条件として決定した。[Apple の Xcode 対応表](https://developer.apple.com/xcode/system-requirements)で、Xcode 27 は iPadOS 17 を Deployment Target にでき、Swift 6.4 コンパイラと Swift 6 言語モードを提供することを同日に確認した。
 - Project と Note は `title: String` と `body: String` を持つ。前後の空白を除いたタイトルが空なら無効。本文は空でもよい。
 - Phase 1 ではデータをメモリ上に保持し、再起動後の復元と保存操作は設けない。
 - Note 作成は対象。Note 単体削除と SwiftData は Phase 2。
@@ -50,6 +50,17 @@
 新規 Swift ファイルは既存の file-system-synchronized group に配置する。Xcode Project の設定変更が必要かは Build で確認し、必要な場合のみ Project ファイルを編集する。
 
 ---
+
+### Task 0: Swift 6 言語モードへの設定変更
+
+**Files:** Modify `ResearchNotebook.xcodeproj/project.pbxproj`; Modify `ResearchNotebook/`、`ResearchNotebookTests/`、`ResearchNotebookUITests/` の既存 Swift ファイルは Swift 6 診断の解消が必要な場合のみ
+
+**Interfaces:** アプリ、Unit Test、UI Test の 3 Target すべてで Debug・Release の `SWIFT_VERSION = 6.0` を設定する。Deployment Target `17.0` と Bundle Identifier `com.tabfav` は維持する。
+
+- [ ] **Step 1: 現行設定と利用可能なツールチェーンを確認する。** `xcrun swift --version`、`xcodebuild -version`、`rg 'SWIFT_VERSION|IPHONEOS_DEPLOYMENT_TARGET|PRODUCT_BUNDLE_IDENTIFIER' ResearchNotebook.xcodeproj/project.pbxproj` を実行して記録する。
+- [ ] **Step 2: 6 箇所の `SWIFT_VERSION` を `6.0` に変更する。** Swift 6 のコンパイル診断が出た場合は原因を確認し、既存コードの意図を保つ最小の修正だけを行う。
+- [ ] **Step 3: `scripts/build.sh`、`SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh`、`scripts/lint.sh` を実行する。** 期待: Build、既存 Unit/UI Test、Lint が成功し、新規警告なし。生成アプリが iPadOS 17 を対象とする設定を確認する。
+- [ ] **Step 4: `git diff --check` を実行し、設定変更と必要な診断修正をコミットする。**
 
 ### Task 1: 一時データと操作
 
