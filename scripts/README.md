@@ -15,4 +15,4 @@ SIMULATOR_UDID='選択したiPadのUDID' scripts/test.sh
 
 `SIMULATOR_UDID` を省略すると説明を表示して失敗する。存在しない UDID や Simulator サービスの障害による `xcodebuild` の失敗も、そのまま終了コードとして返す。
 
-CI も同じスクリプトを呼び出す。CI Workflow と実行結果の確認は Phase 0 の Task 4 で行う。
+CI も同じスクリプトを呼び出す。Workflow は `.github/workflows/build-test.yml`、Xcode と Simulator の実測結果および成功した run は `docs/requirements/phase-0-development-foundation.md` の Task 4 に記録した。
