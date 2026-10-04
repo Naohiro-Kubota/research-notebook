@@ -7,6 +7,8 @@ extends = ":workspace"
 
 [permissions.research-notebook-git.filesystem]
 "/Users/nao/Project/ai/research-notebook/.git" = "write"
+# Codex-managed worktrees for all repositories; other paths still use on-request approval.
+"/Users/nao/.codex/worktrees" = "write"
 "/Users/nao/Library/Developer/Xcode/DerivedData" = "write"
 "/Users/nao/Library/Developer/CoreSimulator" = "write"
 "/Users/nao/Library/Developer/Xcode" = "write"
