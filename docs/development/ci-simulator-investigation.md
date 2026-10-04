@@ -41,3 +41,10 @@
 ## 第4段階の確認
 
 Workflow の `concurrency` は Workflow 名と PR の ref をグループキーにして、同じ PR への連続 push で古い実行を取り消す。異なる PR の run は別グループになる。これは個々の run の Test 時間を短縮しない。
+
+確認に使用した一次情報（2026-10-04 確認）:
+
+- [Apple Xcode 10 Release Notes](https://developer.apple.com/documentation/xcode-release-notes/xcode-10-release-notes): 並列テストでは Simulator の複製を使う場合がある。今回の失敗 run で複製が原因だったかは不明。
+- [Apple: Organizing tests to improve feedback](https://developer.apple.com/documentation/xcode/organizing-tests-to-improve-feedback): テスト診断収集の設定を確認。今回の適用案は失敗時の診断収集を省くこと。
+- [GitHub: Control workflow concurrency](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency): 同じグループの進行中 run を `cancel-in-progress` で取り消せる。今回の適用案は Workflow 名と PR ref の組み合わせ。
+- ローカルの `xcrun simctl help bootstatus` と `xcodebuild -help`: `bootstatus -b`、`-parallel-testing-enabled NO`、`-collect-test-diagnostics never` の指定を確認。
