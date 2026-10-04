@@ -6,13 +6,14 @@
 
 **Architecture:** `ContentView` が値型の `NotebookState` を `@State` で所有し、必要な子 View に Binding を渡す。Project 一覧、Note 一覧、Note 編集を `NavigationSplitView` の sidebar、content、detail に置く。永続化は Phase 2 に残す。
 
-**Tech Stack:** Swift 5、SwiftUI、Swift Testing、XCTest UI Test、iPadOS 17 以降。外部依存なし。
+**Tech Stack:** Xcode 27.0 同梱の Swift 6.4 コンパイラ、既存 Target の Swift 5 言語モード (`SWIFT_VERSION = 5.0`)、SwiftUI、Swift Testing、XCTest UI Test、iPadOS 17 以降。外部依存なし。
 
 **Spec:** `docs/requirements/phase-1-notebook-basic-ui.md`、`docs/adr/0004-three-column-notebook-navigation.md`
 
 ## Global Constraints
 
 - 対象は iPad、Deployment Target は iPadOS 17、Bundle Identifier は `com.tabfav`。
+- Phase 1 では既存の Swift 5 言語モードを変更しない。Swift 6 言語モードへの移行は別の判断として扱う。Swift 6.4 コンパイラと Swift 5 言語モードは併用できる（[Swift 公式の互換性説明](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/compatibility/)、2026-10-04 確認）。
 - Project と Note は `title: String` と `body: String` を持つ。前後の空白を除いたタイトルが空なら無効。本文は空でもよい。
 - Phase 1 ではデータをメモリ上に保持し、再起動後の復元と保存操作は設けない。
 - Note 作成は対象。Note 単体削除と SwiftData は Phase 2。
