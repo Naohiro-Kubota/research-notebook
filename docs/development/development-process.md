@@ -34,6 +34,10 @@ HIG / Accessibilityレビュー（AI）
 
 Xcode の Build / Test では、作業中の Worktree 内の `DerivedData/` を `-derivedDataPath` に指定する。Codex の設定に個別の Worktree の絶対パスを追加しない。
 
+`.codex/config.toml` は管理 Worktree の親ディレクトリ `~/.codex/worktrees` を書き込み可能にする。これにより Worktree 内のファイル編集、実行権限変更、sandbox 内で完結するスクリプト実行は承認不要になる。対象は他リポジトリの管理 Worktree も含む。現在の workspace、既存の一時領域、設定に列挙したディレクトリ以外への書き込みは引き続き `on-request` とし、2026-10-04 に [OpenAI 公式 Permissions 資料](https://learn.chatgpt.com/docs/permissions)と実際の sandbox で確認した。
+
+スクリプトを一律に sandbox 外で許可しない。Worktree 内のスクリプトは編集できるため、一律許可するとリスト外への書き込みも承認を経ずに実行できる。iPad Simulator を使う `scripts/test.sh` は現在の sandbox 内で CoreSimulatorService に接続できず、sandbox 外での実行が必要になる。この制限は Worktree の書き込み権限だけでは解消しない。
+
 作業完了時は作業ブランチをpushし、GitHubの`develop`ブランチをbaseとするPull Requestを作成する。PRのタイトルと本文は日本語で記述する。
 
 このプロジェクトでは `.codex/rules/github.rules` により、`gh pr` と `gh api` のサンドボックス外実行を承認なしで許可する。PR の編集や任意の GitHub API 操作もこの許可に含まれる。
