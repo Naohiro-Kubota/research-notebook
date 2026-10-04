@@ -1,12 +1,12 @@
 # ADR-0003: Swift の Linter / Formatter を選定する
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-04
 - Decision Owner: Human
 
 ## Context
 
-Phase 0 では Lint / Format ツールの導入を対象外とした。今後の Swift コード増加に備え、ローカルと Pull Request CI で同じ規則を検査し、整形を再現できるようにする。現状の CI は Xcode 27 の `xcode-27` ランナーでビルドと設定テストを実行する。ツールの採用、ルール、CI への組み込みは本 ADR の承認後に別作業で実施する。
+Phase 0 では Lint / Format ツールの導入を対象外とした。今後の Swift コード増加に備え、ローカルと Pull Request CI で同じ規則を検査し、整形を再現できるようにする。現状の CI は Xcode 27 の `xcode-27` ランナーでビルドと設定テストを実行する。
 
 本 ADR は開発用ツールの判断であり、アプリの実行時依存や UI の変更は提案しない。
 
@@ -14,7 +14,7 @@ Phase 0 では Lint / Format ツールの導入を対象外とした。今後の
 
 | 資料 | 確認した事実 | 本プロジェクトへの適用・未確認点 |
 |---|---|---|
-| [swiftlang/swift-format README](https://github.com/swiftlang/swift-format/blob/main/README.md) | Swift 6 / Xcode 16 以降のツールチェーンに `swift format` が含まれる。`format` と `lint` のサブコマンド、`.swift-format` 設定ファイル、`lint --strict` がある。README は既定スタイルを唯一の Swift 公式スタイルとは位置付けていない。 | Xcode 27 のローカル環境で `xcrun swift format --version` と両サブコマンドのヘルプを確認した。現行ソースへの診断数、Xcode 更新時の出力差分は未測定。 |
+| [swiftlang/swift-format README](https://github.com/swiftlang/swift-format/blob/main/README.md) | Swift 6 / Xcode 16 以降のツールチェーンに `swift format` が含まれる。`format` と `lint` のサブコマンド、`.swift-format` 設定ファイル、`lint --strict` がある。README は既定スタイルを唯一の Swift 公式スタイルとは位置付けていない。 | Xcode 27 のローカル環境で `xcrun swift format --version` と両サブコマンドのヘルプを確認した。既定の 2 スペース設定では現行 4 ファイルに計 15 件のインデント診断が出た。4 スペース設定では診断 0 件。Xcode 更新時の出力差分は未測定。 |
 | [swiftlang/swift-format LICENSE](https://github.com/swiftlang/swift-format/blob/main/LICENSE.txt) | Apache License 2.0 with Runtime Library Exception。 | 同梱ツールをコマンドとして使う場合、追加の Package 依存は不要。 |
 | [realm/SwiftLint README](https://github.com/realm/SwiftLint/blob/main/README.md) | Swift のスタイルと規約を検査する。Swift Package plugin、Homebrew などの導入経路があり、設定可能なルールを持つ。README は専用の SwiftLintPlugins リポジトリを plugin 利用時に推奨する。 | 追加導入するならバージョン固定方法、CI との一致、使用ルールの選定が必要。現行ソースへの診断数は未測定。 |
 | [realm/SwiftLint LICENSE](https://github.com/realm/SwiftLint/blob/main/LICENSE) | MIT License。 | 外部開発ツールとしてのライセンス確認資料。 |
@@ -51,7 +51,9 @@ Phase 0 では Lint / Format ツールの導入を対象外とした。今後の
 
 ## Human Decision
 
-未決定。採用案、ルールの範囲、CI での失敗条件について人間が承認するまで、この ADR は Proposed とする。
+2026-10-04、案 A を承認。規模が大きくなり、個別の規約を適用した方がよいと判断した時点で案 B を再検討する。
+
+導入時の設定は、既存コードと一致する 4 スペースのインデントのみを既定値から変更する。対象はアプリと Unit / UI Test の Swift ソースで、生成コードは対象に含めない。CI は `lint --strict` により診断があれば失敗させ、整形は開発者が明示的に実行する。
 
 ## Consequences
 
