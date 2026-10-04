@@ -17,13 +17,13 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 
 ## Acceptance Criteria
 
-- [ ] iPadOS 17 以降の iPad を対象とする SwiftUI アプリの Xcode Project を開ける。
+- [x] iPadOS 17 以降の iPad を対象とする SwiftUI アプリの Xcode Project を開ける。
 - [x] アプリとテストの Target、およびローカルと CI で共通に使う Scheme がある。
 - [x] リポジトリ内に記載された同じ手順で、ローカルの Build と Test が成功する。
 - [x] iPad Simulator で最小アプリの起動を確認できる。
 - [x] GitHub Actions が Build と Simulator 不要の検査を実行し、成功結果を確認できる。Swift Testing / UI Test はローカルで実行する（2026-10-04 に人間が方針変更）。
 - [x] 採用した設定、実行手順、参照した Apple 公式資料、学習内容を文書化する。
-- [ ] 新規のコンパイラ警告を残さず、Phase 0 に該当する Definition of Done を確認する。
+- [x] 新規のコンパイラ警告を残さず、Phase 0 に該当する Definition of Done を確認する。
 
 ## 対象外
 
@@ -97,6 +97,6 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 
 - 最新の `origin/develop` を起点とする専用 worktree で Xcode 27.0 (27A266a) の `scripts/build.sh` を実行し、exit 0、`BUILD SUCCEEDED` を確認した。`SIMULATOR_UDID=33CA3AC8-9A60-42F4-A25A-14DBF86375DA scripts/test.sh` は exit 0、Swift Testing と XCTest UI Test が各 1 件成功した。
 - iPad Pro (11-inch) (4th generation) と iPad mini (6th generation) の iPadOS 17.2 Simulator にアプリをインストールして起動し、全画面の異なる幅でタイトルを画像確認した。iPad Pro では Dark Mode と最大のアクセシビリティ文字サイズでもタイトルが表示され、見切れないことを確認した。
-- 同一ウインドウのリサイズ操作と VoiceOver の実際の読み上げは未実施。異なる iPad の全画面と UI Test の要素存在だけでは、その 2 項目を確認済みとはみなさない。
+- AI による確認時点では、同一ウインドウのリサイズ操作と VoiceOver の実際の読み上げは未実施だった。2026-10-04 に人間が作業 worktree の Xcode Project のオープン、可変ウインドウ幅、VoiceOver の読み上げを確認し、3 項目すべて確認できたと報告した。
 - Apple 公式資料と学習内容は `docs/learning/phase-0.md` に、再現手順は `README.md` に記録した。現行 Workflow は Task 4 後の承認済み変更で Pull Request 起動のみになった。Task 4 当時の push / Pull Request run は履歴である。Task 5 の [Pull Request run](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37187058386) は Build / Test とも成功した。
-- **Definition of Done:** Build、既存の 2 件の Test、最小アプリ起動、Dark Mode、Dynamic Type、異なる iPad の全画面、文書更新、Pull Request CI は確認済み。Xcode UI で作業 worktree の Project を開く操作、可変ウインドウ幅と VoiceOver の実操作が残るため、Phase 0 全体は未完了とする。既出の App Intents メタデータ抽出警告は残る。
+- **Definition of Done:** Build、既存の 2 件の Test、最小アプリ起動、Dark Mode、Dynamic Type、異なる iPad の全画面、文書更新、Pull Request CI は AI の実測で確認済み。Xcode UI での Project オープン、可変ウインドウ幅、VoiceOver の読み上げは人間の確認報告により達成した。新規の Swift コンパイラ警告は確認されていない。既出の App Intents メタデータ抽出警告は残る。Phase 0 に該当する Definition of Done を満たした。

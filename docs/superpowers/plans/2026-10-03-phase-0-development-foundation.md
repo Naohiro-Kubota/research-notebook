@@ -120,9 +120,11 @@ Task 4 は 2026-10-04 にローカルの Xcode 27.0 (27A266a) で Build と iPad
 
 - [x] **Step 1: 学習ログを記入する。** `docs/learning/phase-log-template.md` の項目に沿い、Project / Target / Scheme / Simulator / Swift Package Manager / Swift Testing / XCTest の学習事項、参照 URL と確認日、人間が決めた事項、次 Phase の課題を書く。
 - [x] **Step 2: README と要求文書を更新する。** Xcode 版、Simulator の選び方、Build / Test コマンド、CI run の URL、Acceptance Criteria の確認結果を記載する。結果のない項目にチェックを付けない。
-- [ ] **Step 3: 最小画面を目視確認する。** iPad Simulator で可変ウインドウ幅、Dark Mode、Dynamic Type、VoiceOver の読み上げ、色だけに依存しない表示を確認し、結果を学習ログに記す。UI が単一の静的 Text であるため、対象外の Keyboard 操作とエラー UI は理由を記す。
+- [x] **Step 3: 最小画面を目視確認する。** iPad Simulator で可変ウインドウ幅、Dark Mode、Dynamic Type、VoiceOver の読み上げ、色だけに依存しない表示を確認し、結果を学習ログに記す。UI が単一の静的 Text であるため、対象外の Keyboard 操作とエラー UI は理由を記す。
 - [x] **Step 4: 最終検証する。** `scripts/build.sh`、`SIMULATOR_UDID=<実在するiPadのUDID> scripts/test.sh`、CI の成功ログ、`git diff --check`、新規警告の有無を確認する。Definition of Done に未達項目があれば完了と報告せず、理由と残課題を記録する。
-- [ ] **Step 5: 文書をコミットする。** メッセージ例: `docs: record Phase 0 validation and learning`。
+- [x] **Step 5: 文書をコミットする。** メッセージ例: `docs: record Phase 0 validation and learning`。
+
+Task 5 は 2026-10-04 に完了した。AI は Xcode 27.0 (27A266a) で Build、iPadOS 17.2 Simulator で Swift Testing と XCTest UI Test 各 1 件、iPad Pro と iPad mini の全画面、Dark Mode、最大 Dynamic Type を確認した。GitHub Actions の [Pull Request run](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37187392678) も成功した。作業 worktree の Xcode Project オープン、同一ウインドウの幅変更、VoiceOver 読み上げは人間が確認し、3 項目すべて達成したと報告した。学習ログと要求文書を更新し、Phase 0 の Acceptance Criteria と該当する Definition of Done を満たした。
 
 ## 計画時点の環境リスク
 

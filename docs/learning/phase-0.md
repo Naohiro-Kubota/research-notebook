@@ -30,10 +30,10 @@
 
 ## 画面・アクセシビリティ確認
 
-- iPad Pro (11-inch) (4th generation) と iPad mini (6th generation)、いずれも iPadOS 17.2 の全画面でタイトルが中央に表示され、見切れないことをスクリーンショットで確認した。異なる画面幅は確認したが、同一ウインドウのリサイズ操作は未実施。
+- iPad Pro (11-inch) (4th generation) と iPad mini (6th generation)、いずれも iPadOS 17.2 の全画面でタイトルが中央に表示され、見切れないことをスクリーンショットで確認した。同一ウインドウの幅変更は 2026-10-04 に人間が確認した。
 - iPad Pro で Dark Mode と `accessibility-extra-extra-extra-large` の文字サイズを設定し、白文字と黒背景、タイトルの拡大と非欠けを画像で確認した。
 - `Text("ResearchNotebook")` は色以外の文字そのもので内容を伝える。タップ対象や操作可能な要素はない。Keyboard 操作とエラー UI は Phase 0 の最小静的画面では対象外。
-- XCTest UI Test は `app-title` の存在を確認した。VoiceOver を有効にして実際の読み上げを聞く検証は未実施。意味が正しく読み上げられることは未確認。
+- XCTest UI Test は `app-title` の存在を確認した。VoiceOver の実際の読み上げは 2026-10-04 に人間が確認した。作業 worktree の Xcode Project を開けることも、同日に人間が確認した。
 
 ## AI の提案で理解しづらかったこと
 
@@ -53,5 +53,4 @@
 
 ## 次 Phase で確認したいこと
 
-- Phase 0 の残課題として、同一 iPad ウインドウの幅変更と VoiceOver の実際の読み上げを確認する。
 - Project / Note の具体的な要求とデータモデルは次 Phase の人間による決定を待つ。
