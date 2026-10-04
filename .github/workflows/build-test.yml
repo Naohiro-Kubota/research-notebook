@@ -46,7 +46,7 @@ jobs:
       - name: Boot selected iPad Simulator
         run: |
           xcrun simctl bootstatus "$SIMULATOR_UDID" -b
-          xcrun simctl list devices available | grep "$SIMULATOR_UDID"
+          echo "Simulator boot complete: $SIMULATOR_UDID"
 
       - name: Test
         run: scripts/test.sh

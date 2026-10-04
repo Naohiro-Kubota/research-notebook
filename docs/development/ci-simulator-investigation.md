@@ -19,3 +19,9 @@
 4. 同じ Pull Request の古い run を `concurrency` で取り消し、連続 push 時の実行時間の浪費を減らす。個々の run の速度には影響しない。
 
 各変更は別コミット・別 CI run で確認し、後続の結果を追記する。
+
+## 第1段階の結果
+
+[run 37190856538](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37190856538) は Build / Test とも成功し、ジョブ全体は4分34秒だった。選択時の iPad Pro 13-inch (M5)／iPadOS 27.0 は `Shutdown`。`bootstatus -b` は起動完了まで約52秒だった。Test ステップは1分55秒で、UI Test は約9秒で成功した。
+
+ただし、起動完了後に状態を再表示するための `simctl list devices available` が約51秒かかった。この確認コマンドはテストの成否に不要なので除去し、同じ起動待ち条件で再測定する。1回の成功だけで起動失敗の再発防止は判断しない。
