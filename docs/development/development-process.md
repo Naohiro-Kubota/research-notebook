@@ -40,6 +40,8 @@ Xcode の Build / Test では、作業中の Worktree 内の `DerivedData/` を 
 
 作業完了時は作業ブランチをpushし、GitHubの`develop`ブランチをbaseとするPull Requestを作成する。PRのタイトルと本文は日本語で記述する。
 
+GitHub Actions の Build / Test は Pull Request の作成・更新時に実行する。ブランチへの push だけでは実行しない。
+
 このプロジェクトでは `.codex/rules/github.rules` により、`gh pr` と `gh api` のサンドボックス外実行を承認なしで許可する。PR の編集や任意の GitHub API 操作もこの許可に含まれる。
 
 `.codex/rules/xcode-testing.rules` により、`xcodebuild` と `xcrun xcresulttool` から始まるコマンドのサンドボックス外実行を承認なしで許可する。両方の許可は後続の引数やサブコマンド全体に適用される。2026-10-04 に [OpenAI 公式 Rules 資料](https://learn.chatgpt.com/docs/agent-configuration/rules)で構文と適用条件を確認した。プロジェクトの `.codex/` 設定が信頼されている場合にルールが読み込まれ、追加後は Codex の再起動が必要。
