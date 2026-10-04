@@ -85,7 +85,80 @@ final class ResearchNotebookUITests: XCTestCase {
   }
 
   @MainActor
+  func testNoteCreationAndLiveEditing() {
+    let app = XCUIApplication()
+    app.launch()
+    createProject("Research", in: app)
+    XCTAssertTrue(app.staticTexts["note-empty"].waitForExistence(timeout: 5))
+    app.buttons["note-add"].tap()
+    let title = app.textFields["note-title-input"]
+    XCTAssertTrue(title.waitForExistence(timeout: 5))
+    title.tap()
+    title.typeText("   ")
+    XCTAssertFalse(app.buttons["note-create"].isEnabled)
+    replaceText(title, with: "First note")
+    app.buttons["note-create"].tap()
+    XCTAssertTrue(noteRows(app).firstMatch.waitForExistence(timeout: 5))
+    XCTAssertEqual(noteRows(app).firstMatch.label, "First note")
+    let editorTitle = app.textFields["note-title-input"]
+    XCTAssertTrue(editorTitle.waitForExistence(timeout: 5))
+    replaceText(editorTitle, with: "Updated note")
+    let body = app.textViews["note-body-input"]
+    body.tap()
+    // Wait for the Simulator to idle between keyboard events.
+    for character in "Note body" { body.typeText(String(character)) }
+    XCTAssertEqual(body.value as? String, "Note body")
+    XCTAssertEqual(noteRows(app).firstMatch.label, "Updated note")
+    editorTitle.tap()
+    editorTitle.press(forDuration: 1.2)
+    let selectAll = app.menuItems["Select All"]
+    XCTAssertTrue(selectAll.waitForExistence(timeout: 3))
+    selectAll.tap()
+    editorTitle.typeText("   ")
+    XCTAssertTrue(app.staticTexts["title-validation-error"].exists)
+    XCTAssertEqual(noteRows(app).firstMatch.label, "Updated note")
+    body.tap()
+    XCTAssertEqual(editorTitle.value as? String, "Updated note")
+    XCTAssertFalse(app.buttons["note-delete"].exists)
+    XCTAssertFalse(app.buttons["Noteを削除"].exists)
+    noteRows(app).firstMatch.tap()
+    XCTAssertEqual(body.value as? String, "Note body")
+  }
+
+  @MainActor
+  func testSwitchingProjectsClearsNoteDetail() {
+    let app = XCUIApplication()
+    app.launch()
+    createProject("First project", in: app)
+    app.buttons["note-add"].tap()
+    let title = app.textFields["note-title-input"]
+    XCTAssertTrue(title.waitForExistence(timeout: 5))
+    title.tap()
+    title.typeText("First note")
+    app.buttons["note-create"].tap()
+    XCTAssertTrue(app.textFields["note-title-input"].waitForExistence(timeout: 5))
+    createProject("Second project", in: app)
+    XCTAssertTrue(app.staticTexts["note-empty"].waitForExistence(timeout: 5))
+    XCTAssertFalse(app.textFields["note-title-input"].exists)
+    XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
+    projectRows(app).element(boundBy: 0).tap()
+    XCTAssertTrue(noteRows(app).firstMatch.waitForExistence(timeout: 5))
+    XCTAssertFalse(app.textFields["note-title-input"].exists)
+    noteRows(app).firstMatch.tap()
+    XCTAssertTrue(app.textFields["note-title-input"].waitForExistence(timeout: 5))
+    XCTAssertEqual(app.textFields["note-title-input"].value as? String, "First note")
+  }
+
+  @MainActor
+  private func noteRows(_ app: XCUIApplication) -> XCUIElementQuery {
+    app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "note-row-"))
+  }
+
+  @MainActor
   private func createProject(_ title: String, in app: XCUIApplication) {
+    if !app.buttons["project-add"].isHittable {
+      app.buttons["ToggleSidebar"].tap()
+    }
     app.buttons["project-add"].tap()
     let field = app.textFields["project-title-input"]
     XCTAssertTrue(field.waitForExistence(timeout: 5))
