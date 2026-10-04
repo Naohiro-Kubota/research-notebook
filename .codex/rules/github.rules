@@ -26,3 +26,19 @@ prefix_rule(
         "gh auth status",
     ],
 )
+
+prefix_rule(
+    pattern = ["gh", "run"],
+    decision = "allow",
+    justification = "Allow GitHub Actions run commands for this project without approval",
+    match = [
+        "gh run list --branch codex/example --limit 4",
+        "gh run watch 123456 --exit-status",
+        "gh run view 123456 --log",
+    ],
+    not_match = [
+        "git run list",
+        "gh pr checks 5",
+        "gh api repos/Naohiro-Kubota/research-notebook/actions/runs",
+    ],
+)
