@@ -4,7 +4,7 @@
 
 ## Lint / Format
 
-Xcode 同梱の `swift format` を使う。`.swift-format` は既存コードに合わせてインデントを 4 スペースに設定し、その他はツールチェーンの既定値を使用する。アプリと Unit / UI Test の Swift ソースが対象で、生成コードは含めない。
+Xcode 同梱の `swift format` を使う。`.swift-format` はインデントを 2 スペースに設定し、その他はツールチェーンの既定値を使用する。アプリと Unit / UI Test の Swift ソースが対象で、生成コードは含めない。
 
 ```sh
 scripts/lint.sh
