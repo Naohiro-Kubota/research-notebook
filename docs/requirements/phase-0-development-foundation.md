@@ -21,7 +21,7 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 - [ ] アプリとテストの Target、およびローカルと CI で共通に使う Scheme がある。
 - [ ] リポジトリ内に記載された同じ手順で、ローカルの Build と Test が成功する。
 - [ ] iPad Simulator で最小アプリの起動を確認できる。
-- [ ] GitHub Actions が同じ Build / Test 手順を実行し、成功結果を確認できる。
+- [x] GitHub Actions が同じ Build / Test 手順を実行し、成功結果を確認できる。
 - [ ] 採用した設定、実行手順、参照した Apple 公式資料、学習内容を文書化する。
 - [ ] 新規のコンパイラ警告を残さず、Phase 0 に該当する Definition of Done を確認する。
 
@@ -85,3 +85,10 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 - Xcode 27.0 (27A266a) で `scripts/build.sh` は exit 0、`BUILD SUCCEEDED`。iPad Pro (11-inch) (4th generation)、iPadOS 17.2（UDID `33CA3AC8-9A60-42F4-A25A-14DBF86375DA`）で `scripts/test.sh` は exit 0、Swift Testing と XCTest UI Test が各 1 件成功した。
 - `SIMULATOR_UDID` 未指定は説明付きで exit 2、無効な UDID は `xcodebuild` の失敗を保持して exit 70 となった。
 - Build の詳細ログには Task 2 で記録済みの App Intents メタデータ抽出警告が出た。今回の Swift コンパイラ警告は確認されなかった。CI の成功、画面の目視確認、学習ログ、Phase 0 全体の Definition of Done は Task 4–5 に残る。
+
+## Task 4 の実測結果（2026-10-04）
+
+- GitHub 公式の [GitHub-hosted runners reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners) と [actions/checkout](https://github.com/actions/checkout) を 2026-10-04 に確認した。**公式資料の事実:** `xcode-27` はプレビューの macOS arm64 ランナーであり、`actions/checkout@v7` は現在の利用例に掲載されている。**プロジェクトへの適用:** Workflow の実行先を `xcode-27` に固定し、checkout v7 と Task 3 の共通スクリプトを使用する。**推測・未確認:** プレビューランナーの可用性と搭載 Simulator は今後変わり得るため、実行のたびに iPad を検出する。
+- ローカルの Xcode 27.0 (27A266a) で `scripts/build.sh` は exit 0、`BUILD SUCCEEDED`。`SIMULATOR_UDID=33CA3AC8-9A60-42F4-A25A-14DBF86375DA scripts/test.sh` は iPad Pro (11-inch) (4th generation)、iPadOS 17.2 で Swift Testing と XCTest UI Test が各 1 件成功した。最初のサンドボックス内 Test は CoreSimulatorService に接続できず exit 70 だったため、Simulator を利用できる実行環境で再実行した。
+- GitHub Actions は `xcode-27` 上で Xcode 27.0 (27A266a) と、iPad Pro 13-inch (M5)／iPadOS 27.0（UDID `FC8E648C-B800-4FBC-9401-E362589CA9FF`）を使用した。最終版の [push run](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37176662702) と [pull request run](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37176664742) は Build / Test が成功した。最初の実行で checkout v4 の Node.js 20 非推奨警告を確認し、checkout v7 に更新した。最終版のログではその警告はなく、Swift コンパイラの新規警告も確認されなかった。Task 2 から記録済みの App Intents メタデータ抽出警告は引き続き出る。
+- Task 4 の Definition of Done は、Build・Test・CI 成功、関連文書更新、対象範囲の警告確認を満たした。画面の目視確認、学習ログ、Phase 0 全体の Definition of Done は Task 5 に残る。

@@ -98,10 +98,12 @@ Task 3 は 2026-10-04 に Xcode 27.0 (27A266a) で検証した。`scripts/build.
 - Consumes: Task 3 の `scripts/build.sh` と `scripts/test.sh`。
 - Produces: push と pull request で Build / Test を実行する GitHub Actions Workflow。
 
-- [ ] **Step 1: Workflow を作る。** `runs-on: xcode-27`、`actions/checkout`、`xcodebuild -version`、`scripts/build.sh`、iPad Simulator の検出と `scripts/test.sh` の実行を含める。`xcrun simctl list devices available -j` の結果から利用可能な iPad を 1 台選び、その UDID を明示的に `SIMULATOR_UDID` に渡す。実行先がなければ失敗させる。外部 Package の取得や署名・配布手順は加えない。
-- [ ] **Step 2: Workflow をレビューする。** アプリ Project と共有 Scheme、2 つのテスト Target、ローカルと同じスクリプト、Xcode 27 の実行ログが確認できることを静的に確認する。
-- [ ] **Step 3: 変更をコミットし、GitHub 上で push または pull request の Workflow を実行する。** Build / Test が成功した実際の run URL を記録する。プレビュー扱いの `xcode-27` ランナーで環境起因の失敗が出た場合は、ログと代替案を提示し、成功前に Phase 0 を完了としない。
-- [ ] **Step 4: 実測した Xcode 版、Simulator、成功した Workflow run を要求文書へ記録する。** メッセージ例: `ci: verify iPad app build and tests`。
+- [x] **Step 1: Workflow を作る。** `runs-on: xcode-27`、`actions/checkout`、`xcodebuild -version`、`scripts/build.sh`、iPad Simulator の検出と `scripts/test.sh` の実行を含める。`xcrun simctl list devices available -j` の結果から利用可能な iPad を 1 台選び、その UDID を明示的に `SIMULATOR_UDID` に渡す。実行先がなければ失敗させる。外部 Package の取得や署名・配布手順は加えない。
+- [x] **Step 2: Workflow をレビューする。** アプリ Project と共有 Scheme、2 つのテスト Target、ローカルと同じスクリプト、Xcode 27 の実行ログが確認できることを静的に確認する。
+- [x] **Step 3: 変更をコミットし、GitHub 上で push または pull request の Workflow を実行する。** Build / Test が成功した実際の run URL を記録する。プレビュー扱いの `xcode-27` ランナーで環境起因の失敗が出た場合は、ログと代替案を提示し、成功前に Phase 0 を完了としない。
+- [x] **Step 4: 実測した Xcode 版、Simulator、成功した Workflow run を要求文書へ記録する。** メッセージ例: `ci: verify iPad app build and tests`。
+
+Task 4 は 2026-10-04 にローカルの Xcode 27.0 (27A266a) で Build と iPadOS 17.2 Simulator 上の 2 件の Test が成功した。GitHub Actions は Xcode 27.0 (27A266a)、iPad Pro 13-inch (M5)／iPadOS 27.0 で [push run](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37176662702) と [pull request run](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37176664742) の両方が成功した。checkout v4 の非推奨警告を解消するため v7 に更新した。既出の App Intents メタデータ抽出警告は残る。Phase 0 全体の Definition of Done は Task 5 が残るため未達。
 
 ### Task 5: 学習ログと Definition of Done
 
