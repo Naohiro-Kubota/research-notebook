@@ -61,11 +61,13 @@ Task 1 は 2026-10-03 にコミット `0e0e613` として記録され、`develop
 - Consumes: Task 1 の `ResearchNotebook` アプリ Target、`app-title` 識別子。
 - Produces: Swift Testing 用 `ResearchNotebookTests` と XCTest UI 用 `ResearchNotebookUITests`、両方を実行する Scheme。
 
-- [ ] **Step 1: テスト Target を作成する。** Xcode の Unit Testing Bundle と UI Testing Bundle を追加する。Unit Test の Host Application は `ResearchNotebook` に設定する。Unit Test は `import Testing`、UI Test は `import XCTest` を使用し、両 Target を `ResearchNotebook` Scheme の Test アクションに含める。
-- [ ] **Step 2: Swift Testing の設定テストを書く。** `@Test func appUsesApprovedBundleIdentifier()` で、ホストアプリの `Bundle.main.bundleIdentifier` が `com.tabfav` に等しいことを `#expect` で検証する。
-- [ ] **Step 3: XCTest UI の起動テストを書く。** `func testLaunchShowsAppTitle()` でアプリを起動し、`app.staticTexts["app-title"].exists` を検証する。
-- [ ] **Step 4: iPad Simulator で両テストを実行する。** `xcrun simctl list devices available` で実行先を確認し、選んだ iPad の UDID を `SIMULATOR_UDID` に設定して `xcodebuild -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" CODE_SIGNING_ALLOWED=NO test` を実行する。期待結果は両テスト成功、新規警告なし。
-- [ ] **Step 5: この作業単位をコミットする。** メッセージ例: `test: establish Swift and UI test targets`。
+- [x] **Step 1: テスト Target を作成する。** Xcode の Unit Testing Bundle と UI Testing Bundle を追加する。Unit Test の Host Application は `ResearchNotebook` に設定する。Unit Test は `import Testing`、UI Test は `import XCTest` を使用し、両 Target を `ResearchNotebook` Scheme の Test アクションに含める。
+- [x] **Step 2: Swift Testing の設定テストを書く。** `@Test func appUsesApprovedBundleIdentifier()` で、ホストアプリの `Bundle.main.bundleIdentifier` が `com.tabfav` に等しいことを `#expect` で検証する。
+- [x] **Step 3: XCTest UI の起動テストを書く。** `func testLaunchShowsAppTitle()` でアプリを起動し、`app.staticTexts["app-title"].exists` を検証する。
+- [x] **Step 4: iPad Simulator で両テストを実行する。** `xcrun simctl list devices available` で実行先を確認し、選んだ iPad の UDID を `SIMULATOR_UDID` に設定して `xcodebuild -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" CODE_SIGNING_ALLOWED=NO test` を実行する。期待結果は両テスト成功、新規警告なし。
+- [x] **Step 5: この作業単位をコミットする。** メッセージ例: `test: establish Swift and UI test targets`。
+
+Task 2 は 2026-10-04 に iPad Pro (11-inch) (4th generation)、iPadOS 17.2（UDID `33CA3AC8-9A60-42F4-A25A-14DBF86375DA`）で検証した。`xcodebuild test` で Swift Testing と XCTest UI Test が各 1 件成功した。Build と Test の生成物は Worktree 内の `DerivedData/` に保存した。Xcode UI を介さず Project 設定へ 2 つのテスト Target を追加した。生成物の Info.plist でアプリの Bundle Identifier `com.tabfav`、MinimumOSVersion `17.0`、UIDeviceFamily `[2]` を確認した。初回の詳細ログで Xcode の App Intents メタデータ抽出が「依存なしのためスキップ」と警告した。新しい DerivedData に対する `xcodebuild -quiet ... test` は exit 0、xcresult は 2 件成功・失敗 0 件・runtimeWarnings 0 件で、Swift コンパイラ警告は確認されなかった。Phase 0 全体の Definition of Done は Task 3–5 が残るため未達。
 
 ### Task 3: Codex と CI に共通の Build / Test コマンド
 

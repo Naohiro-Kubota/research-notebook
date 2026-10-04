@@ -8,12 +8,24 @@
 
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* ResearchNotebook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ResearchNotebook.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000121 /* ResearchNotebookTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ResearchNotebookTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000122 /* ResearchNotebookUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ResearchNotebookUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		000000000000000000000010 /* ResearchNotebook */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ResearchNotebook;
+			sourceTree = "<group>";
+		};
+		000000000000000000000011 /* ResearchNotebookTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ResearchNotebookTests;
+			sourceTree = "<group>";
+		};
+		000000000000000000000012 /* ResearchNotebookUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ResearchNotebookUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -24,6 +36,8 @@
 			files = (
 			);
 		};
+		000000000000000130000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; files = (); };
+		000000000000000130000002 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; files = (); };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -31,6 +45,8 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000010 /* ResearchNotebook */,
+				000000000000000000000011 /* ResearchNotebookTests */,
+				000000000000000000000012 /* ResearchNotebookUITests */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -39,6 +55,8 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000120 /* ResearchNotebook.app */,
+				000000000000000000000121 /* ResearchNotebookTests.xctest */,
+				000000000000000000000122 /* ResearchNotebookUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -64,7 +82,49 @@
 			productReference = 000000000000000000000120 /* ResearchNotebook.app */;
 			productType = "com.apple.product-type.application";
 		};
+		000000000000000100000001 /* ResearchNotebookTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000110000001 /* Build configuration list for PBXNativeTarget "ResearchNotebookTests" */;
+			buildPhases = (
+				000000000000000120000001 /* Sources */,
+				000000000000000130000001 /* Frameworks */,
+				000000000000000140000001 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = (000000000000000150000001 /* PBXTargetDependency */);
+			fileSystemSynchronizedGroups = (000000000000000000000011 /* ResearchNotebookTests */);
+			name = ResearchNotebookTests;
+			productName = ResearchNotebookTests;
+			productReference = 000000000000000000000121 /* ResearchNotebookTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		000000000000000100000002 /* ResearchNotebookUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000110000002 /* Build configuration list for PBXNativeTarget "ResearchNotebookUITests" */;
+			buildPhases = (
+				000000000000000120000002 /* Sources */,
+				000000000000000130000002 /* Frameworks */,
+				000000000000000140000002 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = (000000000000000150000002 /* PBXTargetDependency */);
+			fileSystemSynchronizedGroups = (000000000000000000000012 /* ResearchNotebookUITests */);
+			name = ResearchNotebookUITests;
+			productName = ResearchNotebookUITests;
+			productReference = 000000000000000000000122 /* ResearchNotebookUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
+
+/* Begin PBXContainerItemProxy section */
+		000000000000000160000001 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = 000000000000000000000000 /* Project object */; proxyType = 1; remoteGlobalIDString = 000000000000000100000000; remoteInfo = ResearchNotebook; };
+		000000000000000160000002 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = 000000000000000000000000 /* Project object */; proxyType = 1; remoteGlobalIDString = 000000000000000100000000; remoteInfo = ResearchNotebook; };
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		000000000000000150000001 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = 000000000000000100000000 /* ResearchNotebook */; targetProxy = 000000000000000160000001 /* PBXContainerItemProxy */; };
+		000000000000000150000002 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = 000000000000000100000000 /* ResearchNotebook */; targetProxy = 000000000000000160000002 /* PBXContainerItemProxy */; };
+/* End PBXTargetDependency section */
 
 /* Begin PBXProject section */
 		000000000000000000000000 /* Project object */ = {
@@ -77,6 +137,8 @@
 					000000000000000100000000 = {
 						CreatedOnToolsVersion = 26.3;
 					};
+					000000000000000100000001 = {CreatedOnToolsVersion = 27.0; TestTargetID = 000000000000000100000000; };
+					000000000000000100000002 = {CreatedOnToolsVersion = 27.0; TestTargetID = 000000000000000100000000; };
 				};
 			};
 			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "Project" */;
@@ -94,6 +156,8 @@
 			projectRoot = "";
 			targets = (
 				000000000000000100000000 /* ResearchNotebook */,
+				000000000000000100000001 /* ResearchNotebookTests */,
+				000000000000000100000002 /* ResearchNotebookUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -104,6 +168,8 @@
 			files = (
 			);
 		};
+		000000000000000140000001 /* Resources */ = {isa = PBXResourcesBuildPhase; files = (); };
+		000000000000000140000002 /* Resources */ = {isa = PBXResourcesBuildPhase; files = (); };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -112,6 +178,8 @@
 			files = (
 			);
 		};
+		000000000000000120000001 /* Sources */ = {isa = PBXSourcesBuildPhase; files = (); };
+		000000000000000120000002 /* Sources */ = {isa = PBXSourcesBuildPhase; files = (); };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
@@ -311,6 +379,72 @@
 			};
 			name = Release;
 		};
+		000000000000000111000001 /* Debug configuration for ResearchNotebookTests */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tabfav.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ResearchNotebook.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ResearchNotebook";
+			};
+			name = Debug;
+		};
+		000000000000000112000001 /* Release configuration for ResearchNotebookTests */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tabfav.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ResearchNotebook.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ResearchNotebook";
+			};
+			name = Release;
+		};
+		000000000000000111000002 /* Debug configuration for ResearchNotebookUITests */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tabfav.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+				TEST_TARGET_NAME = ResearchNotebook;
+			};
+			name = Debug;
+		};
+		000000000000000112000002 /* Release configuration for ResearchNotebookUITests */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tabfav.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+				TEST_TARGET_NAME = ResearchNotebook;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -328,6 +462,16 @@
 				000000000000000111000000 /* Debug configuration for PBXNativeTarget "ResearchNotebook" */,
 				000000000000000112000000 /* Release configuration for PBXNativeTarget "ResearchNotebook" */,
 			);
+			defaultConfigurationName = Release;
+		};
+		000000000000000110000001 /* Build configuration list for ResearchNotebookTests */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (000000000000000111000001 /* Debug */, 000000000000000112000001 /* Release */);
+			defaultConfigurationName = Release;
+		};
+		000000000000000110000002 /* Build configuration list for ResearchNotebookUITests */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (000000000000000111000002 /* Debug */, 000000000000000112000002 /* Release */);
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */

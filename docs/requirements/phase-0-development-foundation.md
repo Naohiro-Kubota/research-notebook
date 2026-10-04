@@ -69,3 +69,12 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 - `xcodebuild test` は `Scheme ResearchNotebook is not currently configured for the test action` で終了した。テスト Target は計画の Task 2 で追加する。
 - CoreSimulatorService に接続できないため、iPad Simulator での起動と画面確認は未実施。Phase 0 の Acceptance Criteria と Definition of Done は未達のままとする。
 - 当初、Git の実データが書き込み許可のない別ディレクトリにあり、`git add` は `index.lock: Operation not permitted` で失敗した。その後、Task 1 の成果物は作業ブランチ `codex/phase-0-task-1` のコミット `0e0e613` として記録され、`develop` にコミット `cebe9e6` として反映された。Task 2 以降と Phase 0 の Acceptance Criteria は引き続き未完了。
+
+## Task 2 の実測結果（2026-10-04）
+
+- Apple 公式の [Adding tests to your Xcode project](https://developer.apple.com/documentation/xcode/adding-tests-to-your-xcode-project) と [Testing](https://developer.apple.com/documentation/xcode/testing) を 2026-10-04 に再確認した。**公式資料の事実:** Swift Testing は Unit / Integration Test に利用でき、XCTest は UI Test をサポートする。**プロジェクトへの適用:** 承認済み ADR-0002 に従い両者を別 Target に配置した。**推測・未確認:** Xcode の App Intents メタデータ警告がすべての環境で同じように出るかは未確認。
+- 承認済みの ADR-0002 に沿い、Swift Testing 用 Unit Test Target と XCTest 用 UI Test Target を追加し、共有 Scheme の Test アクションに含めた。Unit Test の Host Application は `ResearchNotebook`。
+- Xcode 27.0 (27A266a) の `xcodebuild -list` でアプリと 2 つのテスト Target、共有 Scheme を確認した。独立した Debug Build は exit 0。Swift コンパイラ警告は確認されなかった。
+- iPad Pro (11-inch) (4th generation)、iPadOS 17.2（UDID `33CA3AC8-9A60-42F4-A25A-14DBF86375DA`）で Swift Testing の Bundle Identifier テストと XCTest の UI 起動テストが各 1 件成功した。生成アプリの Info.plist は `com.tabfav`、MinimumOSVersion `17.0`、UIDeviceFamily `[2]`。
+- 初回の詳細ログでは、Xcode の App Intents メタデータ抽出が「AppIntents.framework への依存がないためスキップ」と警告した。新しい DerivedData に対する `xcodebuild -quiet ... test` は exit 0 で診断を出さず、xcresult は 2 件成功・失敗 0 件・runtimeWarnings 0 件だった。Swift コンパイラ警告は確認されなかった。
+- 今回確認した UI は起動時に `app-title` の静的 Text が存在すること。可変ウインドウ幅、Dark Mode、Dynamic Type、VoiceOver の目視確認と CI 成功は未実施。これらと共通 Build / Test コマンドは Task 3–5 に残るため、Phase 0 の Acceptance Criteria および Definition of Done は未達。
