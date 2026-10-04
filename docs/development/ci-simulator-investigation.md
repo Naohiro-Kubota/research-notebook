@@ -25,3 +25,5 @@
 [run 37190856538](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37190856538) は Build / Test とも成功し、ジョブ全体は4分34秒だった。選択時の iPad Pro 13-inch (M5)／iPadOS 27.0 は `Shutdown`。`bootstatus -b` は起動完了まで約52秒だった。Test ステップは1分55秒で、UI Test は約9秒で成功した。
 
 ただし、起動完了後に状態を再表示するための `simctl list devices available` が約51秒かかった。この確認コマンドはテストの成否に不要なので除去し、同じ起動待ち条件で再測定する。1回の成功だけで起動失敗の再発防止は判断しない。
+
+[再測定 run 37191182824](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37191182824) も Build / Test は成功したが、ジョブ全体は8分48秒、起動待ちは1分09秒、Test は6分08秒だった。1回目より大幅に遅く、起動待ちだけで安定した時間短縮が得られたとはいえない。次は既存の共通 `scripts/test.sh` に `-parallel-testing-enabled NO` のみ追加して比較する。
