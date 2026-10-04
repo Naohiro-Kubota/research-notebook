@@ -43,6 +43,10 @@ Project ごとに Note を整理し、iPad 上で一覧から編集へ進める�
 - タグ、検索、外部 Web API、添付ファイル、複数ウインドウ
 - Phase 5 で扱う Inspector などの追加レイアウト
 
+## Swift 6 言語モードの確認
+
+2026-10-04、Xcode 27.0 / Apple Swift 6.4 で、アプリ・Unit Test・UI Test の Debug / Release を `SWIFT_VERSION = 6.0` に設定した。iPadOS 17.2 Simulator で既存 Unit Test 1 件と UI Test 1 件が成功し、Build と Lint も成功した。生成アプリの MinimumOSVersion `17.0`、Bundle Identifier `com.tabfav`、iPad 専用設定を `scripts/test-ci.py` の 3 件で確認した。UI Test の UI 操作メソッドは `@MainActor` に明示した。Swift コンパイラ警告はなく、Phase 0 で記録済みの App Intents メタデータ抽出スキップ警告のみが残る。
+
 ## 関連資料
 
 - [プロダクト要求](product-requirements.md)
