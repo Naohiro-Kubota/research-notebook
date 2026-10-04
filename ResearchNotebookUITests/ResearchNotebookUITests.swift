@@ -1,6 +1,38 @@
+import UIKit
 import XCTest
 
 final class ResearchNotebookUITests: XCTestCase {
+  @MainActor
+  func testBodyPasteSurvivesProjectSwitch() {
+    let app = XCUIApplication()
+    app.launch()
+    createProject("Keyboard research", in: app)
+    app.buttons["note-add"].tap()
+    let title = app.textFields["note-title-input"]
+    XCTAssertTrue(title.waitForExistence(timeout: 5))
+    title.tap()
+    title.typeText("Keyboard note")
+    app.buttons["note-create"].tap()
+    let body = app.textViews["note-body-input"]
+    XCTAssertTrue(body.waitForExistence(timeout: 5))
+    body.tap()
+    let text = "Continuous input keeps every character.\nSecond paragraph."
+    UIPasteboard.general.string = text
+    body.press(forDuration: 1.2)
+    let paste = app.menuItems["Paste"]
+    XCTAssertTrue(paste.waitForExistence(timeout: 5))
+    paste.tap()
+    XCTAssertEqual(body.value as? String, text)
+    let screenshot = XCTAttachment(screenshot: app.screenshot())
+    screenshot.name = "Note editor after multiline paste"
+    screenshot.lifetime = .keepAlways
+    add(screenshot)
+    createProject("Other research", in: app)
+    projectRows(app).element(boundBy: 0).tap()
+    noteRows(app).firstMatch.tap()
+    XCTAssertEqual(app.textViews["note-body-input"].value as? String, text)
+  }
+
   @MainActor
   func testContinuousBodyInputAndRelaunchClearsData() {
     let app = XCUIApplication()
