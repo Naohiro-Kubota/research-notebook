@@ -19,7 +19,7 @@ Phase 0 でテスト基盤を作り、後続 Phase の Unit / Integration / UI T
 ## Decision Drivers
 
 - Apple 公式の現在のテスト手段を学習できること。
-- ローカルと CI で同じテストを再現できること。
+- ローカルで Unit / UI Test を再現でき、CI で Simulator を使わずに継続検査できること（2026-10-04 の改訂）。
 - 後続 Phase で重要な振る舞いを検証し、テスト方式による不要な複雑さを増やさないこと。
 
 ## Options
@@ -53,8 +53,11 @@ Option A。Unit / Integration Test は Swift Testing、UI Test は XCTest を使
 
 2026-10-03、Option A と本 ADR を承認。
 
+2026-10-04、CI の Simulator 実行時間と成否が不安定な実測を受け、人間が実行環境の分担を変更した。Swift Testing / XCTest の採用は維持し、Simulator が必要なテストはローカルで実行する。GitHub Actions は Simulator を起動せず、Build と生成アプリの設定検査を実行する。将来 Simulator を必要としないテストが増えた場合は CI に追加できる。
+
 ## Consequences
 
 - Xcode Project に必要なテスト Target を設け、Scheme の Test アクションに含める。
-- ローカルと GitHub Actions で共通の手順を使い、実際の成功を確認する。
-- UI Test は Simulator が必要なため、実行環境が利用できない場合は Phase 0 を完了と報告しない。
+- ローカルで `scripts/test.sh` により Swift Testing と XCTest UI Test を実行する。
+- GitHub Actions では `scripts/build.sh` と `scripts/test-ci.py` を実行する。CI の成功は Swift Testing / UI Test の成功を意味しない。
+- ローカルで Simulator が利用できず、必要なテストを実行できない場合は Phase 0 を完了と報告しない。

@@ -48,3 +48,11 @@ Workflow の `concurrency` は Workflow 名と PR の ref をグループキー�
 - [Apple: Organizing tests to improve feedback](https://developer.apple.com/documentation/xcode/organizing-tests-to-improve-feedback): テスト診断収集の設定を確認。今回の適用案は失敗時の診断収集を省くこと。
 - [GitHub: Control workflow concurrency](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency): 同じグループの進行中 run を `cancel-in-progress` で取り消せる。今回の適用案は Workflow 名と PR ref の組み合わせ。
 - ローカルの `xcrun simctl help bootstatus` と `xcodebuild -help`: `bootstatus -b`、`-parallel-testing-enabled NO`、`-collect-test-diagnostics never` の指定を確認。
+
+## 2026-10-04 の方針変更
+
+最終の [run 37192556031](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37192556031) は成功したが、ジョブ全体は12分58秒、Test は10分24秒だった。起動完了待ちと直列化を加えても時間は安定しなかった。同じ PR への連続 push では、古い [run 37192514663](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37192514663) が Build 中に取り消され、`concurrency` の効果は確認できた。
+
+人間の決定により、CI は Simulator を使用しない。Build と生成アプリの設定検査を CI に残し、Swift Testing と XCTest UI Test はローカルで実行する。Simulator 起動待ち・直列テスト・失敗時の診断収集抑制は CI 対策として採用しない。失敗原因の下位要因は未特定のままであり、CI の成功はローカルの Simulator テスト成功を代替しない。
+
+改訂後のローカル `scripts/build.sh` と `python3 scripts/test-ci.py`（設定検査3件）は成功した。`SIMULATOR_UDID=33CA3AC8-9A60-42F4-A25A-14DBF86375DA scripts/test.sh` でも Swift Testing と XCTest UI Test が各1件成功した。

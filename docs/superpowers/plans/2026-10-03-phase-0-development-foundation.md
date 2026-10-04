@@ -10,6 +10,8 @@
 
 **Spec:** `docs/requirements/phase-0-development-foundation.md`。関連判断は `docs/adr/0001-native-swiftui-data-flow.md` と `docs/adr/0002-testing-strategy.md`。
 
+**2026-10-04 の実行方針改訂:** Task 1–5 の完了記録は当時の実測として保持する。人間の新しい決定により、以降の GitHub Actions は Simulator を必要としない Build と生成アプリ設定検査だけを実行する。Swift Testing / XCTest UI Test はローカルの iPad Simulator で確認する。詳細は ADR-0002 の改訂記録を参照。
+
 ## Global Constraints
 
 - アプリ名は `ResearchNotebook`、Bundle Identifier は正確に `com.tabfav`。

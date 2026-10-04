@@ -21,7 +21,7 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 - [ ] アプリとテストの Target、およびローカルと CI で共通に使う Scheme がある。
 - [ ] リポジトリ内に記載された同じ手順で、ローカルの Build と Test が成功する。
 - [ ] iPad Simulator で最小アプリの起動を確認できる。
-- [x] GitHub Actions が同じ Build / Test 手順を実行し、成功結果を確認できる。
+- [x] GitHub Actions が Build と Simulator 不要の検査を実行し、成功結果を確認できる。Swift Testing / UI Test はローカルで実行する（2026-10-04 に人間が方針変更）。
 - [ ] 採用した設定、実行手順、参照した Apple 公式資料、学習内容を文書化する。
 - [ ] 新規のコンパイラ警告を残さず、Phase 0 に該当する Definition of Done を確認する。
 
@@ -38,7 +38,7 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 - Lint / Format ツールや外部 Package は Phase 0 で導入しない案とする。導入する場合は別途、人間が判断する。
 - `docs/adr/0001-native-swiftui-data-flow.md` の承認済み初期方針に従う。
 - テスト戦略は承認済みの `docs/adr/0002-testing-strategy.md` に従う。
-- GitHub Actions の Xcode 版、iPad Simulator の実行先、コマンドは、利用可能な環境を確認して実装計画で具体化する。
+- GitHub Actions の Xcode 版とコマンドは、利用可能な環境を確認して実装計画で具体化する。CI では Simulator を起動しない（2026-10-04 の方針変更）。
 
 ## 検証観点
 
