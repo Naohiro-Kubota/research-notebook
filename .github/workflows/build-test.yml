@@ -1,0 +1,48 @@
+name: Build and Test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: xcode-27
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Xcode version and project targets
+        run: |
+          xcodebuild -version
+          xcodebuild -list -project ResearchNotebook.xcodeproj
+
+      - name: Build
+        run: scripts/build.sh
+
+      - name: Select an available iPad Simulator
+        shell: bash
+        run: |
+          xcrun simctl list devices available -j > "$RUNNER_TEMP/simulators.json"
+          python3 - "$RUNNER_TEMP/simulators.json" <<'PY'
+          import json
+          import os
+          import sys
+
+          with open(sys.argv[1], encoding="utf-8") as source:
+              runtimes = json.load(source)["devices"]
+
+          for runtime, devices in runtimes.items():
+              for device in devices:
+                  if device.get("isAvailable") and device.get("name", "").startswith("iPad"):
+                      print(f"Selected {device['name']} ({runtime}), UDID {device['udid']}")
+                      with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as output:
+                          print(f"SIMULATOR_UDID={device['udid']}", file=output)
+                      sys.exit(0)
+
+          sys.exit("No available iPad Simulator was found")
+          PY
+
+      - name: Test
+        run: scripts/test.sh
