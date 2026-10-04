@@ -78,3 +78,10 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 - iPad Pro (11-inch) (4th generation)、iPadOS 17.2（UDID `33CA3AC8-9A60-42F4-A25A-14DBF86375DA`）で Swift Testing の Bundle Identifier テストと XCTest の UI 起動テストが各 1 件成功した。生成アプリの Info.plist は `com.tabfav`、MinimumOSVersion `17.0`、UIDeviceFamily `[2]`。
 - 初回の詳細ログでは、Xcode の App Intents メタデータ抽出が「AppIntents.framework への依存がないためスキップ」と警告した。新しい DerivedData に対する `xcodebuild -quiet ... test` は exit 0 で診断を出さず、xcresult は 2 件成功・失敗 0 件・runtimeWarnings 0 件だった。Swift コンパイラ警告は確認されなかった。
 - 今回確認した UI は起動時に `app-title` の静的 Text が存在すること。可変ウインドウ幅、Dark Mode、Dynamic Type、VoiceOver の目視確認と CI 成功は未実施。これらと共通 Build / Test コマンドは Task 3–5 に残るため、Phase 0 の Acceptance Criteria および Definition of Done は未達。
+
+## Task 3 の実測結果（2026-10-04）
+
+- `scripts/build.sh` と `scripts/test.sh` を追加した。両者は共有 Scheme と Worktree 内の `DerivedData/` を使い、Bundle Identifier を上書きしない。実行方法と iPad Simulator の UDID の調べ方は `scripts/README.md` に記載した。
+- Xcode 27.0 (27A266a) で `scripts/build.sh` は exit 0、`BUILD SUCCEEDED`。iPad Pro (11-inch) (4th generation)、iPadOS 17.2（UDID `33CA3AC8-9A60-42F4-A25A-14DBF86375DA`）で `scripts/test.sh` は exit 0、Swift Testing と XCTest UI Test が各 1 件成功した。
+- `SIMULATOR_UDID` 未指定は説明付きで exit 2、無効な UDID は `xcodebuild` の失敗を保持して exit 70 となった。
+- Build の詳細ログには Task 2 で記録済みの App Intents メタデータ抽出警告が出た。今回の Swift コンパイラ警告は確認されなかった。CI の成功、画面の目視確認、学習ログ、Phase 0 全体の Definition of Done は Task 4–5 に残る。
