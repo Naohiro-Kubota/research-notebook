@@ -18,11 +18,11 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 ## Acceptance Criteria
 
 - [ ] iPadOS 17 以降の iPad を対象とする SwiftUI アプリの Xcode Project を開ける。
-- [ ] アプリとテストの Target、およびローカルと CI で共通に使う Scheme がある。
-- [ ] リポジトリ内に記載された同じ手順で、ローカルの Build と Test が成功する。
-- [ ] iPad Simulator で最小アプリの起動を確認できる。
+- [x] アプリとテストの Target、およびローカルと CI で共通に使う Scheme がある。
+- [x] リポジトリ内に記載された同じ手順で、ローカルの Build と Test が成功する。
+- [x] iPad Simulator で最小アプリの起動を確認できる。
 - [x] GitHub Actions が Build と Simulator 不要の検査を実行し、成功結果を確認できる。Swift Testing / UI Test はローカルで実行する（2026-10-04 に人間が方針変更）。
-- [ ] 採用した設定、実行手順、参照した Apple 公式資料、学習内容を文書化する。
+- [x] 採用した設定、実行手順、参照した Apple 公式資料、学習内容を文書化する。
 - [ ] 新規のコンパイラ警告を残さず、Phase 0 に該当する Definition of Done を確認する。
 
 ## 対象外
@@ -92,3 +92,11 @@ ResearchNotebook の後続 Phase を、小さな変更ごとにビルド・テ�
 - ローカルの Xcode 27.0 (27A266a) で `scripts/build.sh` は exit 0、`BUILD SUCCEEDED`。`SIMULATOR_UDID=33CA3AC8-9A60-42F4-A25A-14DBF86375DA scripts/test.sh` は iPad Pro (11-inch) (4th generation)、iPadOS 17.2 で Swift Testing と XCTest UI Test が各 1 件成功した。最初のサンドボックス内 Test は CoreSimulatorService に接続できず exit 70 だったため、Simulator を利用できる実行環境で再実行した。
 - GitHub Actions は `xcode-27` 上で Xcode 27.0 (27A266a) と、iPad Pro 13-inch (M5)／iPadOS 27.0（UDID `FC8E648C-B800-4FBC-9401-E362589CA9FF`）を使用した。最終版の [push run](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37176662702) と [pull request run](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37176664742) は Build / Test が成功した。最初の実行で checkout v4 の Node.js 20 非推奨警告を確認し、checkout v7 に更新した。最終版のログではその警告はなく、Swift コンパイラの新規警告も確認されなかった。Task 2 から記録済みの App Intents メタデータ抽出警告は引き続き出る。
 - Task 4 の Definition of Done は、Build・Test・CI 成功、関連文書更新、対象範囲の警告確認を満たした。画面の目視確認、学習ログ、Phase 0 全体の Definition of Done は Task 5 に残る。
+
+## Task 5 の実測結果（2026-10-04）
+
+- 最新の `origin/develop` を起点とする専用 worktree で Xcode 27.0 (27A266a) の `scripts/build.sh` を実行し、exit 0、`BUILD SUCCEEDED` を確認した。`SIMULATOR_UDID=33CA3AC8-9A60-42F4-A25A-14DBF86375DA scripts/test.sh` は exit 0、Swift Testing と XCTest UI Test が各 1 件成功した。
+- iPad Pro (11-inch) (4th generation) と iPad mini (6th generation) の iPadOS 17.2 Simulator にアプリをインストールして起動し、全画面の異なる幅でタイトルを画像確認した。iPad Pro では Dark Mode と最大のアクセシビリティ文字サイズでもタイトルが表示され、見切れないことを確認した。
+- 同一ウインドウのリサイズ操作と VoiceOver の実際の読み上げは未実施。異なる iPad の全画面と UI Test の要素存在だけでは、その 2 項目を確認済みとはみなさない。
+- Apple 公式資料と学習内容は `docs/learning/phase-0.md` に、再現手順は `README.md` に記録した。現行 Workflow は Task 4 後の承認済み変更で Pull Request 起動のみになった。Task 4 当時の push / Pull Request run は履歴であり、Task 5 の最終版 CI run は Pull Request 作成後に確認する。
+- **Definition of Done:** Build、既存の 2 件の Test、最小アプリ起動、Dark Mode、Dynamic Type、異なる iPad の全画面、文書更新は確認済み。Xcode UI で Project を開く操作、可変ウインドウ幅と VoiceOver の実操作、および最終版 CI の確認が残るため、Phase 0 全体は未完了とする。既出の App Intents メタデータ抽出警告は残る。

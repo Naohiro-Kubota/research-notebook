@@ -62,6 +62,18 @@ AIは重要な意思決定を黙って確定してはいけません。
 4. `docs/learning/roadmap.md` のPhase 0から開始する。
 5. 技術判断が必要になったら `docs/adr/README.md` の手順でADRを作成する。
 
+## Phase 0 の Build / Test
+
+Xcode 27 と iPad Simulator を用意し、リポジトリのルートで実行します。実測環境は Xcode 27.0 (27A266a)、iPadOS 17.2 の iPad Pro (11-inch) (4th generation) です。
+
+```sh
+xcrun simctl list devices available
+scripts/build.sh
+SIMULATOR_UDID='選択したiPadのUDID' scripts/test.sh
+```
+
+両スクリプトは共有 `ResearchNotebook` Scheme と worktree 内の `DerivedData/` を使用します。UDID の選び方と失敗時の動作は [scripts/README.md](scripts/README.md)、CI の実測結果は [Phase 0 要求](docs/requirements/phase-0-development-foundation.md)、学習事項は [Phase 0 学習ログ](docs/learning/phase-0.md)を参照してください。現行 CI は Pull Request で起動します。
+
 ## ディレクトリ
 
 ```text
