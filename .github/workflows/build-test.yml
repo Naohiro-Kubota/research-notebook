@@ -24,5 +24,8 @@ jobs:
       - name: Build
         run: scripts/build.sh
 
+      - name: Lint and check formatting
+        run: scripts/lint.sh
+
       - name: Test built app settings
         run: python3 scripts/test-ci.py
