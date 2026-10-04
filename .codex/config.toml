@@ -1,4 +1,6 @@
 default_permissions = "research-notebook-git"
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
 
 [permissions.research-notebook-git]
 extends = ":workspace"
@@ -6,3 +8,5 @@ extends = ":workspace"
 [permissions.research-notebook-git.filesystem]
 "/Users/nao/Project/ai/research-notebook/.git" = "write"
 "/Users/nao/Library/Developer/Xcode/DerivedData" = "write"
+"/Users/nao/Library/Developer/CoreSimulator" = "write"
+"/Users/nao/Library/Developer/Xcode" = "write"
