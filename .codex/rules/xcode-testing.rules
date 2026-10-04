@@ -16,16 +16,17 @@ prefix_rule(
     ],
 )
 
-# Reading the test summary also needs access to Xcode's result bundle.
+# Allow all xcresulttool commands, as requested in the PR review.
 prefix_rule(
-    pattern = ["xcrun", "xcresulttool", "get", "test-results", "summary"],
+    pattern = ["xcrun", "xcresulttool"],
     decision = "allow",
-    justification = "Allow reading Xcode test result summaries without repeated approval",
+    justification = "Allow Xcode result bundle commands without repeated approval",
     match = [
         "xcrun xcresulttool get test-results summary --path DerivedData/Task2Audit/Logs/Test/Test-ResearchNotebook.xcresult",
+        "xcrun xcresulttool export --path DerivedData/Task2Audit/Logs/Test/Test-ResearchNotebook.xcresult",
     ],
     not_match = [
-        "xcrun xcresulttool export --path DerivedData/Task2Audit/Logs/Test/Test-ResearchNotebook.xcresult",
+        "xcresulttool get test-results summary --path DerivedData/Task2Audit/Logs/Test/Test-ResearchNotebook.xcresult",
         "xcrun simctl erase DEVICE_ID",
     ],
 )
