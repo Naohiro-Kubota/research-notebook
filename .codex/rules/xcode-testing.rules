@@ -1,0 +1,31 @@
+# Xcode's project, build, and test commands require access to Xcode and Simulator services.
+# This matches the xcodebuild prefix approved while implementing Phase 0 Task 2.
+prefix_rule(
+    pattern = ["xcodebuild"],
+    decision = "allow",
+    justification = "Allow Xcode project inspection, build, and test commands without repeated approval",
+    match = [
+        "xcodebuild -list -project ResearchNotebook.xcodeproj",
+        "xcodebuild -quiet -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData CODE_SIGNING_ALLOWED=NO build",
+        "xcodebuild -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -destination 'platform=iOS Simulator,id=33CA3AC8-9A60-42F4-A25A-14DBF86375DA' -derivedDataPath DerivedData CODE_SIGNING_ALLOWED=NO test",
+        "xcodebuild -quiet -project ResearchNotebook.xcodeproj -scheme ResearchNotebook -destination 'platform=iOS Simulator,id=33CA3AC8-9A60-42F4-A25A-14DBF86375DA' -derivedDataPath DerivedData/Task2Audit CODE_SIGNING_ALLOWED=NO test",
+    ],
+    not_match = [
+        "xcrun xcodebuild -list -project ResearchNotebook.xcodeproj",
+        "swift test",
+    ],
+)
+
+# Reading the test summary also needs access to Xcode's result bundle.
+prefix_rule(
+    pattern = ["xcrun", "xcresulttool", "get", "test-results", "summary"],
+    decision = "allow",
+    justification = "Allow reading Xcode test result summaries without repeated approval",
+    match = [
+        "xcrun xcresulttool get test-results summary --path DerivedData/Task2Audit/Logs/Test/Test-ResearchNotebook.xcresult",
+    ],
+    not_match = [
+        "xcrun xcresulttool export --path DerivedData/Task2Audit/Logs/Test/Test-ResearchNotebook.xcresult",
+        "xcrun simctl erase DEVICE_ID",
+    ],
+)

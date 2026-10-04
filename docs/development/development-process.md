@@ -38,6 +38,8 @@ Xcode の Build / Test では、作業中の Worktree 内の `DerivedData/` を 
 
 このプロジェクトでは `.codex/rules/github.rules` により、`gh pr` と `gh api` のサンドボックス外実行を承認なしで許可する。PR の編集や任意の GitHub API 操作もこの許可に含まれる。
 
+`.codex/rules/xcode-testing.rules` により、`xcodebuild` と `xcrun xcresulttool get test-results summary` のサンドボックス外実行を承認なしで許可する。`xcodebuild` の許可はコマンド全体に適用され、Project や Scheme では限定しない。2026-10-04 に [OpenAI 公式 Rules 資料](https://learn.chatgpt.com/docs/agent-configuration/rules)で構文と適用条件を確認した。プロジェクトの `.codex/` 設定が信頼されている場合にルールが読み込まれ、追加後は Codex の再起動が必要。
+
 ## AIの調査出力
 
 Apple固有事項では、実装前に必要に応じて以下を提示する。
