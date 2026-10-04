@@ -33,7 +33,10 @@
 - Project一覧
 - Project作成・編集・削除
 - Note一覧
+- Note作成
 - Note編集
+
+Phase 1 の Project / Note はメモリ上で扱う。どちらもタイトルと本文を持ち、タイトルは必須とする。入力は画面上のデータに即時反映する。Project 削除時には所属 Note も削除する。
 
 **学習**
 
@@ -50,7 +53,9 @@
 
 - Project / Note永続化
 - Relationship
-- 削除
+- 永続化のための保存操作
+- Note単体の削除
+- Project削除時の所属Note削除を永続化へ反映
 
 **学習**
 
