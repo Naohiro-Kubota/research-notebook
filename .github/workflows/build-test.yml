@@ -35,13 +35,18 @@ jobs:
           for runtime, devices in runtimes.items():
               for device in devices:
                   if device.get("isAvailable") and device.get("name", "").startswith("iPad"):
-                      print(f"Selected {device['name']} ({runtime}), UDID {device['udid']}")
+                      print(f"Selected {device['name']} ({runtime}), UDID {device['udid']}, state {device.get('state', 'unknown')}")
                       with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as output:
                           print(f"SIMULATOR_UDID={device['udid']}", file=output)
                       sys.exit(0)
 
           sys.exit("No available iPad Simulator was found")
           PY
+
+      - name: Boot selected iPad Simulator
+        run: |
+          xcrun simctl bootstatus "$SIMULATOR_UDID" -b
+          xcrun simctl list devices available | grep "$SIMULATOR_UDID"
 
       - name: Test
         run: scripts/test.sh
