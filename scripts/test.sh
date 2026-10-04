@@ -14,7 +14,5 @@ exec xcodebuild \
   -configuration Debug \
   -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
   -derivedDataPath "$PWD/DerivedData" \
-  -parallel-testing-enabled NO \
-  -collect-test-diagnostics never \
   CODE_SIGNING_ALLOWED=NO \
   test
