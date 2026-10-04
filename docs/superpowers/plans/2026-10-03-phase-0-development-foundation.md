@@ -80,11 +80,13 @@ Task 2 は 2026-10-04 に iPad Pro (11-inch) (4th generation)、iPadOS 17.2（UD
 - Consumes: `ResearchNotebook.xcodeproj`、共有 `ResearchNotebook` Scheme、利用可能な iPad Simulator の UDID。
 - Produces: リポジトリのルートから実行できる `scripts/build.sh` と `SIMULATOR_UDID=<UDID> scripts/test.sh`。
 
-- [ ] **Step 1: `build.sh` を作る。** Project、Scheme、Debug、generic iOS Simulator、`CODE_SIGNING_ALLOWED=NO` を固定し、書き込み可能なリポジトリ内の `DerivedData/` を `-derivedDataPath` に指定して `xcodebuild ... build` の終了コードをそのまま返す。引数や環境値で Bundle Identifier を上書きしない。
-- [ ] **Step 2: `test.sh` を作る。** `SIMULATOR_UDID` が空なら説明を表示して非ゼロ終了し、値がある場合は同じ `DerivedData/` とその iPad Simulator に対して `xcodebuild ... test` を実行する。存在しない UDID やサービス停止時も `xcodebuild` の失敗を隠さない。
-- [ ] **Step 3: 正常系を検証する。** `scripts/build.sh` と `SIMULATOR_UDID=<実在するiPadのUDID> scripts/test.sh` を実行し、Build と両テストの成功を確認する。
-- [ ] **Step 4: 異常系を検証する。** `env -u SIMULATOR_UDID scripts/test.sh` が説明付きで非ゼロ終了すること、無効な UDID でも成功扱いにならないことを確認する。
-- [ ] **Step 5: `scripts/README.md` に実行方法と Simulator の UDID の調べ方を記載し、コミットする。** メッセージ例: `build: add shared build and test commands`。
+- [x] **Step 1: `build.sh` を作る。** Project、Scheme、Debug、generic iOS Simulator、`CODE_SIGNING_ALLOWED=NO` を固定し、書き込み可能なリポジトリ内の `DerivedData/` を `-derivedDataPath` に指定して `xcodebuild ... build` の終了コードをそのまま返す。引数や環境値で Bundle Identifier を上書きしない。
+- [x] **Step 2: `test.sh` を作る。** `SIMULATOR_UDID` が空なら説明を表示して非ゼロ終了し、値がある場合は同じ `DerivedData/` とその iPad Simulator に対して `xcodebuild ... test` を実行する。存在しない UDID やサービス停止時も `xcodebuild` の失敗を隠さない。
+- [x] **Step 3: 正常系を検証する。** `scripts/build.sh` と `SIMULATOR_UDID=<実在するiPadのUDID> scripts/test.sh` を実行し、Build と両テストの成功を確認する。
+- [x] **Step 4: 異常系を検証する。** `env -u SIMULATOR_UDID scripts/test.sh` が説明付きで非ゼロ終了すること、無効な UDID でも成功扱いにならないことを確認する。
+- [x] **Step 5: `scripts/README.md` に実行方法と Simulator の UDID の調べ方を記載し、コミットする。** メッセージ例: `build: add shared build and test commands`。
+
+Task 3 は 2026-10-04 に Xcode 27.0 (27A266a) で検証した。`scripts/build.sh` は exit 0、`BUILD SUCCEEDED`。`SIMULATOR_UDID=33CA3AC8-9A60-42F4-A25A-14DBF86375DA scripts/test.sh` は iPad Pro (11-inch) (4th generation)、iPadOS 17.2 で Swift Testing と XCTest UI Test が各 1 件成功した。UDID 未指定は説明付きで exit 2、無効な UDID は `xcodebuild` の失敗を保持して exit 70 となった。Build の詳細ログには Task 2 で記録済みの App Intents メタデータ抽出警告が出た。CI と Phase 0 全体の Definition of Done は Task 4–5 に残る。
 
 ### Task 4: GitHub Actions CI
 
