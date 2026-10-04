@@ -6,8 +6,8 @@
 
 - iPad 専用の最小 SwiftUI アプリ（`ResearchNotebook`、Bundle Identifier `com.tabfav`、iPadOS 17 以降）。
 - Swift Testing の Unit Test Target、XCTest の UI Test Target、両方を含む共有 Scheme。
-- ローカルと GitHub Actions で共通の `scripts/build.sh` と `scripts/test.sh`。
-- Pull Request で Build と Test を実行する GitHub Actions Workflow。Task 4 当時は push と Pull Request の両方で成功したが、その後承認済みの変更により現行設定は Pull Request のみになった。
+- `scripts/build.sh` と、ローカルの iPad Simulator で使う `scripts/test.sh`。Task 5 当時は両スクリプトを CI でも使用した。
+- Pull Request で Build と Simulator 不要の設定検査を実行する GitHub Actions Workflow。Task 4 当時は push と Pull Request の両方で Simulator テストが成功したが、その後の承認済み変更により、現行設定は Pull Request のみで起動し、Simulator テストはローカルで実行する。
 
 ## 学んだ Swift / iPadOS 概念
 
@@ -42,7 +42,7 @@
 ## 人間が決めた事項・変更した AI の判断
 
 - アプリ名、Bundle Identifier、iPad 専用、Deployment Target、テスト方式、GitHub Actions は承認済み要求と ADR に従った。
-- CI の起動契機は Task 4 完了後に人間の承認を経て Pull Request のみに変更された。Task 4 当時の push run は履歴として残す。
+- CI の起動契機は Task 4 完了後に人間の承認を経て Pull Request のみに変更された。さらに 2026-10-04、人間は Simulator を使うテストをローカルに移し、CI は Build と Simulator 不要の設定検査に絞る方針を決定した。Task 4–5 当時の CI run は履歴として残す。
 - AI の提案を人間が却下した事例は、この Phase の記録からは確認できない。
 
 ## 設計上の気づき

@@ -72,7 +72,7 @@ scripts/build.sh
 SIMULATOR_UDID='選択したiPadのUDID' scripts/test.sh
 ```
 
-両スクリプトは共有 `ResearchNotebook` Scheme と worktree 内の `DerivedData/` を使用します。UDID の選び方と失敗時の動作は [scripts/README.md](scripts/README.md)、CI の実測結果は [Phase 0 要求](docs/requirements/phase-0-development-foundation.md)、学習事項は [Phase 0 学習ログ](docs/learning/phase-0.md)を参照してください。現行 CI は Pull Request で起動します。
+両スクリプトは共有 `ResearchNotebook` Scheme と worktree 内の `DerivedData/` を使用します。UDID の選び方と失敗時の動作は [scripts/README.md](scripts/README.md)、CI の実測結果は [Phase 0 要求](docs/requirements/phase-0-development-foundation.md)、学習事項は [Phase 0 学習ログ](docs/learning/phase-0.md)を参照してください。現行 CI は Pull Request で起動し、Build と Simulator 不要の設定検査を実行します。Swift Testing と UI Test はローカルで確認します。
 
 ## ディレクトリ
 
