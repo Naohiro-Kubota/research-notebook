@@ -62,7 +62,15 @@ AIは重要な意思決定を黙って確定してはいけません。
 4. `docs/learning/roadmap.md` のPhase 0から開始する。
 5. 技術判断が必要になったら `docs/adr/README.md` の手順でADRを作成する。
 
-## Phase 0 の Build / Test
+## Phase 1 の操作
+
+Project 一覧の追加ボタンから、必須のタイトルと任意の本文を入力して Project を作成します。Project を選択すると所属する Note 一覧へ進み、Note の追加ボタンから Note を作成できます。Note を選択するとタイトルと本文を編集できます。Project の変更・削除は「Projectを編集」から行います。削除の確認画面は所属する Note も削除されることを説明し、キャンセルできます。
+
+有効なタイトルと本文は入力中に反映されます。空白だけのタイトルでは作成できません。編集時の無効なタイトルは説明を表示し、入力欄を離れると最後の有効なタイトルへ戻ります。作成ショートカットは Project が ⌘⇧N、Note が ⌘N です。
+
+**Phase 1 のデータはメモリ上だけに保持され、アプリを終了して再起動すると消えます。** 保存操作と SwiftData による永続化、Note 単体の削除は Phase 2 の対象です。最大 Dynamic Type の Simulator 連続本文入力で文字欠落を観測し、原因は調査中です。可変幅・VoiceOver・キーボードの確認にも未確認項目があり、Phase 1 全体を Done とは判定していません。[Phase 1 学習ログ](docs/learning/phase-1.md)に検証範囲と残課題を記録しています。
+
+## Build / Test
 
 Xcode 27 と iPad Simulator を用意し、リポジトリのルートで実行します。実測環境は Xcode 27.0 (27A266a)、iPadOS 17.2 の iPad Pro (11-inch) (4th generation) です。
 

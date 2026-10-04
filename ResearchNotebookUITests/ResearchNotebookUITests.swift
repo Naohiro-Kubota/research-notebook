@@ -2,6 +2,31 @@ import XCTest
 
 final class ResearchNotebookUITests: XCTestCase {
   @MainActor
+  func testContinuousBodyInputAndRelaunchClearsData() {
+    let app = XCUIApplication()
+    app.launch()
+    createProject("Temporary research", in: app)
+    app.buttons["note-add"].tap()
+    let title = app.textFields["note-title-input"]
+    XCTAssertTrue(title.waitForExistence(timeout: 5))
+    title.tap()
+    title.typeText("Temporary note")
+    app.buttons["note-create"].tap()
+    let body = app.textViews["note-body-input"]
+    XCTAssertTrue(body.waitForExistence(timeout: 5))
+    body.tap()
+    let text = "Continuous input keeps every character.\nSecond paragraph."
+    body.typeText(text)
+    XCTAssertEqual(body.value as? String, text)
+    app.terminate()
+    app.launch()
+    XCTAssertTrue(app.staticTexts["project-empty"].waitForExistence(timeout: 5))
+    XCTAssertEqual(projectRows(app).count, 0)
+    XCTAssertEqual(noteRows(app).count, 0)
+    XCTAssertFalse(app.textViews["note-body-input"].exists)
+  }
+
+  @MainActor
   func testLaunchShowsProjectEmptyState() {
     let app = XCUIApplication()
     app.launch()
