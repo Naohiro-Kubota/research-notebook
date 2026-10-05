@@ -30,7 +30,7 @@ Apple 公式の [Relationship の定義と削除規則](https://developer.apple.
 
 ## 最終検証
 
-- `scripts/build.sh` 成功。Phase 2 の生成実行にも出ていた AppIntents metadata extraction skipped のツール警告以外、新規コンパイラ警告なし。
+- `scripts/build.sh` 成功。Phase 2 のビルドログにも記録されていた AppIntents metadata extraction skipped のツール警告以外、新規コンパイラ警告なし。
 - `scripts/lint.sh` と `git diff --check` 成功。
 - `SIMULATOR_UDID=33CA3AC8-9A60-42F4-A25A-14DBF86375DA scripts/test.sh` 成功。Swift Testing 12 テスト（共有・Note 削除・Project 削除は各 memory/disk 2 ケース）、既存 XCTest UI 15 テスト、失敗 0。
 - 最終ログは `/private/tmp/task1-final-build.log`、`/private/tmp/task1-final-lint.log`、`/private/tmp/task1-final-all-tests.log`。xcresult は Worktree 内 `DerivedData/Logs/Test/Test-ResearchNotebook-2026.10.05_23-44-29-+0900.xcresult`。
