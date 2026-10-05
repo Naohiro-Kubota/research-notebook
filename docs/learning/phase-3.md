@@ -22,3 +22,31 @@
 - 承認済み [要求](../requirements/phase-3-app-state-and-search.md)と [ADR-0006](../adr/0006-phase-3-tags-and-search-state.md)のうち、Task 1 が担当する共有 Tag、削除後の保持、旧ストアのデータ保持を満たした。タグ名規則・付与 UI・検索は後続 Task の対象。
 - `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` は成功。Swift Testing 12 件と XCTest UI Test 15 件が iPadOS 17.2 Simulator で成功した。新規 Swift コンパイラ警告はない。AppIntents メタデータ抽出省略の既存ツール警告のみ確認した。
 - 新規 UI はない。Phase 3 の可変幅、Dark Mode、Dynamic Type、VoiceOver、キーボードの操作確認は、タグ操作と検索 UI が入る後続 Task で行う。Phase 3 全体の Definition of Done は未達。
+
+## Task 2・3: タグ名規則と Note のタグ操作
+
+確認日: 2026-10-06。
+
+### Apple 公式資料で確認した事実
+
+| 資料 | 公式資料の事実 | このアプリへの適用 |
+|---|---|---|
+| [ModelContext.save()](https://developer.apple.com/documentation/swiftdata/modelcontext/save()) | 未保存の変更を永続ストアに書き込み、失敗をエラーとして伝える。 | タグの付与・解除後に保存を試み、失敗を画面に示す。 |
+| [Query](https://developer.apple.com/documentation/swiftdata/query) | 取得した永続モデルを基になるデータと同期する。 | 編集画面の既存 Tag 一覧に `@Query` を使う。 |
+| [SwiftUI Accessibility modifiers](https://developer.apple.com/documentation/SwiftUI/View-Accessibility) | `accessibilityLabel(_:)` で要素の内容を伝えられる。 | Tag 名と付与状態を読み上げられるラベルを設定する。 |
+
+前後の空白除去、空白入力の拒否、大文字・小文字が異なる名前の再利用、保存失敗時のロールバックは、このプロジェクトの要求と実装判断である。Apple 公式資料がこれらのアプリ固有規則を指定しているわけではない。
+
+### 実装範囲
+
+- Tag 操作関数で入力を正規化し、同名 Tag を再利用する。同じ Note に二重付与せず、解除しても Tag 自体と他の Note の関連を残す。
+- Note 編集画面に既存 Tag の付与・解除と新規 Tag 入力を追加した。既存の保存ボタンなしの方針を維持し、保存失敗時はロールバックしてアラートを表示する。タグ名変更と全体削除は設けていない。
+- Swift Testing でメモリ内・ディスク上の別 Context から再取得し、別 Project での共有と保存失敗後の既存データ保持を検証する。XCTest UI Test では新規付与、既存 Tag の再利用、解除、再起動後の状態、読み取り専用ストアでの失敗表示を検証する。
+
+### Task 2・3 の検証
+
+- iPadOS 17.2 の iPad Pro (11-inch) Simulator で `scripts/build.sh` と `scripts/lint.sh` が成功した。Swift Testing 15 ケース、XCTest UI Test 17 件が成功し、失敗は 0 件。新規コンパイラ警告はなく、AppIntents メタデータ抽出省略の既存ツール警告だけを確認した。
+- 読み取り専用ストアで Tag 作成と解除の保存失敗を再現し、既存の 2 Note と共有 Tag が残ることを Swift Testing で確認した。UI Test では失敗アラートと再起動後の既存 Note 本文・Tag 非作成を確認した。
+- 標準 Form、TextField、Button を使用し、色に加えてチェックマークとラベルで付与状態を示す。UI Test で Tag 名と付与状態のアクセシビリティラベルを照合した。VoiceOver の実音声操作、可変ウインドウ幅、Dark Mode、Dynamic Type、外部キーボード操作はこの自動テストでは直接観測しておらず、Phase 3 総合確認で扱う。
+
+Task 4・5 の検索・絞り込み・選択整合は未実装であり、Phase 3 全体の Definition of Done は未達。
