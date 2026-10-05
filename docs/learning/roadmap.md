@@ -65,6 +65,8 @@ Phase 1 の Project / Note はメモリ上で扱う。どちらもタイトル�
 - @Query
 - Migrationの考え方
 
+Phase 2 完了後のレビューで許容した課題は[継続課題](../development/phase-2-review-followups.md)に記録する。対応時期は未定。
+
 ## Phase 3 — アプリ状態と検索
 
 **成果**
