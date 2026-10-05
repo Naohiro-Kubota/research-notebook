@@ -12,6 +12,70 @@ final class ResearchNotebookUITests: XCTestCase {
   }
 
   @MainActor
+  func testReadOnlyStoreRejectsProjectCreationWithoutDismissingSheet() {
+    let app = launchReadOnlyApp(withNote: false)
+    XCTAssertTrue(projectRows(app).firstMatch.waitForExistence(timeout: 5))
+    app.buttons["project-add"].tap()
+    let field = app.textFields["project-title-input"]
+    XCTAssertTrue(field.waitForExistence(timeout: 5))
+    field.tap()
+    field.typeText("Unsaved")
+    app.buttons["project-create"].tap()
+    XCTAssertTrue(
+      app.alerts["変更を保存できませんでした"].waitForExistence(timeout: 5),
+      app.debugDescription)
+    XCTAssertTrue(app.buttons["project-create"].exists)
+    app.alerts.buttons["OK"].tap()
+    app.terminate()
+    app.launch()
+    XCTAssertEqual(projectRows(app).count, 1)
+    XCTAssertEqual(projectRows(app).firstMatch.label, "Existing")
+  }
+
+  @MainActor
+  func testReadOnlyStoreRejectsNoteEditAndReportsFailure() {
+    let app = launchReadOnlyApp(withNote: true)
+    projectRows(app).firstMatch.tap()
+    noteRows(app).firstMatch.tap()
+    let body = app.textViews["note-body-input"]
+    XCTAssertTrue(body.waitForExistence(timeout: 5))
+    body.tap()
+    body.typeText("X")
+    XCTAssertTrue(app.alerts["変更を保存できませんでした"].waitForExistence(timeout: 5))
+    app.alerts.buttons["OK"].tap()
+    XCTAssertEqual(projectRows(app).count, 1)
+    XCTAssertEqual(noteRows(app).count, 1)
+    app.terminate()
+    app.launch()
+    projectRows(app).firstMatch.tap()
+    noteRows(app).firstMatch.tap()
+    XCTAssertEqual(app.textViews["note-body-input"].value as? String, "Existing body")
+  }
+
+  @MainActor
+  func testReadOnlyStoreRejectsNoteCreationWithoutDismissingSheet() {
+    let app = launchReadOnlyApp(withNote: true)
+    projectRows(app).firstMatch.tap()
+    app.buttons["note-add"].tap()
+    let fields = app.textFields.matching(identifier: "note-title-input")
+    XCTAssertTrue(fields.firstMatch.waitForExistence(timeout: 5))
+    let field = fields.element(boundBy: fields.count - 1)
+    field.tap()
+    field.typeText("Unsaved note")
+    app.buttons["note-create"].tap()
+    XCTAssertTrue(
+      app.alerts["変更を保存できませんでした"].waitForExistence(timeout: 5),
+      app.debugDescription)
+    XCTAssertTrue(app.buttons["note-create"].exists)
+    app.alerts.buttons["OK"].tap()
+    app.terminate()
+    app.launch()
+    projectRows(app).firstMatch.tap()
+    XCTAssertEqual(noteRows(app).count, 1)
+    XCTAssertEqual(noteRows(app).firstMatch.label, "Existing note")
+  }
+
+  @MainActor
   func testBodyPasteSurvivesProjectSwitch() {
     let app = makeApp()
     // Pin app language for the Paste menu in the tested Simulator.
@@ -114,6 +178,13 @@ final class ResearchNotebookUITests: XCTestCase {
     XCTAssertEqual(app.textFields["project-title-input"].value as? String, "U")
     app.buttons["project-edit-done"].tap()
     XCTAssertEqual(projectRows(app).firstMatch.label, "U")
+    app.buttons["project-edit"].tap()
+    XCTAssertEqual(app.textViews["project-body-input"].value as? String, "Project body")
+    app.buttons["project-edit-done"].tap()
+    app.terminate()
+    app.launch()
+    XCTAssertEqual(projectRows(app).firstMatch.label, "U")
+    projectRows(app).firstMatch.tap()
     app.buttons["project-edit"].tap()
     XCTAssertEqual(app.textViews["project-body-input"].value as? String, "Project body")
   }
@@ -249,6 +320,12 @@ final class ResearchNotebookUITests: XCTestCase {
     XCTAssertTrue(app.buttons["note-delete"].exists)
     noteRows(app).firstMatch.tap()
     XCTAssertEqual(body.value as? String, "Note body")
+    app.terminate()
+    app.launch()
+    projectRows(app).firstMatch.tap()
+    noteRows(app).firstMatch.tap()
+    XCTAssertEqual(app.textFields["note-title-input"].value as? String, "U")
+    XCTAssertEqual(app.textViews["note-body-input"].value as? String, "Note body")
   }
 
   @MainActor
@@ -293,6 +370,25 @@ final class ResearchNotebookUITests: XCTestCase {
   private func makeApp() -> XCUIApplication {
     let app = XCUIApplication()
     app.launchArguments = ["-uiTestingStoreID", UUID().uuidString]
+    return app
+  }
+
+  @MainActor
+  private func launchReadOnlyApp(withNote: Bool) -> XCUIApplication {
+    let storeID = UUID().uuidString
+    let app = XCUIApplication()
+    app.launchArguments = ["-uiTestingStoreID", storeID]
+    app.launch()
+    createProject("Existing", in: app)
+    if withNote {
+      createNote("Existing note", in: app)
+      let body = app.textViews["note-body-input"]
+      body.tap()
+      body.typeText("Existing body")
+    }
+    app.terminate()
+    app.launchArguments = ["-uiTestingReadOnlyStoreID", storeID]
+    app.launch()
     return app
   }
 

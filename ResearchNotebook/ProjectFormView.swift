@@ -8,6 +8,7 @@ struct ProjectFormView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var confirmsDeletion = false
   @State private var deletionFailed = false
+  @State private var saveFailed = false
 
   var body: some View {
     NavigationStack {
@@ -55,6 +56,21 @@ struct ProjectFormView: View {
       }
       .alert("Projectを削除できませんでした", isPresented: $deletionFailed) {
         Button("OK") {}
+      }
+      .alert("変更を保存できませんでした", isPresented: $saveFailed) {
+        Button("OK") {}
+      }
+      .onChange(of: project.title) { _, _ in
+        if !saveChanges(modelContext) {
+          modelContext.rollback()
+          saveFailed = true
+        }
+      }
+      .onChange(of: project.body) { _, _ in
+        if !saveChanges(modelContext) {
+          modelContext.rollback()
+          saveFailed = true
+        }
       }
     }
   }

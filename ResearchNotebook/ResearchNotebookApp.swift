@@ -31,6 +31,17 @@ struct ResearchNotebookApp: App {
           for: Project.self, Note.self,
           configurations: ModelConfiguration(url: url, allowsSave: false))
       }
+      if let index = arguments.firstIndex(of: "-uiTestingReadOnlyStoreID"),
+        arguments.indices.contains(index + 1),
+        let storeID = UUID(uuidString: arguments[index + 1])
+      {
+        let directory = URL.applicationSupportDirectory
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let url = directory.appendingPathComponent("UITest-\(storeID.uuidString).store")
+        return try ModelContainer(
+          for: Project.self, Note.self,
+          configurations: ModelConfiguration(url: url, allowsSave: false))
+      }
       if let index = arguments.firstIndex(of: "-uiTestingStoreID"),
         arguments.indices.contains(index + 1),
         let storeID = UUID(uuidString: arguments[index + 1])

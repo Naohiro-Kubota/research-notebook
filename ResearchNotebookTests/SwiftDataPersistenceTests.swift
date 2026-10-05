@@ -89,6 +89,28 @@ struct SwiftDataPersistenceTests {
     #expect(try verifier.fetch(FetchDescriptor<Project>()).map(\.title) == ["Existing"])
   }
 
+  @Test func readOnlyConfigurationRejectsNoteInsertion() throws {
+    let storeURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString)
+      .appendingPathExtension("store")
+    do {
+      let writable = try ModelContainer(
+        for: Project.self, Note.self, configurations: ModelConfiguration(url: storeURL))
+      let project = Project(title: "Existing")
+      writable.mainContext.insert(project)
+      writable.mainContext.insert(Note(project: project, title: "Existing note"))
+      try writable.mainContext.save()
+    }
+    let readOnly = try ModelContainer(
+      for: Project.self, Note.self,
+      configurations: ModelConfiguration(url: storeURL, allowsSave: false))
+    let context = readOnly.mainContext
+    let project = try #require(context.fetch(FetchDescriptor<Project>()).first)
+    context.insert(Note(project: project, title: "Unsaved"))
+    #expect(context.hasChanges)
+    #expect(throws: (any Error).self) { try context.save() }
+  }
+
   @Test func deletingNoteKeepsOtherNotesAndProjects() throws {
     let container = try ModelContainer(
       for: Project.self, Note.self,

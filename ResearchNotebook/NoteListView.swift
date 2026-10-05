@@ -8,6 +8,7 @@ struct NoteListView: View {
   @State private var showsCreation = false
   @State private var newTitle = ""
   @State private var newBody = ""
+  @State private var saveFailed = false
 
   var body: some View {
     List(selection: $selectedNoteID) {
@@ -65,12 +66,20 @@ struct NoteListView: View {
             Button("作成") {
               let note = Note(project: project, title: newTitle, body: newBody)
               modelContext.insert(note)
-              selectedNoteID = note.id
-              showsCreation = false
+              if saveChanges(modelContext) {
+                selectedNoteID = note.id
+                showsCreation = false
+              } else {
+                modelContext.delete(note)
+                saveFailed = true
+              }
             }
             .disabled(!isValidTitle(newTitle))
             .accessibilityIdentifier("note-create")
           }
+        }
+        .alert("変更を保存できませんでした", isPresented: $saveFailed) {
+          Button("OK") {}
         }
       }
     }
