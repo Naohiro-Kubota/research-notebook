@@ -5,6 +5,8 @@ final class ResearchNotebookUITests: XCTestCase {
   @MainActor
   func testBodyPasteSurvivesProjectSwitch() {
     let app = XCUIApplication()
+    // Command shortcuts failed on the tested iPadOS 17.2 Simulator; fix menu localization.
+    app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
     app.launch()
     createProject("Keyboard research", in: app)
     app.buttons["note-add"].tap()
@@ -69,6 +71,8 @@ final class ResearchNotebookUITests: XCTestCase {
   @MainActor
   func testProjectCreationAndEditing() {
     let app = XCUIApplication()
+    // Command shortcuts failed on the tested iPadOS 17.2 Simulator; fix menu localization.
+    app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
     app.launch()
     XCTAssertTrue(app.staticTexts["project-empty"].waitForExistence(timeout: 5))
     app.buttons["project-add"].tap()
@@ -144,6 +148,8 @@ final class ResearchNotebookUITests: XCTestCase {
   @MainActor
   func testNoteCreationAndLiveEditing() {
     let app = XCUIApplication()
+    // Command shortcuts failed on the tested iPadOS 17.2 Simulator; fix menu localization.
+    app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
     app.launch()
     createProject("Research", in: app)
     XCTAssertTrue(app.staticTexts["note-empty"].waitForExistence(timeout: 5))
