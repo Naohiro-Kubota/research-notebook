@@ -12,19 +12,19 @@
 
 ## 作業開始条件
 
-- [ ] 人間から実装開始の明示的な指示を受ける。計画の作成・承認を開始指示と扱わない。
-- [ ] `origin/develop` の最新状態を取得し、専用ブランチと Git Worktree を確認する。基点が進んでいれば、作業ブランチを最新の `origin/develop` に合わせる。変更、Build、Test はその Worktree 内だけで行う。
-- [ ] [AGENTS.md](../../../AGENTS.md)、要求、ADR-0001・0002・0004・0005・0006、[Definition of Done](../../development/definition-of-done.md)を再確認する。
+- [x] 人間から実装開始の明示的な指示を受ける。計画の作成・承認を開始指示と扱わない。
+- [x] `origin/develop` の最新状態を取得し、専用ブランチと Git Worktree を確認する。基点が進んでいれば、作業ブランチを最新の `origin/develop` に合わせる。変更、Build、Test はその Worktree 内だけで行う。
+- [x] [AGENTS.md](../../../AGENTS.md)、要求、ADR-0001・0002・0004・0005・0006、[Definition of Done](../../development/definition-of-done.md)を再確認する。
 
 ## Task 1: Tag スキーマと旧ストアのデータ保持
 
 **対象:** `ResearchNotebook/Tag.swift`、`ResearchNotebook/Note.swift`、`ResearchNotebook/ResearchNotebookApp.swift`、`ResearchNotebookTests/SwiftDataPersistenceTests.swift`。
 
-- [ ] 複数 Note が一つの Tag を参照でき、Note・Project を削除しても Tag は残る振る舞いを Swift Testing に記述し、失敗を確認する。
-- [ ] `Tag` を独立した `@Model` として追加し、Note との Relationship と全 `ModelContainer` 構成へ登録する。既存の Project・Note フィールドと削除規則を変えない。
-- [ ] メモリ上とディスク上のコンテナで、タグの再利用、関連の保存・再取得、Note・Project 削除後の Tag 保持を確認する。
-- [ ] Phase 2 版で Project と Note を保存した旧ストアの**コピー**を新版で開く。Project・Note の件数、ID、タイトル、本文、所属関係の一致を確認する。自動移行の成功を推測で済ませない。
-- [ ] 自動移行に失敗した場合は元ストアを消去・置換せず、`SchemaMigrationPlan` の候補と影響を整理して作業を止め、人間の判断を受ける。移行方式が決まるまで次の Task に進まない。
+- [x] 複数 Note が一つの Tag を参照でき、Note・Project を削除しても Tag は残る振る舞いを Swift Testing に記述し、失敗を確認する。
+- [x] `Tag` を独立した `@Model` として追加し、Note との Relationship と全 `ModelContainer` 構成へ登録する。既存の Project・Note フィールドと削除規則を変えない。
+- [x] メモリ上とディスク上のコンテナで、タグの再利用、関連の保存・再取得、Note・Project 削除後の Tag 保持を確認する。
+- [x] Phase 2 版で Project と Note を保存した旧ストアの**コピー**を新版で開く。Project・Note の件数、ID、タイトル、本文、所属関係の一致を確認する。自動移行の成功を推測で済ませない。
+- [x] 自動移行に失敗した場合は元ストアを消去・置換せず、`SchemaMigrationPlan` の候補と影響を整理して作業を止め、人間の判断を受ける。移行方式が決まるまで次の Task に進まない。（自動移行が成功したため停止条件は発生せず）
 
 ## Task 2: タグ名と関連付けの規則
 
