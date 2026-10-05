@@ -46,7 +46,7 @@
 ### Task 2・3 の検証
 
 - iPadOS 17.2 の iPad Pro (11-inch) Simulator で `scripts/build.sh` と `scripts/lint.sh` が成功した。Swift Testing 15 ケース、XCTest UI Test 17 件が成功し、失敗は 0 件。新規コンパイラ警告はなく、AppIntents メタデータ抽出省略の既存ツール警告だけを確認した。
-- 読み取り専用ストアで Tag 作成と解除の保存失敗を再現し、既存の 2 Note と共有 Tag が残ることを Swift Testing で確認した。UI Test では失敗アラートと再起動後の既存 Note 本文・Tag 非作成を確認した。
+- 読み取り専用ストアで Tag 作成と解除の保存失敗を再現し、既存の 2 Note と共有 Tag が残ることを Swift Testing で確認した。UI Test では失敗アラート直後に未保存 Tag が一覧へ現れず、既存 Note 本文が残ることと、再起動後の同じ状態を確認した。
 - 標準 Form、TextField、Button を使用し、色に加えてチェックマークとラベルで付与状態を示す。UI Test で Tag 名と付与状態のアクセシビリティラベルを照合した。VoiceOver の実音声操作、可変ウインドウ幅、Dark Mode、Dynamic Type、外部キーボード操作はこの自動テストでは直接観測しておらず、Phase 3 総合確認で扱う。
 
 Task 4・5 の検索・絞り込み・選択整合は未実装であり、Phase 3 全体の Definition of Done は未達。
