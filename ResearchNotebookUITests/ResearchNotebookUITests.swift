@@ -5,7 +5,8 @@ final class ResearchNotebookUITests: XCTestCase {
   @MainActor
   func testBodyPasteSurvivesProjectSwitch() {
     let app = XCUIApplication()
-    // Command shortcuts failed on the tested iPadOS 17.2 Simulator; fix menu localization.
+    // Pin app language for the Paste menu in the tested Simulator.
+    // Non-English device locale remains unverified.
     app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
     app.launch()
     createProject("Keyboard research", in: app)
