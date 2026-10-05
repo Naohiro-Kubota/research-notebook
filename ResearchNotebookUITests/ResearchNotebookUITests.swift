@@ -121,16 +121,37 @@ final class ResearchNotebookUITests: XCTestCase {
   }
 
   @MainActor
-  func testProjectDeletionRemovesRow() {
+  func testProjectDeletionRemovesProjectNoteAndSelectedDetail() {
     let app = XCUIApplication()
     app.launch()
     createProject("Delete me", in: app)
+    app.buttons["note-add"].tap()
+    let noteTitle = app.textFields["note-title-input"]
+    XCTAssertTrue(noteTitle.waitForExistence(timeout: 5))
+    noteTitle.tap()
+    noteTitle.typeText("Delete my note")
+    app.buttons["note-create"].tap()
+    let noteRow = noteRows(app).firstMatch
+    XCTAssertTrue(noteRow.waitForExistence(timeout: 5))
+    XCTAssertEqual(noteRow.label, "Delete my note")
+    noteRow.tap()
+    XCTAssertTrue(noteTitle.waitForExistence(timeout: 5))
+    XCTAssertEqual(noteTitle.value as? String, "Delete my note")
+    let noteBody = app.textViews["note-body-input"]
+    XCTAssertTrue(noteBody.waitForExistence(timeout: 5))
+    noteBody.tap()
+    noteBody.typeText("Delete my body")
+    XCTAssertEqual(noteBody.value as? String, "Delete my body")
     app.buttons["project-edit"].tap()
     app.buttons["project-delete"].tap()
     XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 5))
     app.alerts.buttons["削除"].tap()
     XCTAssertTrue(app.staticTexts["project-empty"].waitForExistence(timeout: 5))
     XCTAssertEqual(projectRows(app).count, 0)
+    XCTAssertEqual(noteRows(app).count, 0)
+    XCTAssertFalse(noteTitle.exists)
+    XCTAssertFalse(noteBody.exists)
+    XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
     XCTAssertFalse(app.buttons["project-edit"].exists)
   }
 
