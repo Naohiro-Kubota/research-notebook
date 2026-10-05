@@ -41,6 +41,70 @@ struct NotebookStateTests {
     #expect(state.selectedNoteID == secondNote)
   }
 
+  @Test func rejectsDuplicateProjectIDWithoutChangingState() throws {
+    var state = NotebookState()
+    let duplicateID = UUID()
+    let originalProject = state.addProject(
+      id: duplicateID, title: "Original", body: "Original body")
+    _ = try #require(originalProject)
+    let selectedProject = state.addProject(title: "Selected")
+    let selected = try #require(selectedProject)
+    let selectedNote = state.addNote(projectID: selected, title: "Selected note")
+    let note = try #require(selectedNote)
+    let projects = state.projects
+    let notes = state.notes
+
+    let duplicate = state.addProject(
+      id: duplicateID, title: "Replacement", body: "Replacement body")
+
+    #expect(duplicate == nil)
+    #expect(state.projects == projects)
+    #expect(state.notes == notes)
+    #expect(state.selectedProjectID == selected)
+    #expect(state.selectedNoteID == note)
+  }
+
+  @Test func rejectsDuplicateNoteIDWithoutChangingState() throws {
+    var state = NotebookState()
+    let firstProject = state.addProject(title: "First")
+    let first = try #require(firstProject)
+    let secondProject = state.addProject(title: "Second")
+    let second = try #require(secondProject)
+    let duplicateID = UUID()
+    let originalNote = state.addNote(
+      id: duplicateID, projectID: first, title: "Original", body: "Original body")
+    _ = try #require(originalNote)
+    let selectedNote = state.addNote(projectID: second, title: "Selected note")
+    let note = try #require(selectedNote)
+    let projects = state.projects
+    let notes = state.notes
+
+    let duplicate = state.addNote(
+      id: duplicateID, projectID: first, title: "Replacement", body: "Replacement body")
+
+    #expect(duplicate == nil)
+    #expect(state.projects == projects)
+    #expect(state.notes == notes)
+    #expect(state.selectedProjectID == second)
+    #expect(state.selectedNoteID == note)
+  }
+
+  @Test func allowsSameIDAcrossProjectsAndNotes() throws {
+    var state = NotebookState()
+    let sharedID = UUID()
+    let createdProject = state.addProject(id: sharedID, title: "Project")
+    let project = try #require(createdProject)
+    let createdNote = state.addNote(id: sharedID, projectID: project, title: "Note")
+    #expect(createdNote == sharedID)
+    let anotherID = UUID()
+    let anotherNote = state.addNote(id: anotherID, projectID: project, title: "Another note")
+    _ = try #require(anotherNote)
+    let anotherProject = state.addProject(id: anotherID, title: "Another project")
+    #expect(anotherProject == anotherID)
+    #expect(state.projects.map(\.id) == [sharedID, anotherID])
+    #expect(state.notes.map(\.id) == [sharedID, anotherID])
+  }
+
   @Test func rejectsNoteForMissingProject() {
     var state = NotebookState()
     let missingProjectNote = state.addNote(projectID: UUID(), title: "Note")
