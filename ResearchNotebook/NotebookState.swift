@@ -25,7 +25,7 @@ struct NotebookState {
 
   @discardableResult
   mutating func addProject(id: UUID = UUID(), title: String, body: String = "") -> UUID? {
-    guard Self.isValidTitle(title) else { return nil }
+    guard Self.isValidTitle(title), !projects.contains(where: { $0.id == id }) else { return nil }
     projects.append(NotebookProject(id: id, title: title, body: body))
     selectProject(id)
     return id
@@ -35,7 +35,9 @@ struct NotebookState {
   mutating func addNote(id: UUID = UUID(), projectID: UUID, title: String, body: String = "")
     -> UUID?
   {
-    guard Self.isValidTitle(title), projects.contains(where: { $0.id == projectID }) else {
+    guard Self.isValidTitle(title), projects.contains(where: { $0.id == projectID }),
+      !notes.contains(where: { $0.id == id })
+    else {
       return nil
     }
     notes.append(NotebookNote(id: id, projectID: projectID, title: title, body: body))
