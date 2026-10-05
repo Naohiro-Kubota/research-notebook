@@ -44,4 +44,4 @@ Phase 1 の Project と Note はメモリ上にあり、アプリの再起動で
 - [ADR-0001: SwiftUI データフロー](../adr/0001-native-swiftui-data-flow.md)
 - [ADR-0002: テスト戦略](../adr/0002-testing-strategy.md)
 - [ADR-0004: Navigation 構造](../adr/0004-three-column-notebook-navigation.md)
-- [ADR-0005: SwiftData 永続化方式案](../adr/0005-swiftdata-persistence.md)
+- [ADR-0005: SwiftData 永続化方式](../adr/0005-swiftdata-persistence.md)
