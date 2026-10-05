@@ -1,12 +1,12 @@
 # Phase 2 学習ログ — SwiftData 永続化
 
-確認日: 2026-10-05。現在は Task 1（永続モデル）までの記録。アプリの画面はまだ Phase 1 のメモリ内モデルを使用しており、Phase 2 の Acceptance Criteria は未達。
+確認日: 2026-10-05。現在は Task 2（既存 UI の SwiftData 接続）までの記録。Phase 2 全体の Acceptance Criteria は未達。
 
 ## Apple 公式資料で確認した事実
 
 | 資料 | 確認した事実 | このアプリへの適用 |
 |---|---|---|
-| [Preserving your app’s model data across launches](https://developer.apple.com/documentation/swiftdata/preserving-your-apps-model-data-across-launches) | `@Model`、`ModelContainer`、`ModelContext` でモデルを永続化し、`@Query` で View に取得できる。 | Project と Note を `@Model` とした。View への接続は Task 2。 |
+| [Preserving your app’s model data across launches](https://developer.apple.com/documentation/swiftdata/preserving-your-apps-model-data-across-launches) | `@Model`、`ModelContainer`、`ModelContext` でモデルを永続化し、`@Query` で View に取得できる。 | Project と Note を `@Model` とし、Task 2 で View を接続した。 |
 | [Defining data relationships with enumerations and model classes](https://developer.apple.com/documentation/swiftdata/defining-data-relationships-with-enumerations-and-model-classes) | 親の Relationship に `.cascade` を指定すると、親の削除時に関連モデルを削除する。関連グラフの根を `insert` すると子も登録される。 | `Project.notes` に `.cascade` と `Note.project` の inverse を設定した。テストでは親だけを `insert` した。 |
 | [ModelContext.autosaveEnabled](https://developer.apple.com/documentation/swiftdata/modelcontext/autosaveenabled) | メインコンテキストは自動保存が有効で、変更後やライフサイクルの変化時に保存する。 | 各文字入力直後のディスク保存は保証されないため、再起動テストを Task 4 で行う。 |
 | [ModelContext.save()](https://developer.apple.com/documentation/swiftdata/modelcontext/save())、[ModelContext](https://developer.apple.com/documentation/swiftdata/modelcontext) | `save()` はエラーを投げる。`didSave` は保存成功後の通知であり、失敗通知ではない。 | 保存失敗の検出・表示方法と再現用保存先は Task 0 の残課題。 |
@@ -25,7 +25,7 @@ Xcode 27 SDK の SwiftData インターフェースでも、`@Model`、`@Relatio
 ## 残課題
 
 - Task 0 は完了。暗黙の自動保存には公開された失敗通知が確認できなかったため、Task 4 では自動保存を有効に保ち、変更直後の明示的な `save()` でエラーを検出する。詳細は下記。Task 4 の UI とエラー表示は未実装。
-- Task 2〜5: View の SwiftData 接続、単体削除、自動保存と失敗表示、再起動 UI Test、iPad の操作・Accessibility 確認を行う。
+- Task 3〜5: Note 単体削除、Project の連鎖削除の永続検証、保存失敗表示、追加の再起動 UI Test、iPad の操作・Accessibility 確認を行う。
 
 ## 今回の Definition of Done 確認
 
@@ -42,3 +42,13 @@ Xcode 27 SDK の SwiftData インターフェースでも、`@Model`、`@Relatio
 **このプロジェクトの方針:** 暗黙の自動保存の失敗を通知で確実に取得する公開 API は確認できなかった。Task 4 では自動保存を維持し、Project / Note の有効な変更直後に `hasChanges` を確認して `save()` を呼び、エラーを画面に表示する。保存ボタンは置かず、失敗した変更を保存済みと表示しない。失敗時の画面状態と、連続入力時の書き込み負荷は Task 4 でテストする。
 
 Task 0 の確認: 読み取り専用ディスク保存先のテストを含む Swift Testing 14 件と既存 UI Test 9 件、Build、Lint、`git diff --check` は成功した。今回の変更はテストと文書のみで、アプリの保存動作と Phase 2 全体の DoD はまだ未完了。
+
+## Task 2: 既存 UI の SwiftData 接続（2026-10-05）
+
+- アプリにローカル `ModelContainer` を設け、Project 一覧を `@Query` から表示する。選択中の Project の `notes` Relationship から Note 一覧を表示し、タイトル・本文は `@Bindable` でモデルへ反映する。選択 ID は View の `@State` に保持する。Phase 1 の `NotebookState` とそのテストは、呼び出しを移行してから削除した。
+- UI Test は Debug ビルドの起動引数にテストごとの UUID を渡し、Application Support 内の別々の保存先を使用する。同じテストでの再起動は同じ保存先を使う。通常起動と Release ビルドは既定のローカル保存先を使う。
+- `ValidatedTitleField` は共通の `isValidTitle` で空白タイトルをモデルへ渡さない。Phase 1 の `NoteBodyEditor.equatable()` は移植せず、SwiftData へ直接 Binding した本文で連続入力とペーストの既存 UI Test が成功した。
+- Project の既存の削除操作は条件付きの `ModelContext.delete(model:where:)` と `.cascade` を使用した。UI 上の削除と選択解除は確認した。所属 Note がディスクからも消えること、他の Project と Note が残ることは Task 3 で検証する。
+- iPadOS 17 Simulator で作成・編集・タイトル検証・Project 切替・本文ペースト・再起動後の本文復元の UI Test が成功した。保存失敗の表示は Task 4 の範囲で未実装。Task 2 の新規 UI は標準の SwiftUI フォームと Navigation を維持し、既存の accessibilityIdentifier を引き継いだ。実機の VoiceOver とウインドウ幅の確認は Task 5 に残る。
+- 保存先を開けない場合は既存データを消さず、エラー画面を表示する。読み取り専用の存在しないテスト保存先で、起動時クラッシュせずエラー画面になることを UI Test で確認した。通常の保存処理中の失敗表示は Task 4 に残る。
+- Task 2 の最終確認: `scripts/build.sh`、Release ビルド、`scripts/lint.sh`、`git diff --check`、Swift Testing 5 件、UI Test 10 件が成功した。Debug 専用の保存先失敗テストも分岐追加後に再実行して成功した。新規の Swift 警告はない。Task 2 の DoD は満たしたが、Note 単体削除、保存失敗表示、Project 削除後のディスク再取得、実操作の確認が残るため Phase 2 全体の DoD は未達。

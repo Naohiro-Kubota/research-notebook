@@ -14,7 +14,7 @@ struct ValidatedTitleField: View {
         .focused($isFocused)
         .onAppear { draft = title }
         .onChange(of: draft) { _, value in
-          if NotebookState.isValidTitle(value) { title = value }
+          if isValidTitle(value) { title = value }
         }
         .onChange(of: isFocused) { _, focused in
           if !focused { draft = title }
@@ -22,7 +22,7 @@ struct ValidatedTitleField: View {
         .onChange(of: title) { _, value in
           if !isFocused { draft = value }
         }
-      if !NotebookState.isValidTitle(draft) {
+      if !isValidTitle(draft) {
         Text("タイトルを入力してください。空白だけのタイトルは使えません。")
           .font(.caption)
           .foregroundStyle(.secondary)
