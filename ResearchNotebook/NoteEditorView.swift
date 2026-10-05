@@ -5,9 +5,15 @@ struct NoteEditorView: View {
   @Bindable var note: Note
   let onDeleted: () -> Void
   @Environment(\.modelContext) private var modelContext
+  @Query private var availableTags: [Tag]
   @State private var confirmsDeletion = false
   @State private var deletionFailed = false
   @State private var saveFailed = false
+  @State private var newTagName = ""
+
+  private var trimmedTagName: String {
+    newTagName.trimmingCharacters(in: .whitespacesAndNewlines)
+  }
 
   var body: some View {
     Form {
@@ -21,6 +27,42 @@ struct NoteEditorView: View {
           .frame(minHeight: 240)
           .accessibilityLabel("Noteの本文")
           .accessibilityIdentifier("note-body-input")
+      }
+      Section("タグ") {
+        ForEach(
+          availableTags.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        ) { tag in
+          let isAttached = note.tags.contains { $0.id == tag.id }
+          Button {
+            do {
+              if isAttached {
+                try detachTag(tag, from: note, in: modelContext)
+              } else {
+                try attachTag(named: tag.name, to: note, in: modelContext)
+              }
+            } catch {
+              saveFailed = true
+            }
+          } label: {
+            Label(tag.name, systemImage: isAttached ? "checkmark.circle.fill" : "circle")
+          }
+          .accessibilityLabel("タグ \(tag.name)、\(isAttached ? "付与済み" : "未付与")")
+          .accessibilityIdentifier("tag-toggle-\(tag.id)")
+        }
+        HStack {
+          TextField("新しいタグ", text: $newTagName)
+            .accessibilityIdentifier("tag-name-input")
+          Button("タグを追加") {
+            do {
+              try attachTag(named: newTagName, to: note, in: modelContext)
+              newTagName = ""
+            } catch {
+              saveFailed = true
+            }
+          }
+          .disabled(trimmedTagName.isEmpty)
+          .accessibilityIdentifier("tag-create")
+        }
       }
       Section {
         Button("Noteを削除", role: .destructive) { confirmsDeletion = true }

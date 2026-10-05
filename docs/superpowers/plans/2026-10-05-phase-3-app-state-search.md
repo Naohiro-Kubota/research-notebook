@@ -30,17 +30,17 @@
 
 **対象:** `ResearchNotebook/Tag.swift`、`ResearchNotebook/Note.swift`、必要なら小さなタグ操作関数、`ResearchNotebookTests/SwiftDataPersistenceTests.swift`。
 
-- [ ] 前後の空白除去、空白だけの拒否、大文字・小文字だけが異なる名前での既存 Tag 再利用、同じ Note への二重付与防止をテストする。
-- [ ] Note への付与・解除を実装する。解除では Tag 自体を削除せず、別 Note の関連を変えない。
-- [ ] 保存後に別の `ModelContext` から再取得し、複数 Project の Note が同じ Tag を参照できることを確認する。
+- [x] 前後の空白除去、空白だけの拒否、大文字・小文字だけが異なる名前での既存 Tag 再利用、同じ Note への二重付与防止をテストする。
+- [x] Note への付与・解除を実装する。解除では Tag 自体を削除せず、別 Note の関連を変えない。
+- [x] 保存後に別の `ModelContext` から再取得し、複数 Project の Note が同じ Tag を参照できることを確認する。
 
 ## Task 3: Note のタグ操作 UI
 
 **対象:** `ResearchNotebook/NoteEditorView.swift`、必要ならタグ選択用の小さな View、`ResearchNotebookUITests/ResearchNotebookUITests.swift`。
 
-- [ ] 既存 Tag の選択、新規 Tag の作成、Note からの解除を操作できる UI を追加する。タグ名の変更と全体削除の操作は追加しない。
-- [ ] 有効な変更を既存の自動保存方針に沿って保存する。保存失敗は画面に示し、成功したように見せない。失敗時に他の Note・Tag を失わないことを確認する。
-- [ ] UI Test で付与、解除、別 Note での再利用、再起動後の保持、保存失敗時の表示を確認する。VoiceOver にタグ名と選択状態が伝わるラベルを付ける。
+- [x] 既存 Tag の選択、新規 Tag の作成、Note からの解除を操作できる UI を追加する。タグ名の変更と全体削除の操作は追加しない。
+- [x] 有効な変更を既存の自動保存方針に沿って保存する。保存失敗は画面に示し、成功したように見せない。失敗時に他の Note・Tag を失わないことを確認する。
+- [x] UI Test で付与、解除、別 Note での再利用、再起動後の保持、保存失敗時の表示を確認する。VoiceOver にタグ名と選択状態が伝わるラベルを付ける。
 
 ## Task 4: Project 内検索と空結果
 

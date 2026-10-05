@@ -78,6 +78,59 @@ final class ResearchNotebookUITests: XCTestCase {
   }
 
   @MainActor
+  func testTagsCanBeAddedReusedDetachedAndRestored() {
+    let app = makeApp()
+    app.launch()
+    createProject("Research", in: app)
+    createNote("First", in: app)
+    let input = app.textFields["tag-name-input"]
+    XCTAssertTrue(input.waitForExistence(timeout: 5))
+    input.tap()
+    input.typeText("  Shared  ")
+    app.buttons["tag-create"].tap()
+    XCTAssertTrue(tagButton("Shared", attached: true, in: app).waitForExistence(timeout: 5))
+    createNote("Second", in: app)
+    let unassigned = tagButton("Shared", attached: false, in: app)
+    XCTAssertTrue(unassigned.waitForExistence(timeout: 5))
+    unassigned.tap()
+    XCTAssertTrue(tagButton("Shared", attached: true, in: app).exists)
+    tagButton("Shared", attached: true, in: app).tap()
+    XCTAssertTrue(tagButton("Shared", attached: false, in: app).exists)
+    noteRows(app).matching(NSPredicate(format: "label == %@", "First")).firstMatch.tap()
+    XCTAssertTrue(tagButton("Shared", attached: true, in: app).exists)
+    app.terminate()
+    app.launch()
+    showProjectsIfNeeded(in: app)
+    projectRows(app).firstMatch.tap()
+    noteRows(app).matching(NSPredicate(format: "label == %@", "First")).firstMatch.tap()
+    XCTAssertTrue(tagButton("Shared", attached: true, in: app).waitForExistence(timeout: 5))
+    noteRows(app).matching(NSPredicate(format: "label == %@", "Second")).firstMatch.tap()
+    XCTAssertTrue(tagButton("Shared", attached: false, in: app).exists)
+  }
+
+  @MainActor
+  func testReadOnlyStoreRejectsTagWithoutLosingExistingData() {
+    let app = launchReadOnlyApp(withNote: true)
+    projectRows(app).firstMatch.tap()
+    noteRows(app).firstMatch.tap()
+    let input = app.textFields["tag-name-input"]
+    XCTAssertTrue(input.waitForExistence(timeout: 5))
+    input.tap()
+    input.typeText("Unsaved")
+    app.buttons["tag-create"].tap()
+    XCTAssertTrue(app.alerts["変更を保存できませんでした"].waitForExistence(timeout: 5))
+    app.alerts.buttons["OK"].tap()
+    app.terminate()
+    app.launch()
+    showProjectsIfNeeded(in: app)
+    projectRows(app).firstMatch.tap()
+    noteRows(app).firstMatch.tap()
+    XCTAssertEqual(app.textViews["note-body-input"].value as? String, "Existing body")
+    XCTAssertFalse(tagButton("Unsaved", attached: true, in: app).exists)
+    XCTAssertFalse(tagButton("Unsaved", attached: false, in: app).exists)
+  }
+
+  @MainActor
   func testBodyPasteSurvivesProjectSwitch() {
     let app = makeApp()
     // Pin app language for the Paste menu in the tested Simulator.
@@ -418,6 +471,15 @@ final class ResearchNotebookUITests: XCTestCase {
   @MainActor
   private func noteRows(_ app: XCUIApplication) -> XCUIElementQuery {
     app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "note-row-"))
+  }
+
+  @MainActor
+  private func tagButton(_ name: String, attached: Bool, in app: XCUIApplication) -> XCUIElement {
+    app.buttons.matching(
+      NSPredicate(
+        format: "label == %@",
+        "タグ \(name)、\(attached ? "付与済み" : "未付与")")
+    ).firstMatch
   }
 
   @MainActor
