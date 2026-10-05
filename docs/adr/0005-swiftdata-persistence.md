@@ -1,6 +1,6 @@
 # ADR-0005: Project と Note の SwiftData 永続化方式
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-05
 - Decision Owner: Human
 
@@ -70,7 +70,7 @@ Phase 2 は最初の永続スキーマを定義する段階であり、Migration
 
 ## Human Decision
 
-2026-10-05、人間は Phase 2 の Acceptance Criteria と「変更を自動保存し、保存ボタンは置かない」という利用者向け方針を承認した。永続化方式の選択肢 A・B、Relationship の具体的な定義、テスト用保存先を含む本 ADR 全体の最終承認は未了。
+2026-10-05、人間は Phase 2 の Acceptance Criteria と「変更を自動保存し、保存ボタンは置かない」という利用者向け方針を承認した。同日、Option A と本 ADR を最終承認した。
 
 外部依存、外部 API、破壊的なデータモデル変更、プライバシーに影響する設計が必要になった場合は別途検討する。
 
