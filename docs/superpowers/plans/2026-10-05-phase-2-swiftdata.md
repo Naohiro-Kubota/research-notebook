@@ -53,7 +53,7 @@
 
 **Interfaces:** `ModelContext.autosaveEnabled`、`save()`、`didSave`、`ModelConfiguration` の iPadOS 17 での利用条件と、保存失敗を利用者へ伝える経路。
 
-- [ ] **Step 1: Apple 公式資料と Xcode 27 の SDK で採用 API の Availability を確認する。** `@Model`、`@Relationship`、`@Query`、`ModelContainer`、`ModelContext`、テスト用 `ModelConfiguration` を対象とする。
+- [x] **Step 1: Apple 公式資料と Xcode 27 の SDK で採用 API の Availability を確認する。** `@Model`、`@Relationship`、`@Query`、`ModelContainer`、`ModelContext`、テスト用 `ModelConfiguration` を対象とする。
 - [ ] **Step 2: 自動保存の失敗を検出できる範囲を調べる。** `didSave` を失敗通知と取り違えない。確実に検出できる操作と、失敗を再現するテスト用保存先を記録する。
 - [ ] **Step 3: 承認済み Acceptance Criteria に足りる保存・エラー表示方法を Task 4 に具体化する。** 標準 API で満たせない場合は要求や ADR を暗黙に変えず、人間へ判断材料を提示してから実装する。
 
@@ -63,10 +63,10 @@
 
 **Interfaces:** `@Model final class Project` と `@Model final class Note`。双方が `id: UUID`、`title: String`、`body: String` を持つ。`Project.notes` は `.cascade` と `Note.project` の inverse を持つ。共通の `isValidTitle(_ title: String) -> Bool` は前後の空白を除いた空文字を拒否する。View は作成・更新前に検証し、Note 作成時には所属 Project を必須とする。
 
-- [ ] **Step 1: Swift Testing に失敗するテストを書く。** `persistsProjectAndNoteRelationship` は保存後に別の `ModelContext` から ID、タイトル、本文、所属を再取得する。`allowsDuplicateTitlesWithDistinctIDs` は同名の二組を区別する。`rejectsBlankTitles` は `isValidTitle` が空白だけの入力を拒むことを確認する。
-- [ ] **Step 2: 選択した iPad Simulator の UDID で `scripts/test.sh` を実行し、新規テストの失敗を確認する。** 期待: 未実装の型と振る舞いに対応する失敗。
-- [ ] **Step 3: 二つの `@Model` とタイトル検証を実装する。** テストには `ModelConfiguration(isStoredInMemoryOnly: true)` を使い、実 Web サービスや利用者の保存先に依存しない。
-- [ ] **Step 4: 同じテストを再実行する。** 期待: Task 1 のテスト成功。`scripts/lint.sh` と `git diff --check` を確認し、Task 1 をコミットする。
+- [x] **Step 1: Swift Testing に失敗するテストを書く。** `persistsProjectAndNoteRelationship` は保存後に別の `ModelContext` から ID、タイトル、本文、所属を再取得する。`allowsDuplicateTitlesWithDistinctIDs` は同名の二組を区別する。`rejectsBlankTitles` は `isValidTitle` が空白だけの入力を拒むことを確認する。
+- [x] **Step 2: 選択した iPad Simulator の UDID で `scripts/test.sh` を実行し、新規テストの失敗を確認する。** 期待: 未実装の型と振る舞いに対応する失敗。
+- [x] **Step 3: 二つの `@Model` とタイトル検証を実装する。** テストには `ModelConfiguration(isStoredInMemoryOnly: true)` を使い、実 Web サービスや利用者の保存先に依存しない。
+- [x] **Step 4: 同じテストを再実行する。** 期待: Task 1 のテスト成功。`scripts/lint.sh` と `git diff --check` を確認し、Task 1 をコミットする。
 
 ### Task 2: 既存の作成・編集 UI を SwiftData に接続する
 
@@ -85,7 +85,7 @@
 
 **Interfaces:** Note 削除は `ModelContext.delete(_:)` を使う。Project 削除は `Project.notes` の `.cascade` を使い、Note の手動全件削除を重ねない。削除後、無効な選択 ID を解除する。
 
-- [ ] **Step 1: 失敗するテストを書く。** Note 単体の削除・キャンセル・他項目の保持、Project 削除後の所属 Note の不在、選択詳細の解除を検証する。保存後に別コンテキストから再取得して削除を確認する。
+- [ ] **Step 1: 失敗するテストを書く。** Note 単体の削除・キャンセル・他項目の保持、Project 削除後の所属 Note の不在、選択詳細の解除を検証する。保存後に別コンテキストから再取得して削除を確認する。iPadOS 17 Simulator のメモリ内コンテナでは `delete(_:)` 後に子 Note が残った一方、`delete(model:where:)` では削除された。Task 3 で本番と同じディスク保存先でも再確認する。
 - [ ] **Step 2: `scripts/test.sh` で失敗を確認する。** 期待: Note 単体削除の操作が存在しない。
 - [ ] **Step 3: 標準の破壊的操作と確認表示で削除を実装する。** Project 削除時は所属 Note も失うことを既存の確認文で知らせる。
 - [ ] **Step 4: 同じテスト、`scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を実行する。** 期待: 削除と既存フローが成功。Task 3 をコミットする。
