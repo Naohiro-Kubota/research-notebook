@@ -20,7 +20,7 @@ struct NotebookState {
   private(set) var selectedNoteID: UUID? = nil
 
   static func isValidTitle(_ title: String) -> Bool {
-    !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    ResearchNotebook.isValidTitle(title)
   }
 
   @discardableResult
