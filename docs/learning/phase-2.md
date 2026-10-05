@@ -1,6 +1,6 @@
 # Phase 2 学習ログ — SwiftData 永続化
 
-確認日: 2026-10-05。現在は Task 2（既存 UI の SwiftData 接続）までの記録。Phase 2 全体の Acceptance Criteria は未達。
+確認日: 2026-10-05。現在は Task 3（削除）までの記録。Phase 2 全体の Acceptance Criteria は未達。
 
 ## Apple 公式資料で確認した事実
 
@@ -12,7 +12,7 @@
 | [ModelContext.save()](https://developer.apple.com/documentation/swiftdata/modelcontext/save())、[ModelContext](https://developer.apple.com/documentation/swiftdata/modelcontext) | `save()` はエラーを投げる。`didSave` は保存成功後の通知であり、失敗通知ではない。 | 保存失敗の検出・表示方法と再現用保存先は Task 0 の残課題。 |
 | [ModelConfiguration](https://developer.apple.com/documentation/swiftdata/modelconfiguration) | メモリ内の保存先を指定できる。 | モデルテストは `isStoredInMemoryOnly: true` の独立したコンテナを使用した。 |
 | [iOS & iPadOS 17 Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-17-release-notes) | SwiftData と `@Query` は iOS・iPadOS 17 で利用できる。 | Deployment Target の iPadOS 17 と整合する。 |
-| [Deleting persistent data from your app](https://developer.apple.com/documentation/swiftdata/deleting-persistent-data-from-your-app) | `ModelContext.delete(model:where:)` でモデルを条件付き削除でき、サンプルは `.cascade` による子の削除を説明している。 | Task 3 で Project 単体の条件付き削除を検証する。 |
+| [Deleting persistent data from your app](https://developer.apple.com/documentation/swiftdata/deleting-persistent-data-from-your-app)、[ModelContext.delete(_:)](https://developer.apple.com/documentation/swiftdata/modelcontext/delete(_:))、[ModelContext.delete(model:where:includeSubclasses:)](https://developer.apple.com/documentation/swiftdata/modelcontext/delete(model:where:includesubclasses:)) | `delete(_:)` で対象モデルを削除でき、`delete(model:where:)` は条件に一致するモデルを削除する。サンプルは `.cascade` による子の削除を説明している。 | Note は `delete(_:)`、Project は既存の ID 条件付き削除と `.cascade` を使う。Task 3 でディスク保存先の削除結果を検証した。 |
 
 Xcode 27 SDK の SwiftData インターフェースでも、`@Model`、`@Relationship`、`ModelContainer`、`ModelContext`、`ModelConfiguration` の iOS 17 以降での利用条件を確認した。
 
@@ -20,12 +20,12 @@ Xcode 27 SDK の SwiftData インターフェースでも、`@Model`、`@Relatio
 
 - Project と Note に UUID、必須タイトル用の検証関数、本文、所属 Relationship を定義した。同名でも UUID で区別する。本文は空文字を許す。`Note.project` は SwiftData の双方向 Relationship のため optional とし、作成時の引数では Project を必須にした。
 - 別の `ModelContext` から Project と Note の属性・所属を再取得できた。同名 Project・Note の識別と空白タイトル検証を Swift Testing で確認した。
-- 連鎖削除を先行調査したところ、iPadOS 17 Simulator のメモリ内コンテナで `ModelContext.delete(project)` の後に所属 Note が残った。一方、同じデータを `delete(model: Project.self, where: ...)` で削除すると Note も消えた。これはこの環境での観測であり、Apple が一般的な動作として保証しているという意味ではない。Task 3 でディスク保存先を含めて再検証し、承認済みの `.cascade` 方針のまま実装する。
+- 連鎖削除を先行調査したところ、iPadOS 17 Simulator のメモリ内コンテナで `ModelContext.delete(project)` の後に所属 Note が残った。一方、同じデータを `delete(model: Project.self, where: ...)` で削除すると Note も消えた。これはこの環境での観測であり、Apple が一般的な動作として保証しているという意味ではない。Task 3 では本番と同じディスク保存先で ID 条件付き Project 削除を行い、再起動相当の新しいコンテナから所属 Note の不在と他項目の保持を確認した。
 
 ## 残課題
 
 - Task 0 は完了。暗黙の自動保存には公開された失敗通知が確認できなかったため、Task 4 では自動保存を有効に保ち、変更直後の明示的な `save()` でエラーを検出する。詳細は下記。Task 4 の UI とエラー表示は未実装。
-- Task 3〜5: Note 単体削除、Project の連鎖削除の永続検証、保存失敗表示、追加の再起動 UI Test、iPad の操作・Accessibility 確認を行う。
+- Task 4〜5: 保存失敗表示、追加の再起動 UI Test、iPad の操作・Accessibility 確認を行う。
 
 ## 今回の Definition of Done 確認
 
@@ -52,3 +52,15 @@ Task 0 の確認: 読み取り専用ディスク保存先のテストを含む S
 - iPadOS 17 Simulator で作成・編集・タイトル検証・Project 切替・本文ペースト・再起動後の本文復元の UI Test が成功した。保存失敗の表示は Task 4 の範囲で未実装。Task 2 の新規 UI は標準の SwiftUI フォームと Navigation を維持し、既存の accessibilityIdentifier を引き継いだ。実機の VoiceOver とウインドウ幅の確認は Task 5 に残る。
 - 保存先を開けない場合は既存データを消さず、エラー画面を表示する。読み取り専用の存在しないテスト保存先で、起動時クラッシュせずエラー画面になることを UI Test で確認した。通常の保存処理中の失敗表示は Task 4 に残る。
 - Task 2 の最終確認: `scripts/build.sh`、Release ビルド、`scripts/lint.sh`、`git diff --check`、Swift Testing 5 件、UI Test 10 件が成功した。Debug 専用の保存先失敗テストも分岐追加後に再実行して成功した。新規の Swift 警告はない。Task 2 の DoD は満たしたが、Note 単体削除、保存失敗表示、Project 削除後のディスク再取得、実操作の確認が残るため Phase 2 全体の DoD は未達。
+
+## Task 3: Note 単体削除と Project の連鎖削除（2026-10-05）
+
+**Apple 公式資料の事実:** [Deleting persistent data from your app](https://developer.apple.com/documentation/swiftdata/deleting-persistent-data-from-your-app) は `ModelContext.delete(_:)` でモデルを削除する例と `.cascade` による関連モデル削除の例を示す。[ModelContext.delete(model:where:includeSubclasses:)](https://developer.apple.com/documentation/swiftdata/modelcontext/delete(model:where:includesubclasses:)) は条件に一致するモデルを削除する。[ModelContext.save()](https://developer.apple.com/documentation/swiftdata/modelcontext/save()) は失敗時にエラーを投げる。
+
+**このプロジェクトの実装:** Note の編集画面に破壊的な削除ボタンと確認画面を設けた。キャンセル時は変更せず、確定時に対象 Note を `delete(_:)` で削除して `save()` する。成功したときだけ選択中の詳細を解除する。保存が失敗した場合はロールバックしてエラーを表示する。Project は Task 2 の ID 条件付き削除と承認済み `.cascade` を継続し、子 Note を手動で削除しない。
+
+**実測:** iPadOS 17.2 Simulator で、Note 削除後に別のコンテキストから対象 Note が消え、同じ Project の他 Note と別 Project が残ることを確認した。Project 削除はディスク保存先を新しいコンテナで開き直し、対象 Project と所属 Note がなく、別 Project と Note が残ることを確認した。UI Test では Note 削除のキャンセル、確定後の詳細解除、アプリ再起動後の状態を確認した。Apple の API 説明と実測を区別し、iPadOS 17 Simulator での挙動を記録している。
+
+**Task 3 の Definition of Done:** `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` は成功。Swift Testing 7 件と UI Test 11 件が成功した。Build に App Intents の依存がないためメタデータ抽出を省略したという既存のツール警告のみがあり、新規の Swift 警告はない。削除操作にはテキスト付きの破壊的ボタンと確認画面を使い、色だけで操作を表していない。SwiftUI 標準の Button と Alert により Accessibility の基本要素を維持した。VoiceOver、最大 Dynamic Type、キーボード操作の実機・手動確認は Task 5 に残る。
+
+**残る確認:** Task 4 で有効な編集値の保存失敗表示と連続入力を扱う。Task 5 で VoiceOver、可変幅、キーボードなどの実操作を確認する。Phase 2 全体の DoD は未達。

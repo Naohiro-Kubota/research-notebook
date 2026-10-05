@@ -164,6 +164,40 @@ final class ResearchNotebookUITests: XCTestCase {
     XCTAssertFalse(noteBody.exists)
     XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
     XCTAssertFalse(app.buttons["project-edit"].exists)
+    app.terminate()
+    app.launch()
+    XCTAssertTrue(app.staticTexts["project-empty"].waitForExistence(timeout: 5))
+    XCTAssertEqual(projectRows(app).count, 0)
+  }
+
+  @MainActor
+  func testNoteDeletionCanBeCancelledAndConfirmed() {
+    let app = makeApp()
+    app.launch()
+    createProject("Research", in: app)
+    createNote("Keep", in: app)
+    createNote("Delete", in: app)
+    let deletedRow = noteRows(app).matching(NSPredicate(format: "label == %@", "Delete")).firstMatch
+    XCTAssertTrue(deletedRow.waitForExistence(timeout: 5))
+    XCTAssertTrue(app.buttons["note-delete"].waitForExistence(timeout: 5))
+    app.buttons["note-delete"].tap()
+    XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 5))
+    app.alerts.buttons["キャンセル"].tap()
+    XCTAssertTrue(deletedRow.exists)
+    XCTAssertTrue(app.textFields["note-title-input"].exists)
+
+    app.buttons["note-delete"].tap()
+    app.alerts.buttons["削除"].tap()
+    XCTAssertFalse(deletedRow.exists)
+    XCTAssertEqual(noteRows(app).count, 1)
+    XCTAssertEqual(noteRows(app).firstMatch.label, "Keep")
+    XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
+    app.terminate()
+    app.launch()
+    projectRows(app).firstMatch.tap()
+    XCTAssertEqual(noteRows(app).count, 1)
+    XCTAssertEqual(noteRows(app).firstMatch.label, "Keep")
+    XCTAssertFalse(app.textFields["note-title-input"].exists)
   }
 
   @MainActor
@@ -212,8 +246,7 @@ final class ResearchNotebookUITests: XCTestCase {
     XCTAssertEqual(noteRows(app).firstMatch.label, "U")
     body.tap()
     XCTAssertEqual(editorTitle.value as? String, "U")
-    XCTAssertFalse(app.buttons["note-delete"].exists)
-    XCTAssertFalse(app.buttons["Noteを削除"].exists)
+    XCTAssertTrue(app.buttons["note-delete"].exists)
     noteRows(app).firstMatch.tap()
     XCTAssertEqual(body.value as? String, "Note body")
   }
@@ -280,6 +313,21 @@ final class ResearchNotebookUITests: XCTestCase {
     field.typeText(title)
     app.buttons["project-create"].tap()
     XCTAssertTrue(projectRows(app).firstMatch.waitForExistence(timeout: 5))
+  }
+
+  @MainActor
+  private func createNote(_ title: String, in app: XCUIApplication) {
+    app.buttons["note-add"].tap()
+    let fields = app.textFields.matching(identifier: "note-title-input")
+    XCTAssertTrue(fields.firstMatch.waitForExistence(timeout: 5))
+    let field = fields.element(boundBy: fields.count - 1)
+    XCTAssertTrue(field.waitForExistence(timeout: 5))
+    field.tap()
+    field.typeText(title)
+    app.buttons["note-create"].tap()
+    XCTAssertTrue(
+      noteRows(app).matching(NSPredicate(format: "label == %@", title)).firstMatch
+        .waitForExistence(timeout: 5))
   }
 
   @MainActor

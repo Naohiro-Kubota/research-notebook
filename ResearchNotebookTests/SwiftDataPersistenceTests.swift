@@ -89,4 +89,71 @@ struct SwiftDataPersistenceTests {
     #expect(try verifier.fetch(FetchDescriptor<Project>()).map(\.title) == ["Existing"])
   }
 
+  @Test func deletingNoteKeepsOtherNotesAndProjects() throws {
+    let container = try ModelContainer(
+      for: Project.self, Note.self,
+      configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    let context = ModelContext(container)
+    let first = Project(title: "First")
+    let second = Project(title: "Second")
+    context.insert(first)
+    context.insert(second)
+    let deleted = Note(project: first, title: "Delete")
+    context.insert(deleted)
+    let retained = Note(project: first, title: "Keep")
+    context.insert(retained)
+    let other = Note(project: second, title: "Other")
+    context.insert(other)
+    let deletedID = deleted.id
+    let retainedIDs = Set([retained.id, other.id])
+    let projectIDs = Set([first.id, second.id])
+    try context.save()
+
+    let deletionContext = ModelContext(container)
+    let savedNote = try #require(
+      deletionContext.fetch(FetchDescriptor<Note>()).first { $0.id == deletedID })
+    deletionContext.delete(savedNote)
+    try deletionContext.save()
+
+    let reader = ModelContext(container)
+    #expect(Set(try reader.fetch(FetchDescriptor<Project>()).map(\.id)) == projectIDs)
+    #expect(Set(try reader.fetch(FetchDescriptor<Note>()).map(\.id)) == retainedIDs)
+  }
+
+  @Test func deletingProjectCascadesOnDisk() throws {
+    let storeURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString)
+      .appendingPathExtension("store")
+    let deletedID = UUID()
+    let retainedID = UUID()
+    let retainedNoteID = UUID()
+    do {
+      let container = try ModelContainer(
+        for: Project.self, Note.self,
+        configurations: ModelConfiguration(url: storeURL))
+      let context = ModelContext(container)
+      let deleted = Project(id: deletedID, title: "Delete")
+      let retained = Project(id: retainedID, title: "Keep")
+      _ = Note(project: deleted, title: "Delete note")
+      _ = Note(id: retainedNoteID, project: retained, title: "Keep note")
+      context.insert(deleted)
+      context.insert(retained)
+      try context.save()
+    }
+    do {
+      let container = try ModelContainer(
+        for: Project.self, Note.self,
+        configurations: ModelConfiguration(url: storeURL))
+      let context = ModelContext(container)
+      try context.delete(model: Project.self, where: #Predicate { $0.id == deletedID })
+      try context.save()
+    }
+    let container = try ModelContainer(
+      for: Project.self, Note.self,
+      configurations: ModelConfiguration(url: storeURL))
+    let reader = ModelContext(container)
+    #expect(try reader.fetch(FetchDescriptor<Project>()).map(\.id) == [retainedID])
+    #expect(try reader.fetch(FetchDescriptor<Note>()).map(\.id) == [retainedNoteID])
+  }
+
 }
