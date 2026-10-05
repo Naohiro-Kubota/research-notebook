@@ -316,6 +316,108 @@ struct SwiftDataPersistenceTests {
     return (container, configuration)
   }
 
+  @Test(arguments: [true, false])
+  func normalizesAndReusesTagsAcrossProjects(inMemory: Bool) throws {
+    let (container, configuration) = try tagContainer(inMemory: inMemory)
+    let writer = ModelContext(container)
+    let firstProject = Project(title: "First")
+    let secondProject = Project(title: "Second")
+    writer.insert(firstProject)
+    writer.insert(secondProject)
+    let first = Note(project: firstProject, title: "First note")
+    let second = Note(project: secondProject, title: "Second note")
+    writer.insert(first)
+    writer.insert(second)
+    try writer.save()
+
+    #expect(throws: TagInputError.self) {
+      try attachTag(named: " \n\t ", to: first, in: writer)
+    }
+    try attachTag(named: "  Research  ", to: first, in: writer)
+    try attachTag(named: "RESEARCH", to: first, in: writer)
+    try attachTag(named: "research", to: second, in: writer)
+    let tagID = try #require(first.tags.first?.id)
+    #expect(first.tags.count == 1)
+    #expect(second.tags.count == 1)
+
+    let reopened =
+      inMemory
+      ? container
+      : try ModelContainer(
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, configurations: configuration)
+    let reader = ModelContext(reopened)
+    let tags = try reader.fetch(FetchDescriptor<ResearchNotebook.Tag>())
+    #expect(tags.count == 1)
+    #expect(tags.first?.id == tagID)
+    #expect(tags.first?.name == "Research")
+    let notes = try reader.fetch(FetchDescriptor<Note>())
+    #expect(notes.count == 2)
+    #expect(notes.allSatisfy { $0.tags.map(\.id) == [tagID] })
+    #expect(Set(notes.compactMap { $0.project?.id }) == Set([firstProject.id, secondProject.id]))
+  }
+
+  @Test func detachingTagKeepsItAndOtherNotes() throws {
+    let (container, _) = try tagContainer(inMemory: true)
+    let writer = ModelContext(container)
+    let project = Project(title: "Project")
+    writer.insert(project)
+    let first = Note(project: project, title: "First")
+    let second = Note(project: project, title: "Second")
+    writer.insert(first)
+    writer.insert(second)
+    try writer.save()
+    try attachTag(named: "Shared", to: first, in: writer)
+    try attachTag(named: "shared", to: second, in: writer)
+    let tag = try #require(first.tags.first)
+    try detachTag(tag, from: first, in: writer)
+
+    let reader = ModelContext(container)
+    let notes = try reader.fetch(FetchDescriptor<Note>())
+    #expect(notes.first { $0.id == first.id }?.tags.isEmpty == true)
+    #expect(notes.first { $0.id == second.id }?.tags.map(\.id) == [tag.id])
+    #expect(try reader.fetch(FetchDescriptor<ResearchNotebook.Tag>()).map(\.id) == [tag.id])
+  }
+
+  @Test func failedTagSaveKeepsExistingNotesAndTags() throws {
+    let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    let url = directory.appendingPathComponent("tags.store")
+    do {
+      let writable = try ModelContainer(
+        for: Project.self, Note.self, ResearchNotebook.Tag.self,
+        configurations: ModelConfiguration(url: url))
+      let context = ModelContext(writable)
+      let project = Project(title: "Existing")
+      context.insert(project)
+      let first = Note(project: project, title: "First")
+      let second = Note(project: project, title: "Second")
+      context.insert(first)
+      context.insert(second)
+      try context.save()
+      try attachTag(named: "Shared", to: first, in: context)
+      try attachTag(named: "Shared", to: second, in: context)
+    }
+    let readOnly = try ModelContainer(
+      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      configurations: ModelConfiguration(url: url, allowsSave: false))
+    let context = ModelContext(readOnly)
+    let notes = try context.fetch(FetchDescriptor<Note>())
+    let first = try #require(notes.first { $0.title == "First" })
+    let second = try #require(notes.first { $0.title == "Second" })
+    let shared = try #require(first.tags.first)
+    #expect(throws: (any Error).self) {
+      try attachTag(named: "Unsaved", to: first, in: context)
+    }
+    #expect(throws: (any Error).self) {
+      try detachTag(shared, from: second, in: context)
+    }
+    let verifier = ModelContext(readOnly)
+    let savedNotes = try verifier.fetch(FetchDescriptor<Note>())
+    #expect(savedNotes.count == 2)
+    #expect(savedNotes.allSatisfy { $0.tags.map(\.name) == ["Shared"] })
+    #expect(try verifier.fetch(FetchDescriptor<ResearchNotebook.Tag>()).map(\.name) == ["Shared"])
+  }
+
   @Test func preservesPhase2StoreCopy() throws {
     let original = try #require(
       Bundle(for: Phase2FixtureBundle.self)
