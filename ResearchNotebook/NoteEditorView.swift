@@ -7,6 +7,7 @@ struct NoteEditorView: View {
   @Environment(\.modelContext) private var modelContext
   @State private var confirmsDeletion = false
   @State private var deletionFailed = false
+  @State private var saveFailed = false
 
   var body: some View {
     Form {
@@ -44,6 +45,21 @@ struct NoteEditorView: View {
     .navigationTitle(note.title)
     .alert("Noteを削除できませんでした", isPresented: $deletionFailed) {
       Button("OK") {}
+    }
+    .alert("変更を保存できませんでした", isPresented: $saveFailed) {
+      Button("OK") {}
+    }
+    .onChange(of: note.title) { _, _ in
+      if !saveChanges(modelContext) {
+        modelContext.rollback()
+        saveFailed = true
+      }
+    }
+    .onChange(of: note.body) { _, _ in
+      if !saveChanges(modelContext) {
+        modelContext.rollback()
+        saveFailed = true
+      }
     }
   }
 }

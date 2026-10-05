@@ -9,6 +9,7 @@ struct ProjectSidebarView: View {
   @State private var showsCreation = false
   @State private var newTitle = ""
   @State private var newBody = ""
+  @State private var saveFailed = false
 
   var body: some View {
     List(selection: $selectedProjectID) {
@@ -67,13 +68,21 @@ struct ProjectSidebarView: View {
             Button("作成") {
               let project = Project(title: newTitle, body: newBody)
               modelContext.insert(project)
-              selectedNoteID = nil
-              selectedProjectID = project.id
-              showsCreation = false
+              if saveChanges(modelContext) {
+                selectedNoteID = nil
+                selectedProjectID = project.id
+                showsCreation = false
+              } else {
+                modelContext.delete(project)
+                saveFailed = true
+              }
             }
             .disabled(!isValidTitle(newTitle))
             .accessibilityIdentifier("project-create")
           }
+        }
+        .alert("変更を保存できませんでした", isPresented: $saveFailed) {
+          Button("OK") {}
         }
       }
     }

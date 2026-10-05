@@ -1,6 +1,6 @@
 # Phase 2 学習ログ — SwiftData 永続化
 
-確認日: 2026-10-05。現在は Task 3（削除）までの記録。Phase 2 全体の Acceptance Criteria は未達。
+確認日: 2026-10-05。現在は Task 4（自動保存と保存失敗表示）までの記録。Phase 2 全体の Acceptance Criteria は Task 5 の実操作確認待ち。
 
 ## Apple 公式資料で確認した事実
 
@@ -24,8 +24,8 @@ Xcode 27 SDK の SwiftData インターフェースでも、`@Model`、`@Relatio
 
 ## 残課題
 
-- Task 0 は完了。暗黙の自動保存には公開された失敗通知が確認できなかったため、Task 4 では自動保存を有効に保ち、変更直後の明示的な `save()` でエラーを検出する。詳細は下記。Task 4 の UI とエラー表示は未実装。
-- Task 4〜5: 保存失敗表示、追加の再起動 UI Test、iPad の操作・Accessibility 確認を行う。
+- Task 0 と Task 4 は完了。暗黙の自動保存には公開された失敗通知が確認できなかったため、自動保存を有効に保ち、有効な変更直後の `save()` でエラーを検出する。
+- Task 5: iPad の可変幅、Dark Mode、Dynamic Type、VoiceOver、キーボード操作を確認する。
 
 ## 今回の Definition of Done 確認
 
@@ -64,3 +64,13 @@ Task 0 の確認: 読み取り専用ディスク保存先のテストを含む S
 **Task 3 の Definition of Done:** `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` は成功。Swift Testing 7 件と UI Test 11 件が成功した。Build に App Intents の依存がないためメタデータ抽出を省略したという既存のツール警告のみがあり、新規の Swift 警告はない。削除操作にはテキスト付きの破壊的ボタンと確認画面を使い、色だけで操作を表していない。SwiftUI 標準の Button と Alert により Accessibility の基本要素を維持した。VoiceOver、最大 Dynamic Type、キーボード操作の実機・手動確認は Task 5 に残る。
 
 **残る確認:** Task 4 で有効な編集値の保存失敗表示と連続入力を扱う。Task 5 で VoiceOver、可変幅、キーボードなどの実操作を確認する。Phase 2 全体の DoD は未達。
+
+## Task 4: 自動保存と保存失敗表示（2026-10-05）
+
+**公式情報と設計判断:** [ModelContext.autosaveEnabled](https://developer.apple.com/documentation/swiftdata/modelcontext/autosaveenabled) に従い、メインコンテキストの自動保存は有効のまま使用する。[ModelContext.save()](https://developer.apple.com/documentation/swiftdata/modelcontext/save()) が投げるエラーを、Project・Note の作成と有効な編集の直後に捕捉する。保存ボタンは置かない。これは本プロジェクトの失敗検出方法であり、Apple が各キー入力後のディスク保存を保証しているという意味ではない。
+
+**実装と実測:** Project・Note の作成では保存成功後だけ画面を閉じ、選択を変更する。失敗時は作成画面にエラーを表示し、追加したモデルだけを取り消す。編集失敗時もエラーを表示し、未保存のモデル変更をロールバックする。iPadOS 17.2 Simulator の読み取り専用ディスク保存先で、Project 作成、Note 作成、Note 編集の失敗を UI Test で確認した。失敗後にアプリを再起動しても既存項目のみが残り、新規項目や編集値は保存されていない。Note 作成失敗時にメインコンテキスト全体をロールバックすると、この環境では `@Query` の Project 一覧が空になる挙動を観測したため、その操作で追加した Note だけを取り消す。これは Simulator での実測であり、SwiftData の一般的な保証ではない。
+
+**再起動と入力:** Project のタイトル・本文、Note のタイトル・本文が再起動後に復元された。Note 本文の連続入力とペースト、Project 切替後の全文保持も UI Test で確認した。保存失敗後に既存 Project・Note が画面に残ることも確認した。保存ボタンは存在しない。
+
+**Task 4 の検証:** `scripts/build.sh`、`scripts/lint.sh`、Swift Testing 8 件、UI Test 14 件が成功した。Task 5 の実操作と Phase 2 全体の Definition of Done は未確認。
