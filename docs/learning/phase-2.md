@@ -89,3 +89,7 @@ Task 0 の確認: 読み取り専用ディスク保存先のテストを含む S
 **最終検証:** `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` は成功した。iPadOS 17.2 の iPad Pro 11-inch Simulator で Swift Testing 8 件と UI Test 15 件が成功した。テストには再起動後の復元、所属関係、空白タイトル、同名項目、Note 単体削除、Project の連鎖削除、作成・編集時の保存失敗、保存先を開けない場合、主要ラベルを含む。Build と Test の App Intents メタデータ抽出省略は既存のツール警告であり、新規の Swift コンパイラ警告はない。
 
 **Definition of Done:** 承認済み Acceptance Criteria は全項目をテスト結果と操作確認に照らして満たした。対象外の iCloud、外部 API、外部依存、将来用の Migration Plan は追加していない。Apple 公式情報と本プロジェクトの判断は上記で分けて記録した。可変幅、Dark Mode、Dynamic Type、VoiceOver、キーボード操作を Simulator で確認し、色だけに依存する新規 UI はない。ADR-0005 の変更は不要。実機での VoiceOver と外部キーボードの動作は未確認であり、Simulator での確認範囲を超えて保証しない。
+
+## 完了後のレビュー（2026-10-05）
+
+人間は、[Phase 2 レビューの継続課題](../development/phase-2-review-followups.md)に記録した4件を現時点で許容した。保存失敗時の入力消失、作成シートの終了、入力中の同期保存、削除失敗テストの不足は未解決である。上記の完了時の検証結果は維持し、これらを解決済みとは扱わない。
