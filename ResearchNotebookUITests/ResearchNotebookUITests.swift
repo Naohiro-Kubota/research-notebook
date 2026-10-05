@@ -90,6 +90,7 @@ final class ResearchNotebookUITests: XCTestCase {
     body.tap()
     body.typeText("Project body")
     XCTAssertEqual(body.value as? String, "Project body")
+    XCTAssertEqual(projectRows(app).firstMatch.label, "Updated research")
     let editedTitle = app.textFields["project-title-input"]
     editedTitle.tap()
     editedTitle.typeText(
