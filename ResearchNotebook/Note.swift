@@ -7,6 +7,7 @@ final class Note {
   var title: String
   var body: String
   var project: Project?
+  var tags: [Tag] = []
 
   init(id: UUID = UUID(), project: Project, title: String, body: String = "") {
     self.id = id
