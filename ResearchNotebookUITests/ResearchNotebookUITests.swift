@@ -71,8 +71,6 @@ final class ResearchNotebookUITests: XCTestCase {
   @MainActor
   func testProjectCreationAndEditing() {
     let app = XCUIApplication()
-    // Command shortcuts failed on the tested iPadOS 17.2 Simulator; fix menu localization.
-    app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
     app.launch()
     XCTAssertTrue(app.staticTexts["project-empty"].waitForExistence(timeout: 5))
     app.buttons["project-add"].tap()
@@ -93,16 +91,17 @@ final class ResearchNotebookUITests: XCTestCase {
     body.typeText("Project body")
     XCTAssertEqual(body.value as? String, "Project body")
     let editedTitle = app.textFields["project-title-input"]
-    editedTitle.press(forDuration: 1.2)
-    let selectAll = app.menuItems["Select All"]
-    XCTAssertTrue(selectAll.waitForExistence(timeout: 3))
-    selectAll.tap()
-    editedTitle.typeText("   ")
+    editedTitle.tap()
+    editedTitle.typeText(
+      String(repeating: XCUIKeyboardKey.delete.rawValue, count: "Updated research".count - 1))
+    XCTAssertTrue(waitForValue("U", in: editedTitle))
+    XCTAssertEqual(projectRows(app).firstMatch.label, "U")
+    replaceText(editedTitle, with: "   ")
     XCTAssertTrue(app.staticTexts["title-validation-error"].exists)
     body.tap()
-    XCTAssertEqual(app.textFields["project-title-input"].value as? String, "Updated research")
+    XCTAssertEqual(app.textFields["project-title-input"].value as? String, "U")
     app.buttons["project-edit-done"].tap()
-    XCTAssertEqual(projectRows(app).firstMatch.label, "Updated research")
+    XCTAssertEqual(projectRows(app).firstMatch.label, "U")
     app.buttons["project-edit"].tap()
     XCTAssertEqual(app.textViews["project-body-input"].value as? String, "Project body")
   }
@@ -169,8 +168,6 @@ final class ResearchNotebookUITests: XCTestCase {
   @MainActor
   func testNoteCreationAndLiveEditing() {
     let app = XCUIApplication()
-    // Command shortcuts failed on the tested iPadOS 17.2 Simulator; fix menu localization.
-    app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
     app.launch()
     createProject("Research", in: app)
     XCTAssertTrue(app.staticTexts["note-empty"].waitForExistence(timeout: 5))
@@ -194,15 +191,15 @@ final class ResearchNotebookUITests: XCTestCase {
     XCTAssertEqual(body.value as? String, "Note body")
     XCTAssertEqual(noteRows(app).firstMatch.label, "Updated note")
     editorTitle.tap()
-    editorTitle.press(forDuration: 1.2)
-    let selectAll = app.menuItems["Select All"]
-    XCTAssertTrue(selectAll.waitForExistence(timeout: 3))
-    selectAll.tap()
-    editorTitle.typeText("   ")
+    editorTitle.typeText(
+      String(repeating: XCUIKeyboardKey.delete.rawValue, count: "Updated note".count - 1))
+    XCTAssertTrue(waitForValue("U", in: editorTitle))
+    XCTAssertEqual(noteRows(app).firstMatch.label, "U")
+    replaceText(editorTitle, with: "   ")
     XCTAssertTrue(app.staticTexts["title-validation-error"].exists)
-    XCTAssertEqual(noteRows(app).firstMatch.label, "Updated note")
+    XCTAssertEqual(noteRows(app).firstMatch.label, "U")
     body.tap()
-    XCTAssertEqual(editorTitle.value as? String, "Updated note")
+    XCTAssertEqual(editorTitle.value as? String, "U")
     XCTAssertFalse(app.buttons["note-delete"].exists)
     XCTAssertFalse(app.buttons["Noteを削除"].exists)
     noteRows(app).firstMatch.tap()
@@ -262,5 +259,12 @@ final class ResearchNotebookUITests: XCTestCase {
     field.tap()
     let current = field.value as? String ?? ""
     field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count) + text)
+  }
+
+  @MainActor
+  private func waitForValue(_ value: String, in field: XCUIElement) -> Bool {
+    let expectation = XCTNSPredicateExpectation(
+      predicate: NSPredicate(format: "value == %@", value), object: field)
+    return XCTWaiter.wait(for: [expectation], timeout: 5) == .completed
   }
 }
