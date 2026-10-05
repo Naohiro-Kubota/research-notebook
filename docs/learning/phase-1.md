@@ -5,7 +5,7 @@
 ## 学習した概念と設計判断
 
 - `ContentView` の `@State` が値型の `NotebookState` を所有し、子 View へ Binding を渡す。ViewModel や Repository は追加しない（ADR-0001）。
-- Project と Note は UUID で関連付け、同名でも区別する。モデル操作が必須タイトルと選択の整合性を守る。
+- Project と Note は UUID で関連付け、同名でも区別する。同じ種類の重複 UUID は追加前に拒否し、既存データと Project / Note の選択を保持する。Project と Note の種類をまたぐ同一 UUID は許可する。モデル操作が必須タイトルと選択の整合性を守る。
 - `NavigationSplitView` の sidebar / content / detail に Project / Note / 編集を配置する（人間が承認した ADR-0004）。Note 選択時には編集領域を確保するため先行列の表示を切り替える。3 列が常時並ぶという意味ではない。
 - 作成時は無効タイトルで作成を無効にする。編集時は入力欄の draft と最後の有効なモデル値を分け、フォーカスを離れた時に戻す。無効状態の説明は文言を使う。
 - Note 本文の入力は小さな `NoteBodyEditor` の `@State` に保持し、`onChange` でモデルへ即時反映する。親モデル更新による入力Viewの再評価を `equatable()` で抑える。具体的に観測した文字欠落への修正であり、全Viewへ適用する方針ではない。保存ボタンはなく、データは再起動で消える。SwiftData は Phase 2。
@@ -32,9 +32,11 @@ Xcode 27.0、iPadOS 17.2 の iPad Pro (11-inch) (4th generation)、UDID `33CA3AC
 | 検証 | 結果・証拠の範囲 |
 |---|---|
 | Build / Lint | `scripts/build.sh`、`scripts/lint.sh` 成功。Swift コンパイラの新規警告なし。既知の App Intents metadata extraction skipped 警告は残る。 |
-| 全自動テスト | 修正後のLight / largeでSwift Testing 7 件、UI Test 9 件が成功（失敗 0）。モデルの正常・異常系、作成・編集・キャンセル・削除・選択解除、連続入力、ペーストとモデル反映を検証。 |
+| 全自動テスト | 最終検証日 2026-10-05。修正後のLight / largeでSwift Testing 10 件、UI Test 9 件が成功（失敗 0）。モデルの正常・異常系、作成・編集・キャンセル・削除・選択解除、連続入力、ペーストとモデル反映を検証。 |
 | 連続入力 | `testContinuousBodyInputAndRelaunchClearsData` で複数行57文字を1回の `typeText` で入力し、全文一致を確認。文字ごとの待機なし。修正後の最大 Dynamic Type / Dark Mode で3回反復成功。 |
-| ペーストとモデル反映 | `testBodyPasteSurvivesProjectSwitch` で標準Pasteメニューから複数行57文字を入力し、別Projectへ移動した後に元のNoteを選び直して全文一致を確認。入力欄の状態だけでなく、モデルへ反映された本文を読み直している。 |
+| ペーストとモデル反映 | `testBodyPasteSurvivesProjectSwitch` で標準Pasteメニューから複数行57文字を入力し、別Projectへ移動した後に元のNoteを選び直して全文一致を確認。入力欄の状態だけでなく、モデルへ反映された本文を読み直している。⌘V が当該 Simulator で成立しなかったため、このテストだけ英語の起動言語・ロケールを固定する代替を採用した。非英語 Simulator での比較検証はしていない。 |
+| タイトル検証 | Project / Note 編集の `Select All` メニュー操作を削除。⌘A も当該 Simulator で選択を行わなかったため、削除キーで最後の有効タイトル `U` を確定し、空白入力の説明・保存値保持・フォーカスを離した後の復元を検証。完全な更新タイトルと本文の即時反映も確認。 |
+| Project 削除 | `testProjectDeletionRemovesProjectNoteAndSelectedDetail` で Note を作成・選択してから親 Project を削除し、Project / Note 行、Note タイトル・本文欄の不在と詳細の空状態を確認。内部配列のカスケード削除はモデルテストで補完。 |
 | 再起動 | 同テストで Project と Note を作成後、terminate / launch し、Project 空状態・行なし・本文欄なしを確認。 |
 | 全画面操作 | 上記 iPad の通常 Simulator ウインドウで Project → Note → 編集を UI Test で確認。実際の狭いアプリウインドウへの変更は未確認。 |
 | Dark Mode / 最大 Dynamic Type | 修正後の連続本文入力、ペースト・Project切替、Project編集の3テストが成功。Note編集画面の保存画像を目視し、タイトル・本文の折り返しと操作領域を確認。全UIの目視確認ではない。 |
@@ -91,7 +93,7 @@ Dark Mode と最大 Dynamic Type の設定で、Project 作成・編集は成功
 | 必須タイトルで Project / Note 作成、空本文可 | 自動確認: モデルテストと作成 UI Test。 |
 | 選択 Project の Note 表示・Note 編集 | 自動確認: Note 作成編集、Project 切替 UI Test。 |
 | 有効タイトル・本文の即時反映 | 自動確認: モデル更新、Project / Note 編集 UI Test、連続本文入力。 |
-| Project 削除で所属 Note・選択解除、キャンセル | 自動確認: モデル削除、UI の削除とキャンセル。所属 Note の UI 削除後表示はモデル検証で補完。 |
+| Project 削除で所属 Note・選択解除、キャンセル | 自動確認: モデル削除、UI の削除とキャンセル。Note 作成・選択後の Project / Note 行と詳細の消去も UI Test で確認。内部配列のカスケード削除はモデル検証で補完。 |
 | 空白作成拒否、無効編集の説明・非確定 | 自動確認: モデル異常系、Project / Note の UI Test。 |
 | 再起動非復元・保存操作なし | 自動確認: 再起動テスト。保存操作なしはソース確認。 |
 | 全画面・狭い幅で編集まで移動して戻る | 確認済み: 全画面主要フローの自動確認と、人間の実操作 1・2（中間幅も含む）。 |
@@ -116,9 +118,9 @@ Dark Mode と最大 Dynamic Type の設定で、Project 作成・編集は成功
 | 新規コンパイラ警告なし | 確認: 既知 App Intents 警告のみ。 |
 | 不要な抽象化なし | 確認。 |
 | エラー処理考慮 | 確認: 無効タイトルと無効 ID をモデルで扱う。外部通信なし。 |
-| 追加変更テスト成功 | 最大 Dynamic Type の失敗を修正し、反復3回と通常アプリ3テスト成功。標準環境の最終全実行7 + 9件も成功。 |
-| 重要正常系 / 異常系 | 自動確認: 作成・編集・削除・選択、空白・欠落 ID。 |
-| 必要 ADR 更新 | ADR-0004 Accepted を維持。新規判断なし。 |
+| 追加変更テスト成功 | 最大 Dynamic Type の失敗を修正し、反復3回と通常アプリ3テスト成功。2026-10-05 の標準環境の最終全実行10 + 9件も成功。 |
+| 重要正常系 / 異常系 | 自動確認: 作成・編集・削除・選択、空白・欠落 ID・同種の重複 UUID 拒否と選択保持、種類をまたぐ同一 UUID 許可。 |
+| 必要 ADR 更新 | ADR-0001 / 0002 / 0004 Accepted を維持。今回のレビュー修正は構造変更がなく、新規 ADR は不要。 |
 | 要求と不一致なし | 確認済み: 要求変更なし。自動検証と人間確認を記録。 |
 | 学習ログ更新 | 本ファイル。 |
 
