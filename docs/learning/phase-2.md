@@ -24,7 +24,7 @@ Xcode 27 SDK の SwiftData インターフェースでも、`@Model`、`@Relatio
 
 ## 残課題
 
-- Task 0: 暗黙の自動保存で失敗を検出する方法は公式資料で確認できていない。エラーを検出できる `save()` を利用した保存方法と失敗再現用保存先を検証し、Task 4 の UI へ具体化する。
+- Task 0 は完了。暗黙の自動保存には公開された失敗通知が確認できなかったため、Task 4 では自動保存を有効に保ち、変更直後の明示的な `save()` でエラーを検出する。詳細は下記。Task 4 の UI とエラー表示は未実装。
 - Task 2〜5: View の SwiftData 接続、単体削除、自動保存と失敗表示、再起動 UI Test、iPad の操作・Accessibility 確認を行う。
 
 ## 今回の Definition of Done 確認
@@ -32,3 +32,13 @@ Xcode 27 SDK の SwiftData インターフェースでも、`@Model`、`@Relatio
 - Task 1 のモデルテスト 3 件は成功。全テストは Swift Testing 13 件と UI Test 9 件が成功した。警告修正後にモデルテスト 3 件を再実行し、成功した。
 - `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` は成功。Build で出た App Intents の「依存がないためメタデータ抽出を省略」は既存のツール出力であり、ソースの新規警告は修正した。
 - 既存 UI は変更していないため、この作業単位での HIG・Accessibility の操作確認は対象外。Phase 2 全体の DoD は、上記残課題があるため未達。
+
+## Task 0: 保存失敗経路の調査（2026-10-05）
+
+**Apple 公式資料の事実:** [ModelContext.autosaveEnabled](https://developer.apple.com/documentation/swiftdata/modelcontext/autosaveenabled) は、`mainContext` で有効になり、変更後や画面のライフサイクルに応じて `save()` を呼ぶ。[ModelContext](https://developer.apple.com/documentation/swiftdata/modelcontext) に記載された `didSave` は保存成功後の通知で、失敗通知ではない。[save()](https://developer.apple.com/documentation/swiftdata/modelcontext/save%28%29) はエラーを投げるため、呼び出し元で捕捉できる。`hasChanges` は不要な保存呼び出しの判定に使える。[ModelConfiguration](https://developer.apple.com/documentation/swiftdata/modelconfiguration) の `allowsSave` は保存先の書き込み可否を設定できる。
+
+**実測:** iPadOS 17 Simulator のメモリ内保存先を `allowsSave: false` にすると、保存前に `ModelContainer` の作成が失敗した。書き込み可能なディスク保存先に Project を保存してから同じ保存先を `allowsSave: false` で開き直すと、既存データを取得でき、自動保存有効の `mainContext` で新規 Project の `save()` がエラーを投げた。独立した `ModelContext` から、失敗した変更が保存されていないことも確認した。
+
+**このプロジェクトの方針:** 暗黙の自動保存の失敗を通知で確実に取得する公開 API は確認できなかった。Task 4 では自動保存を維持し、Project / Note の有効な変更直後に `hasChanges` を確認して `save()` を呼び、エラーを画面に表示する。保存ボタンは置かず、失敗した変更を保存済みと表示しない。失敗時の画面状態と、連続入力時の書き込み負荷は Task 4 でテストする。
+
+Task 0 の確認: 読み取り専用ディスク保存先のテストを含む Swift Testing 14 件と既存 UI Test 9 件、Build、Lint、`git diff --check` は成功した。今回の変更はテストと文書のみで、アプリの保存動作と Phase 2 全体の DoD はまだ未完了。

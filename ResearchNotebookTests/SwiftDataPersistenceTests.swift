@@ -63,4 +63,30 @@ struct SwiftDataPersistenceTests {
     #expect(isValidTitle(" Research "))
   }
 
+  @Test func readOnlyConfigurationRejectsSave() throws {
+    let storeURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString)
+      .appendingPathExtension("store")
+    do {
+      let writable = try ModelContainer(
+        for: Project.self, Note.self,
+        configurations: ModelConfiguration(url: storeURL))
+      let context = ModelContext(writable)
+      context.insert(Project(title: "Existing"))
+      try context.save()
+    }
+    let readOnly = ModelConfiguration(url: storeURL, allowsSave: false)
+    let container = try ModelContainer(
+      for: Project.self, Note.self, configurations: readOnly)
+    let context = container.mainContext
+    #expect(context.autosaveEnabled)
+    #expect(try context.fetch(FetchDescriptor<Project>()).count == 1)
+    context.insert(Project(title: "Research"))
+    #expect(throws: (any Error).self) {
+      try context.save()
+    }
+    let verifier = ModelContext(container)
+    #expect(try verifier.fetch(FetchDescriptor<Project>()).map(\.title) == ["Existing"])
+  }
+
 }
