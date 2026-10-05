@@ -57,10 +57,10 @@
 
 **Interfaces:** アプリ、Unit Test、UI Test の 3 Target すべてで Debug・Release の `SWIFT_VERSION = 6.0` を設定する。Deployment Target `17.0` と Bundle Identifier `com.tabfav` は維持する。
 
-- [ ] **Step 1: 現行設定と利用可能なツールチェーンを確認する。** `xcrun swift --version`、`xcodebuild -version`、`rg 'SWIFT_VERSION|IPHONEOS_DEPLOYMENT_TARGET|PRODUCT_BUNDLE_IDENTIFIER' ResearchNotebook.xcodeproj/project.pbxproj` を実行して記録する。
-- [ ] **Step 2: 6 箇所の `SWIFT_VERSION` を `6.0` に変更する。** Swift 6 のコンパイル診断が出た場合は原因を確認し、既存コードの意図を保つ最小の修正だけを行う。
-- [ ] **Step 3: `scripts/build.sh`、`SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh`、`scripts/lint.sh` を実行する。** 期待: Build、既存 Unit/UI Test、Lint が成功し、新規警告なし。生成アプリが iPadOS 17 を対象とする設定を確認する。
-- [ ] **Step 4: `git diff --check` を実行し、設定変更と必要な診断修正をコミットする。**
+- [x] **Step 1: 現行設定と利用可能なツールチェーンを確認する。** `xcrun swift --version`、`xcodebuild -version`、`rg 'SWIFT_VERSION|IPHONEOS_DEPLOYMENT_TARGET|PRODUCT_BUNDLE_IDENTIFIER' ResearchNotebook.xcodeproj/project.pbxproj` を実行して記録する。
+- [x] **Step 2: 6 箇所の `SWIFT_VERSION` を `6.0` に変更する。** Swift 6 のコンパイル診断が出た場合は原因を確認し、既存コードの意図を保つ最小の修正だけを行う。
+- [x] **Step 3: `scripts/build.sh`、`SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh`、`scripts/lint.sh` を実行する。** 期待: Build、既存 Unit/UI Test、Lint が成功し、新規警告なし。生成アプリが iPadOS 17 を対象とする設定を確認する。
+- [x] **Step 4: `git diff --check` を実行し、設定変更と必要な診断修正をコミットする。**
 
 ### Task 1: 一時データと操作
 
@@ -79,11 +79,11 @@
 - `mutating func selectProject(_ id: UUID?)`、`selectNote(_ id: UUID?)`、`removeProject(id: UUID)`
 - `func notes(in projectID: UUID) -> [NotebookNote]`
 
-- [ ] **Step 1: 失敗する Swift Testing を書く。** `rejectsBlankTitles` で `#expect(!NotebookState.isValidTitle("  "))`、`#expect(state.addProject(title: "  ") == nil)`、有効なタイトルと空本文での作成成功を検証する。`keepsDistinctIDsForDuplicateTitles`、`rejectsNoteForMissingProject`、`updatesOnlyValidTitles`、`clearsNoteSelectionWhenProjectChanges`、`removesOnlyDeletedProjectsNotes` で、各名称の振る舞いと本文更新を `#expect` する。
-- [ ] **Step 2: `SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh` で失敗を確認する。** 期待: 未実装の型・操作に対応するテスト失敗。
-- [ ] **Step 3: `NotebookState.swift` を実装する。** 一時データは値型で持ち、ID で関連付ける。`addProject` は新 Project を選択し、`addNote` は所属 Project と新 Note を選択する。`selectProject` は所属しない Note の選択を解除し、`selectNote` は現在の Project に属する Note だけを選択する。`removeProject` は所属 Note と該当する選択を消し、他 Project の選択は保持する。
-- [ ] **Step 4: 同じ Test を再実行する。** 期待: Task 1 の新規テストと既存テストが成功。
-- [ ] **Step 5: `scripts/lint.sh` と `git diff --check` を実行して Task 1 をコミットする。**
+- [x] **Step 1: 失敗する Swift Testing を書く。** `rejectsBlankTitles` で `#expect(!NotebookState.isValidTitle("  "))`、`#expect(state.addProject(title: "  ") == nil)`、有効なタイトルと空本文での作成成功を検証する。`keepsDistinctIDsForDuplicateTitles`、`rejectsNoteForMissingProject`、`updatesOnlyValidTitles`、`clearsNoteSelectionWhenProjectChanges`、`removesOnlyDeletedProjectsNotes` で、各名称の振る舞いと本文更新を `#expect` する。
+- [x] **Step 2: `SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh` で失敗を確認する。** 期待: 未実装の型・操作に対応するテスト失敗。
+- [x] **Step 3: `NotebookState.swift` を実装する。** 一時データは値型で持ち、ID で関連付ける。`addProject` は新 Project を選択し、`addNote` は所属 Project と新 Note を選択する。`selectProject` は所属しない Note の選択を解除し、`selectNote` は現在の Project に属する Note だけを選択する。`removeProject` は所属 Note と該当する選択を消し、他 Project の選択は保持する。
+- [x] **Step 4: 同じ Test を再実行する。** 期待: Task 1 の新規テストと既存テストが成功。
+- [x] **Step 5: `scripts/lint.sh` と `git diff --check` を実行して Task 1 をコミットする。**
 
 ### Task 2: Project 一覧と操作
 
@@ -91,11 +91,11 @@
 
 **Interfaces:** `ContentView` は `@State private var notebook = NotebookState()` を所有する。`ProjectSidebarView` は `@Binding var notebook: NotebookState` を受け、作成 Sheet の入力を所有する。`ProjectFormView` は `@Binding var notebook: NotebookState` と `projectID: UUID` を受ける。`ValidatedTitleField` は `Binding<String>`、ラベル、Accessibility ID を受け、有効入力のみモデルに渡す。
 
-- [ ] **Step 1: 失敗する UI テストを書く。** `testProjectCreationAndEditing` で起動時の `project-empty`、空白タイトルで作成ボタンが無効、有効タイトルで作成後の行、タイトルと本文の編集反映、無効なタイトル編集後に直前の有効値が残ることを `XCTAssert` する。`testProjectDeletionCanBeCancelled` と `testProjectDeletionRemovesRow` でキャンセル・確定を別々に確認する。同名 Project は 2 行として表示されることを確認し、従来の静的 `app-title` テストは新しい起動画面に合わせて更新する。
-- [ ] **Step 2: `SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh` で失敗を確認する。** 期待: 新しい操作を表す UI 要素が未存在。
-- [ ] **Step 3: `ContentView` の 3 列骨格と Project の UI を実装する。** sidebar に Project 一覧と選択を置き、content/detail は選択に応じた意味のある空状態から始める。作成・編集・削除は標準の SwiftUI コントロールを使い、削除時には所属 Note も消えることを確認画面に示す。UI Test 用 Accessibility ID は `project-empty`、`project-add`、`project-title-input`、`project-body-input`、`project-delete`、`project-row-<ID>` とする。
-- [ ] **Step 4: 同じ Test を再実行する。** 期待: Task 2 の UI テストと Task 1 の Unit Test が成功。
-- [ ] **Step 5: `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を実行して Task 2 をコミットする。**
+- [x] **Step 1: 失敗する UI テストを書く。** `testProjectCreationAndEditing` で起動時の `project-empty`、空白タイトルで作成ボタンが無効、有効タイトルで作成後の行、タイトルと本文の編集反映、無効なタイトル編集後に直前の有効値が残ることを `XCTAssert` する。`testProjectDeletionCanBeCancelled` と `testProjectDeletionRemovesRow` でキャンセル・確定を別々に確認する。同名 Project は 2 行として表示されることを確認し、従来の静的 `app-title` テストは新しい起動画面に合わせて更新する。
+- [x] **Step 2: `SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh` で失敗を確認する。** 期待: 新しい操作を表す UI 要素が未存在。
+- [x] **Step 3: `ContentView` の 3 列骨格と Project の UI を実装する。** sidebar に Project 一覧と選択を置き、content/detail は選択に応じた意味のある空状態から始める。作成・編集・削除は標準の SwiftUI コントロールを使い、削除時には所属 Note も消えることを確認画面に示す。UI Test 用 Accessibility ID は `project-empty`、`project-add`、`project-title-input`、`project-body-input`、`project-delete`、`project-row-<ID>` とする。
+- [x] **Step 4: 同じ Test を再実行する。** 期待: Task 2 の UI テストと Task 1 の Unit Test が成功。
+- [x] **Step 5: `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を実行して Task 2 をコミットする。**
 
 ### Task 3: Note 一覧と編集
 
@@ -103,11 +103,11 @@
 
 **Interfaces:** `NoteListView` と `NoteEditorView` は `@Binding var notebook: NotebookState` を受ける。`NoteListView` は Task 1 の `notes(in:)` と `addNote(id:projectID:title:body:)` を使う。`NoteEditorView` は Task 1 の更新操作と Task 2 の `ValidatedTitleField` を使う。
 
-- [ ] **Step 1: 失敗する UI テストを書く。** `testNoteCreationAndLiveEditing` で `note-empty`、空白タイトルでは作成不可、作成後の行と編集画面、タイトル・本文の即時反映、無効なタイトル編集後の有効値保持を `XCTAssert` する。`testSwitchingProjectsClearsNoteDetail` で別 Project に切り替えたときの詳細解除を確認する。Note 単体の削除操作が表示されないことも確認する。
-- [ ] **Step 2: `SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh` で失敗を確認する。** 期待: Note 一覧または編集操作が未存在。
-- [ ] **Step 3: Note 一覧と編集 UI を実装する。** content に選択 Project の Note、detail に選択 Note のタイトルと本文を表示する。ID は `note-empty`、`note-add`、`note-title-input`、`note-body-input`、`note-row-<ID>` とする。本文は `TextEditor` を使う。
-- [ ] **Step 4: 同じ Test を再実行する。** 期待: Project／Note の主要 UI フローと Unit Test が成功。
-- [ ] **Step 5: `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を実行して Task 3 をコミットする。**
+- [x] **Step 1: 失敗する UI テストを書く。** `testNoteCreationAndLiveEditing` で `note-empty`、空白タイトルでは作成不可、作成後の行と編集画面、タイトル・本文の即時反映、無効なタイトル編集後の有効値保持を `XCTAssert` する。`testSwitchingProjectsClearsNoteDetail` で別 Project に切り替えたときの詳細解除を確認する。Note 単体の削除操作が表示されないことも確認する。
+- [x] **Step 2: `SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh` で失敗を確認する。** 期待: Note 一覧または編集操作が未存在。
+- [x] **Step 3: Note 一覧と編集 UI を実装する。** content に選択 Project の Note、detail に選択 Note のタイトルと本文を表示する。ID は `note-empty`、`note-add`、`note-title-input`、`note-body-input`、`note-row-<ID>` とする。本文は `TextEditor` を使う。
+- [x] **Step 4: 同じ Test を再実行する。** 期待: Project／Note の主要 UI フローと Unit Test が成功。
+- [x] **Step 5: `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を実行して Task 3 をコミットする。**
 
 ### Task 4: iPad での検証と文書化
 
@@ -115,11 +115,19 @@
 
 **Interfaces:** Task 1–3 の完成したアプリと `scripts/` の既存コマンドを検証対象とする。
 
-- [ ] **Step 1: iPad Simulator で全画面と狭いウインドウ幅の Project → Note → 編集、戻る操作、削除後の空状態、アプリ再起動後にデータが復元されないことを確認する。** 幅変更の操作が自動化できない場合は人間による確認結果を得て記録する。確認できなければ DoD 未達と明記する。
-- [ ] **Step 2: Dark Mode、最大側の Dynamic Type、VoiceOver、キーボードで主要操作を確認する。** 色だけに依存する状態表示や見切れ、到達不能な操作があれば該当 View と必要なテストを修正する。
-- [ ] **Step 3: `README.md` に Phase 1 の操作と再起動でデータが消えることを記載し、`docs/learning/phase-1.md` に学習概念、Apple 公式資料と確認日、公式事実と設計判断、検証結果、理解しづらかった点、次 Phase の課題を記録する。**
-- [ ] **Step 4: `scripts/build.sh`、`scripts/lint.sh`、`SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh`、`git diff --check` を実行する。** 期待: Build、Lint、Unit/UI Test 成功、新規コンパイラ警告なし。
-- [ ] **Step 5: 要求仕様と Definition of Done の各項目を照合し、Task 4 をコミットする。** 完了後、作業ブランチを push して `develop` 向け日本語 PR を作り、Pull Request CI を確認する。
+- [x] **Step 1: iPad Simulator で全画面と狭いウインドウ幅の Project → Note → 編集、戻る操作、削除後の空状態、アプリ再起動後にデータが復元されないことを確認する。** 幅変更の操作が自動化できない場合は人間による確認結果を得て記録する。確認できなければ DoD 未達と明記する。
+- [x] **Step 2: Dark Mode、最大側の Dynamic Type、VoiceOver、キーボードで主要操作を確認する。** 色だけに依存する状態表示や見切れ、到達不能な操作があれば該当 View と必要なテストを修正する。
+- [x] **Step 3: `README.md` に Phase 1 の操作と再起動でデータが消えることを記載し、`docs/learning/phase-1.md` に学習概念、Apple 公式資料と確認日、公式事実と設計判断、検証結果、理解しづらかった点、次 Phase の課題を記録する。**
+- [x] **Step 4: `scripts/build.sh`、`scripts/lint.sh`、`SIMULATOR_UDID="$RESEARCH_NOTEBOOK_SIMULATOR_UDID" scripts/test.sh`、`git diff --check` を実行する。** 期待: Build、Lint、Unit/UI Test 成功、新規コンパイラ警告なし。
+- [x] **Step 5: 要求仕様と Definition of Done の各項目を照合し、Task 4 をコミットする。** 完了後、作業ブランチを push して `develop` 向け日本語 PR を作り、Pull Request CI を確認する。
+
+## 完了記録
+
+2026-10-05（Asia/Tokyo）、Task 0〜4 の全 24 Step を実装・検証記録と照合した。Task 0 は `f74f2d8`、Task 1 は `6a39a17`、Task 2 は `c9d1698`、Task 3 は `cfd47a5` に実装と各タスクの検証を記録した。Task 1〜3 は未実装時のテスト失敗と実装後の成功を確認済み。
+
+Task 4 は `f3795e6` の検証記録に加え、`f547fd8` で最大 Dynamic Type の本文入力不具合を修正し、Build・Lint・Unit 7 件・UI 9 件と最大文字サイズの追加テストを確認した。`57eee8e` に人間の実操作 1〜5 の確認結果と Acceptance Criteria / Definition of Done の照合を記録した。可変幅・VoiceOver・キーボードなどの人間確認と、エージェントの自動検証の範囲は [Phase 1 学習ログ](../../learning/phase-1.md)を参照する。
+
+作業ブランチは push 済みで、`develop` 向けの日本語 [PR #21](https://github.com/Naohiro-Kubota/research-notebook/pull/21) を作成済み。Draft を解除し、2026-10-05 の [Build and Test CI](https://github.com/Naohiro-Kubota/research-notebook/actions/runs/37251242700) の成功を確認した。Task 4 Step 5 の push・PR・CI 確認も完了している。
 
 ## Self-Review
 
