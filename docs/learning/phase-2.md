@@ -1,6 +1,6 @@
 # Phase 2 学習ログ — SwiftData 永続化
 
-確認日: 2026-10-05。現在は Task 4（自動保存と保存失敗表示）までの記録。Phase 2 全体の Acceptance Criteria は Task 5 の実操作確認待ち。
+確認日: 2026-10-05。Task 1〜4 の実装と Task 5 の iPad Simulator 実操作を記録する。
 
 ## Apple 公式資料で確認した事実
 
@@ -9,10 +9,13 @@
 | [Preserving your app’s model data across launches](https://developer.apple.com/documentation/swiftdata/preserving-your-apps-model-data-across-launches) | `@Model`、`ModelContainer`、`ModelContext` でモデルを永続化し、`@Query` で View に取得できる。 | Project と Note を `@Model` とし、Task 2 で View を接続した。 |
 | [Defining data relationships with enumerations and model classes](https://developer.apple.com/documentation/swiftdata/defining-data-relationships-with-enumerations-and-model-classes) | 親の Relationship に `.cascade` を指定すると、親の削除時に関連モデルを削除する。関連グラフの根を `insert` すると子も登録される。 | `Project.notes` に `.cascade` と `Note.project` の inverse を設定した。テストでは親だけを `insert` した。 |
 | [ModelContext.autosaveEnabled](https://developer.apple.com/documentation/swiftdata/modelcontext/autosaveenabled) | メインコンテキストは自動保存が有効で、変更後やライフサイクルの変化時に保存する。 | 各文字入力直後のディスク保存は保証されないため、再起動テストを Task 4 で行う。 |
-| [ModelContext.save()](https://developer.apple.com/documentation/swiftdata/modelcontext/save())、[ModelContext](https://developer.apple.com/documentation/swiftdata/modelcontext) | `save()` はエラーを投げる。`didSave` は保存成功後の通知であり、失敗通知ではない。 | 保存失敗の検出・表示方法と再現用保存先は Task 0 の残課題。 |
+| [ModelContext.save()](https://developer.apple.com/documentation/swiftdata/modelcontext/save())、[ModelContext](https://developer.apple.com/documentation/swiftdata/modelcontext) | `save()` はエラーを投げる。`didSave` は保存成功後の通知であり、失敗通知ではない。 | 有効な変更の直後に `save()` の失敗を捕捉して表示する。 |
 | [ModelConfiguration](https://developer.apple.com/documentation/swiftdata/modelconfiguration) | メモリ内の保存先を指定できる。 | モデルテストは `isStoredInMemoryOnly: true` の独立したコンテナを使用した。 |
 | [iOS & iPadOS 17 Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-17-release-notes) | SwiftData と `@Query` は iOS・iPadOS 17 で利用できる。 | Deployment Target の iPadOS 17 と整合する。 |
 | [Deleting persistent data from your app](https://developer.apple.com/documentation/swiftdata/deleting-persistent-data-from-your-app)、[ModelContext.delete(_:)](https://developer.apple.com/documentation/swiftdata/modelcontext/delete(_:))、[ModelContext.delete(model:where:includeSubclasses:)](https://developer.apple.com/documentation/swiftdata/modelcontext/delete(model:where:includesubclasses:)) | `delete(_:)` で対象モデルを削除でき、`delete(model:where:)` は条件に一致するモデルを削除する。サンプルは `.cascade` による子の削除を説明している。 | Note は `delete(_:)`、Project は既存の ID 条件付き削除と `.cascade` を使う。Task 3 でディスク保存先の削除結果を検証した。 |
+| [ModelContainer](https://developer.apple.com/documentation/swiftdata/modelcontainer)、[SchemaMigrationPlan](https://developer.apple.com/documentation/swiftdata/schemamigrationplan) | コンテナは互換性のあるスキーマ変更を自動移行する。自動移行の範囲を超える変更には `SchemaMigrationPlan` を指定できる。 | 今回は初回スキーマを定義する。将来の破壊的なモデル変更は別途設計・承認し、必要なら移行計画を作る。 |
+| [HIG Layout](https://developer.apple.com/design/human-interface-guidelines/layout)、[HIG Split views](https://developer.apple.com/design/human-interface-guidelines/split-views) | iPad のウインドウは可変幅で、Split View は狭い幅で列間の移動を考慮する。 | 全画面と狭い幅の `NavigationSplitView` を確認する。 |
+| [HIG VoiceOver](https://developer.apple.com/design/human-interface-guidelines/voiceover)、[HIG Labels](https://developer.apple.com/design/human-interface-guidelines/labels)、[HIG Keyboards](https://developer.apple.com/design/human-interface-guidelines/keyboards/) | 主要操作を分かるラベルで示し、キーボードから到達できるようにする。 | 追加・編集・削除と失敗アラートのラベル、作成ショートカットを確認する。 |
 
 Xcode 27 SDK の SwiftData インターフェースでも、`@Model`、`@Relationship`、`ModelContainer`、`ModelContext`、`ModelConfiguration` の iOS 17 以降での利用条件を確認した。
 
@@ -74,3 +77,15 @@ Task 0 の確認: 読み取り専用ディスク保存先のテストを含む S
 **再起動と入力:** Project のタイトル・本文、Note のタイトル・本文が再起動後に復元された。Note 本文の連続入力とペースト、Project 切替後の全文保持も UI Test で確認した。保存失敗後に既存 Project・Note が画面に残ることも確認した。保存ボタンは存在しない。
 
 **Task 4 の検証:** `scripts/build.sh`、`scripts/lint.sh`、Swift Testing 8 件、UI Test 14 件が成功した。Task 5 の実操作と Phase 2 全体の Definition of Done は未確認。
+
+## Task 5: iPad での操作と Accessibility（2026-10-05）
+
+**公式情報と適用:** 上表の HIG は可変幅のレイアウト、操作名が分かるラベル、キーボード操作を求める。このアプリでは標準の `NavigationSplitView`、Button、Form、Alert を使い、追加・編集・削除・本文に意味が分かるラベルを付けた。SwiftData の将来の Migration は今回の実装範囲外であり、互換性を確認せずにモデルを変更しない。
+
+**Simulator 実操作:** iPadOS 27 の iPad Pro 13-inch Simulator で、全画面と約 330pt の狭いウインドウを確認した。狭い幅では列を切り替えて Project・Note の作成、戻る操作を行い、全画面では Project、Note、詳細の各列を確認した。同 Simulator の Dark Mode とアクセシビリティの大きい文字設定で、主要なツールバーと作成画面に重大な切れを認めなかった。iPadOS 17.2 の iPad mini Simulator でも Dark Mode と大きい文字設定で Note の作成・削除フローを UI Test で確認した。
+
+**VoiceOver とキーボード:** iPadOS 27 Simulator で VoiceOver を有効にし、読み取り専用保存先で Project 作成に失敗させた。失敗アラートは「変更を保存できませんでした」というテキストと「OK」ボタンとしてアクセシビリティツリーに現れ、VoiceOver のフォーカスもアラート本文に移った。追加・編集・削除・本文のラベルは UI Test で確認した。外部キーボード相当の入力で ⌘⇧N の Project 作成と ⌘N の Note 作成が開くことを確認した。これらは Simulator の確認であり、実機の挙動までは確認していない。
+
+**最終検証:** `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` は成功した。iPadOS 17.2 の iPad Pro 11-inch Simulator で Swift Testing 8 件と UI Test 15 件が成功した。テストには再起動後の復元、所属関係、空白タイトル、同名項目、Note 単体削除、Project の連鎖削除、作成・編集時の保存失敗、保存先を開けない場合、主要ラベルを含む。Build と Test の App Intents メタデータ抽出省略は既存のツール警告であり、新規の Swift コンパイラ警告はない。
+
+**Definition of Done:** 承認済み Acceptance Criteria は全項目をテスト結果と操作確認に照らして満たした。対象外の iCloud、外部 API、外部依存、将来用の Migration Plan は追加していない。Apple 公式情報と本プロジェクトの判断は上記で分けて記録した。可変幅、Dark Mode、Dynamic Type、VoiceOver、キーボード操作を Simulator で確認し、色だけに依存する新規 UI はない。ADR-0005 の変更は不要。実機での VoiceOver と外部キーボードの動作は未確認であり、Simulator での確認範囲を超えて保証しない。

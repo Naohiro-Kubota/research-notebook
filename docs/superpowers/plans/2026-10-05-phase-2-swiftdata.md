@@ -111,10 +111,10 @@
 
 **Interfaces:** Task 1〜4 の完成したアプリと既存の Definition of Done。
 
-- [ ] **Step 1: iPad の全画面と狭い幅で作成・編集・削除・戻る操作を確認する。** Dark Mode、最大側の Dynamic Type、VoiceOver、キーボードで主要操作と保存失敗の説明を確認する。確認できない項目は Done と扱わない。
-- [ ] **Step 2: `README.md` と Phase 2 学習ログを更新する。** `@Model`、Relationship、コンテナ、コンテキスト、`@Query`、Migration の考え方、Apple 公式資料の確認日、実測結果と未確認点を記録する。
-- [ ] **Step 3: `scripts/build.sh`、`scripts/lint.sh`、`SIMULATOR_UDID=<利用可能なiPad UDID> scripts/test.sh`、`git diff --check` を実行する。** 期待: Build・全テスト・Lint 成功、新規警告なし。
-- [ ] **Step 4: 全 Acceptance Criteria と Definition of Done を証拠に照らして判定する。** 満たせない項目は理由と残課題を記録する。満たした場合に作業ブランチを push し、日本語の `develop` 宛て PR を作成する。
+- [x] **Step 1: iPad の全画面と狭い幅で作成・編集・削除・戻る操作を確認する。** Dark Mode、最大側の Dynamic Type、VoiceOver、キーボードで主要操作と保存失敗の説明を確認する。確認できない項目は Done と扱わない。
+- [x] **Step 2: `README.md` と Phase 2 学習ログを更新する。** `@Model`、Relationship、コンテナ、コンテキスト、`@Query`、Migration の考え方、Apple 公式資料の確認日、実測結果と未確認点を記録する。
+- [x] **Step 3: `scripts/build.sh`、`scripts/lint.sh`、`SIMULATOR_UDID=<利用可能なiPad UDID> scripts/test.sh`、`git diff --check` を実行する。** 期待: Build・全テスト・Lint 成功、新規警告なし。
+- [x] **Step 4: 全 Acceptance Criteria と Definition of Done を証拠に照らして判定する。** 満たせない項目は理由と残課題を記録する。満たした場合に作業ブランチを push し、日本語の `develop` 宛て PR を作成する。
 
 ## Self-Review
 
