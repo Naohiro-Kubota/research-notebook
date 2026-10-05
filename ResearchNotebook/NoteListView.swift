@@ -1,29 +1,26 @@
+import SwiftData
 import SwiftUI
 
 struct NoteListView: View {
-  @Binding var notebook: NotebookState
-  let projectID: UUID
+  let project: Project
+  @Binding var selectedNoteID: UUID?
+  @Environment(\.modelContext) private var modelContext
   @State private var showsCreation = false
   @State private var newTitle = ""
   @State private var newBody = ""
 
   var body: some View {
-    List(
-      selection: Binding(
-        get: { notebook.selectedNoteID },
-        set: { notebook.selectNote($0) }
-      )
-    ) {
-      ForEach(notebook.notes(in: projectID)) { note in
+    List(selection: $selectedNoteID) {
+      ForEach(project.notes) { note in
         NavigationLink(value: note.id) {
           Text(note.title)
         }
         .accessibilityIdentifier("note-row-\(note.id.uuidString)")
-        .accessibilityAddTraits(notebook.selectedNoteID == note.id ? .isSelected : [])
+        .accessibilityAddTraits(selectedNoteID == note.id ? .isSelected : [])
       }
     }
     .overlay {
-      if notebook.notes(in: projectID).isEmpty {
+      if project.notes.isEmpty {
         ContentUnavailableView {
           Label("Noteがありません", systemImage: "note.text")
             .accessibilityIdentifier("note-empty")
@@ -66,10 +63,12 @@ struct NoteListView: View {
           }
           ToolbarItem(placement: .confirmationAction) {
             Button("作成") {
-              notebook.addNote(projectID: projectID, title: newTitle, body: newBody)
+              let note = Note(project: project, title: newTitle, body: newBody)
+              modelContext.insert(note)
+              selectedNoteID = note.id
               showsCreation = false
             }
-            .disabled(!NotebookState.isValidTitle(newTitle))
+            .disabled(!isValidTitle(newTitle))
             .accessibilityIdentifier("note-create")
           }
         }

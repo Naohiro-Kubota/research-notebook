@@ -1,50 +1,49 @@
+import SwiftData
 import SwiftUI
 
 struct ProjectFormView: View {
-  @Binding var notebook: NotebookState
-  let projectID: UUID
+  @Bindable var project: Project
+  let onDeleted: () -> Void
+  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
   @State private var confirmsDeletion = false
-
-  private var project: NotebookProject? {
-    notebook.projects.first { $0.id == projectID }
-  }
+  @State private var deletionFailed = false
 
   var body: some View {
     NavigationStack {
       Form {
-        if let project {
-          Section("タイトル（必須）") {
-            ValidatedTitleField(
-              title: Binding(
-                get: { self.project?.title ?? "" },
-                set: { notebook.updateProjectTitle(id: projectID, title: $0) }
-              ), label: "Projectのタイトル", accessibilityID: "project-title-input")
-          }
-          Section("本文") {
-            TextEditor(
-              text: Binding(
-                get: { self.project?.body ?? "" },
-                set: { notebook.updateProjectBody(id: projectID, body: $0) }
-              )
-            )
+        Section("タイトル（必須）") {
+          ValidatedTitleField(
+            title: $project.title, label: "Projectのタイトル",
+            accessibilityID: "project-title-input")
+        }
+        Section("本文") {
+          TextEditor(text: $project.body)
             .frame(minHeight: 160)
             .accessibilityLabel("Projectの本文")
             .accessibilityIdentifier("project-body-input")
-          }
-          Section {
-            Button("Projectを削除", role: .destructive) { confirmsDeletion = true }
-              .accessibilityIdentifier("project-delete")
-          }
-          .alert("「\(project.title)」を削除しますか？", isPresented: $confirmsDeletion) {
-            Button("キャンセル", role: .cancel) {}
-            Button("削除", role: .destructive) {
-              notebook.removeProject(id: projectID)
+        }
+        Section {
+          Button("Projectを削除", role: .destructive) { confirmsDeletion = true }
+            .accessibilityIdentifier("project-delete")
+        }
+        .alert("「\(project.title)」を削除しますか？", isPresented: $confirmsDeletion) {
+          Button("キャンセル", role: .cancel) {}
+          Button("削除", role: .destructive) {
+            do {
+              let projectID = project.id
+              try modelContext.delete(
+                model: Project.self, where: #Predicate { $0.id == projectID })
+              try modelContext.save()
+              onDeleted()
               dismiss()
+            } catch {
+              modelContext.rollback()
+              deletionFailed = true
             }
-          } message: {
-            Text("このProjectと所属するすべてのNoteが削除されます。")
           }
+        } message: {
+          Text("このProjectと所属するすべてのNoteが削除されます。")
         }
       }
       .navigationTitle("Projectを編集")
@@ -53,6 +52,9 @@ struct ProjectFormView: View {
           Button("完了") { dismiss() }
             .accessibilityIdentifier("project-edit-done")
         }
+      }
+      .alert("Projectを削除できませんでした", isPresented: $deletionFailed) {
+        Button("OK") {}
       }
     }
   }

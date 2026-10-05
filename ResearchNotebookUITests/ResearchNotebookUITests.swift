@@ -3,11 +3,20 @@ import XCTest
 
 final class ResearchNotebookUITests: XCTestCase {
   @MainActor
+  func testUnavailableStoreShowsError() {
+    let app = makeApp()
+    app.launchArguments += ["-uiTestingStoreFailure"]
+    app.launch()
+    XCTAssertTrue(app.staticTexts["store-open-error"].waitForExistence(timeout: 5))
+    XCTAssertFalse(app.buttons["project-add"].exists)
+  }
+
+  @MainActor
   func testBodyPasteSurvivesProjectSwitch() {
-    let app = XCUIApplication()
+    let app = makeApp()
     // Pin app language for the Paste menu in the tested Simulator.
     // Non-English device locale remains unverified.
-    app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+    app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
     app.launch()
     createProject("Keyboard research", in: app)
     app.buttons["note-add"].tap()
@@ -37,8 +46,8 @@ final class ResearchNotebookUITests: XCTestCase {
   }
 
   @MainActor
-  func testContinuousBodyInputAndRelaunchClearsData() {
-    let app = XCUIApplication()
+  func testContinuousBodyInputAndRelaunchKeepsData() {
+    let app = makeApp()
     app.launch()
     createProject("Temporary research", in: app)
     app.buttons["note-add"].tap()
@@ -55,15 +64,16 @@ final class ResearchNotebookUITests: XCTestCase {
     XCTAssertEqual(body.value as? String, text)
     app.terminate()
     app.launch()
-    XCTAssertTrue(app.staticTexts["project-empty"].waitForExistence(timeout: 5))
-    XCTAssertEqual(projectRows(app).count, 0)
-    XCTAssertEqual(noteRows(app).count, 0)
-    XCTAssertFalse(app.textViews["note-body-input"].exists)
+    XCTAssertTrue(projectRows(app).firstMatch.waitForExistence(timeout: 5))
+    projectRows(app).firstMatch.tap()
+    XCTAssertTrue(noteRows(app).firstMatch.waitForExistence(timeout: 5))
+    noteRows(app).firstMatch.tap()
+    XCTAssertEqual(app.textViews["note-body-input"].value as? String, text)
   }
 
   @MainActor
   func testLaunchShowsProjectEmptyState() {
-    let app = XCUIApplication()
+    let app = makeApp()
     app.launch()
     XCTAssertTrue(app.staticTexts["project-empty"].waitForExistence(timeout: 5))
     XCTAssertTrue(app.buttons["project-add"].isEnabled)
@@ -71,7 +81,7 @@ final class ResearchNotebookUITests: XCTestCase {
 
   @MainActor
   func testProjectCreationAndEditing() {
-    let app = XCUIApplication()
+    let app = makeApp()
     app.launch()
     XCTAssertTrue(app.staticTexts["project-empty"].waitForExistence(timeout: 5))
     app.buttons["project-add"].tap()
@@ -110,7 +120,7 @@ final class ResearchNotebookUITests: XCTestCase {
 
   @MainActor
   func testProjectDeletionCanBeCancelled() {
-    let app = XCUIApplication()
+    let app = makeApp()
     app.launch()
     createProject("Keep me", in: app)
     app.buttons["project-edit"].tap()
@@ -123,7 +133,7 @@ final class ResearchNotebookUITests: XCTestCase {
 
   @MainActor
   func testProjectDeletionRemovesProjectNoteAndSelectedDetail() {
-    let app = XCUIApplication()
+    let app = makeApp()
     app.launch()
     createProject("Delete me", in: app)
     app.buttons["note-add"].tap()
@@ -158,7 +168,7 @@ final class ResearchNotebookUITests: XCTestCase {
 
   @MainActor
   func testProjectsMayHaveDuplicateTitles() {
-    let app = XCUIApplication()
+    let app = makeApp()
     app.launch()
     createProject("Same title", in: app)
     createProject("Same title", in: app)
@@ -169,7 +179,7 @@ final class ResearchNotebookUITests: XCTestCase {
 
   @MainActor
   func testNoteCreationAndLiveEditing() {
-    let app = XCUIApplication()
+    let app = makeApp()
     app.launch()
     createProject("Research", in: app)
     XCTAssertTrue(app.staticTexts["note-empty"].waitForExistence(timeout: 5))
@@ -210,7 +220,7 @@ final class ResearchNotebookUITests: XCTestCase {
 
   @MainActor
   func testSwitchingProjectsClearsNoteDetail() {
-    let app = XCUIApplication()
+    let app = makeApp()
     app.launch()
     createProject("First project", in: app)
     app.buttons["note-add"].tap()
@@ -220,16 +230,37 @@ final class ResearchNotebookUITests: XCTestCase {
     title.typeText("First note")
     app.buttons["note-create"].tap()
     XCTAssertTrue(app.textFields["note-title-input"].waitForExistence(timeout: 5))
+    let firstNoteID = noteRows(app).firstMatch.identifier
     createProject("Second project", in: app)
     XCTAssertTrue(app.staticTexts["note-empty"].waitForExistence(timeout: 5))
     XCTAssertFalse(app.textFields["note-title-input"].exists)
     XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
+    app.buttons["note-add"].tap()
+    let secondTitle = app.textFields["note-title-input"]
+    XCTAssertTrue(secondTitle.waitForExistence(timeout: 5))
+    secondTitle.tap()
+    secondTitle.typeText("First note")
+    app.buttons["note-create"].tap()
+    XCTAssertTrue(noteRows(app).firstMatch.waitForExistence(timeout: 5))
+    XCTAssertNotEqual(noteRows(app).firstMatch.identifier, firstNoteID)
+    if !projectRows(app).firstMatch.isHittable {
+      app.buttons["ToggleSidebar"].tap()
+    }
     projectRows(app).element(boundBy: 0).tap()
     XCTAssertTrue(noteRows(app).firstMatch.waitForExistence(timeout: 5))
+    XCTAssertEqual(noteRows(app).count, 1)
+    XCTAssertEqual(noteRows(app).firstMatch.identifier, firstNoteID)
     XCTAssertFalse(app.textFields["note-title-input"].exists)
     noteRows(app).firstMatch.tap()
     XCTAssertTrue(app.textFields["note-title-input"].waitForExistence(timeout: 5))
     XCTAssertEqual(app.textFields["note-title-input"].value as? String, "First note")
+  }
+
+  @MainActor
+  private func makeApp() -> XCUIApplication {
+    let app = XCUIApplication()
+    app.launchArguments = ["-uiTestingStoreID", UUID().uuidString]
+    return app
   }
 
   @MainActor

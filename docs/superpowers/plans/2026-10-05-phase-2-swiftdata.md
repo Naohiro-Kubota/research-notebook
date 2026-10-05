@@ -78,10 +78,10 @@
 
 **Interfaces:** `ResearchNotebookApp` がローカル `ModelContainer` を提供する。Project 一覧は `@Query` から、Note 一覧は選択 Project の Relationship から表示する。選択は Project・Note の UUID で保持する。UI Test はテストごとに独立した保存先を指定し、同じテスト内の再起動では同じ保存先を使う。既存の accessibilityIdentifier と 3 列構造を維持する。
 
-- [ ] **Step 1: UI Test を更新する。** Project と Note の作成・編集、空白タイトルの拒否、同名項目の識別、Project 切替時の詳細解除を検証する。Phase 1 の「再起動で消える」期待だけを、Task 4 で復元を確認する期待へ変更する。
-- [ ] **Step 2: `scripts/test.sh` で新しい期待の失敗を確認する。** 期待: 永続化前の起動・再起動の振る舞いと一致しない。
-- [ ] **Step 3: 既存 View を永続モデルへ接続し、値型の配列と旧呼び出しを同じ変更で削除する。** UI Test の保存先も分離する。`ValidatedTitleField` は無効入力をモデルへ渡さない。`NoteBodyEditor` の局所的な `equatable()` は無条件に移植せず、連続入力で必要か確認する。
-- [ ] **Step 4: UI Test と Task 1 のテストを再実行する。** 期待: 作成・編集・選択の正常系と異常系が成功。`scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を確認し、Task 2 をコミットする。
+- [x] **Step 1: UI Test を更新する。** Project と Note の作成・編集、空白タイトルの拒否、同名項目の識別、Project 切替時の詳細解除を検証する。Phase 1 の「再起動で消える」期待だけを、Task 4 で復元を確認する期待へ変更する。
+- [x] **Step 2: `scripts/test.sh` で新しい期待の失敗を確認する。** 期待: 永続化前の起動・再起動の振る舞いと一致しない。
+- [x] **Step 3: 既存 View を永続モデルへ接続し、値型の配列と旧呼び出しを同じ変更で削除する。** UI Test の保存先も分離する。`ValidatedTitleField` は無効入力をモデルへ渡さない。`NoteBodyEditor` の局所的な `equatable()` は無条件に移植せず、連続入力で必要か確認する。
+- [x] **Step 4: UI Test と Task 1 のテストを再実行する。** 期待: 作成・編集・選択の正常系と異常系が成功。`scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を確認し、Task 2 をコミットする。
 
 ### Task 3: Note 単体削除と Project の連鎖削除
 

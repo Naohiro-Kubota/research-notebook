@@ -1,28 +1,27 @@
+import SwiftData
 import SwiftUI
 
 struct ProjectSidebarView: View {
-  @Binding var notebook: NotebookState
+  let projects: [Project]
+  @Binding var selectedProjectID: UUID?
+  @Binding var selectedNoteID: UUID?
+  @Environment(\.modelContext) private var modelContext
   @State private var showsCreation = false
   @State private var newTitle = ""
   @State private var newBody = ""
 
   var body: some View {
-    List(
-      selection: Binding(
-        get: { notebook.selectedProjectID },
-        set: { notebook.selectProject($0) }
-      )
-    ) {
-      ForEach(notebook.projects) { project in
+    List(selection: $selectedProjectID) {
+      ForEach(projects) { project in
         NavigationLink(value: project.id) {
           Text(project.title)
         }
         .accessibilityIdentifier("project-row-\(project.id.uuidString)")
-        .accessibilityAddTraits(notebook.selectedProjectID == project.id ? .isSelected : [])
+        .accessibilityAddTraits(selectedProjectID == project.id ? .isSelected : [])
       }
     }
     .overlay {
-      if notebook.projects.isEmpty {
+      if projects.isEmpty {
         ContentUnavailableView {
           Label("Projectがありません", systemImage: "folder")
             .accessibilityIdentifier("project-empty")
@@ -66,10 +65,13 @@ struct ProjectSidebarView: View {
           }
           ToolbarItem(placement: .confirmationAction) {
             Button("作成") {
-              notebook.addProject(title: newTitle, body: newBody)
+              let project = Project(title: newTitle, body: newBody)
+              modelContext.insert(project)
+              selectedNoteID = nil
+              selectedProjectID = project.id
               showsCreation = false
             }
-            .disabled(!NotebookState.isValidTitle(newTitle))
+            .disabled(!isValidTitle(newTitle))
             .accessibilityIdentifier("project-create")
           }
         }

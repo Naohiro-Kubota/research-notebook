@@ -62,13 +62,15 @@ AIは重要な意思決定を黙って確定してはいけません。
 4. `docs/learning/roadmap.md` のPhase 0から開始する。
 5. 技術判断が必要になったら `docs/adr/README.md` の手順でADRを作成する。
 
-## Phase 1 の操作
+## 現在の操作
 
 Project 一覧の追加ボタンから、必須のタイトルと任意の本文を入力して Project を作成します。Project を選択すると所属する Note 一覧へ進み、Note の追加ボタンから Note を作成できます。Note を選択するとタイトルと本文を編集できます。Project の変更・削除は「Projectを編集」から行います。削除の確認画面は所属する Note も削除されることを説明し、キャンセルできます。
 
 有効なタイトルと本文は入力中に反映されます。空白だけのタイトルでは作成できません。編集時の無効なタイトルは説明を表示し、入力欄を離れると最後の有効なタイトルへ戻ります。作成ショートカットは Project が ⌘⇧N、Note が ⌘N です。
 
-**Phase 1 のデータはメモリ上だけに保持され、アプリを終了して再起動すると消えます。** 保存操作と SwiftData による永続化、Note 単体の削除は Phase 2 の対象です。最大 Dynamic Type の連続本文入力で観測した文字欠落は、入力Viewの再評価を抑える修正後に反復テストとペーストで確認しました。2026-10-05 に人間から可変幅・VoiceOver・キーボード全経路・通常入力と日本語IME・Dark Mode / 最大Dynamic Typeの実操作 1〜5 がすべて問題ないとの確認を得て、Phase 1 の Acceptance Criteria と Definition of Done を満たしました。[Phase 1 学習ログ](docs/learning/phase-1.md)に自動検証の根拠と人間の確認結果を記録しています。
+現在は Project と Note を SwiftData のローカル保存先に保持します。通常の操作に保存ボタンはなく、iPadOS 17 Simulator で作成・編集後の再起動と本文の復元を確認しました。保存先を開けない場合はエラー画面を表示します。保存処理中の失敗通知は Phase 2 Task 4、Note 単体の削除は Task 3 で実装します。Phase 2 全体の Definition of Done はまだ完了していません。[Phase 2 学習ログ](docs/learning/phase-2.md)に確認範囲を記録しています。
+
+Phase 1 ではデータをメモリ上だけに保持していました。最大 Dynamic Type の連続本文入力で観測した文字欠落は、当時の入力Viewの再評価を抑える修正後に反復テストとペーストで確認しました。2026-10-05 に人間から可変幅・VoiceOver・キーボード全経路・通常入力と日本語IME・Dark Mode / 最大Dynamic Typeの実操作 1〜5 がすべて問題ないとの確認を得て、Phase 1 の Acceptance Criteria と Definition of Done を満たしました。[Phase 1 学習ログ](docs/learning/phase-1.md)に自動検証の根拠と人間の確認結果を記録しています。
 
 ## Build / Test
 
