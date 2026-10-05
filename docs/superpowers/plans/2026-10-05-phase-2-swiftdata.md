@@ -89,10 +89,10 @@
 
 **Interfaces:** Note 削除は `ModelContext.delete(_:)` を使う。Project 削除は `Project.notes` の `.cascade` を使い、Note の手動全件削除を重ねない。削除後、無効な選択 ID を解除する。
 
-- [ ] **Step 1: 失敗するテストを書く。** Note 単体の削除・キャンセル・他項目の保持、Project 削除後の所属 Note の不在、選択詳細の解除を検証する。保存後に別コンテキストから再取得して削除を確認する。iPadOS 17 Simulator のメモリ内コンテナでは `delete(_:)` 後に子 Note が残った一方、`delete(model:where:)` では削除された。Task 3 で本番と同じディスク保存先でも再確認する。
-- [ ] **Step 2: `scripts/test.sh` で失敗を確認する。** 期待: Note 単体削除の操作が存在しない。
-- [ ] **Step 3: 標準の破壊的操作と確認表示で削除を実装する。** Project 削除時は所属 Note も失うことを既存の確認文で知らせる。
-- [ ] **Step 4: 同じテスト、`scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を実行する。** 期待: 削除と既存フローが成功。Task 3 をコミットする。
+- [x] **Step 1: 失敗するテストを書く。** Note 単体の削除・キャンセル・他項目の保持、Project 削除後の所属 Note の不在、選択詳細の解除を検証する。保存後に別コンテキストから再取得して削除を確認する。iPadOS 17 Simulator のメモリ内コンテナでは `delete(_:)` 後に子 Note が残った一方、`delete(model:where:)` では削除された。Task 3 で本番と同じディスク保存先でも再確認する。
+- [x] **Step 2: `scripts/test.sh` で失敗を確認する。** 期待: Note 単体削除の操作が存在しない。
+- [x] **Step 3: 標準の破壊的操作と確認表示で削除を実装する。** Project 削除時は所属 Note も失うことを既存の確認文で知らせる。
+- [x] **Step 4: 同じテスト、`scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を実行する。** 期待: 削除と既存フローが成功。Task 3 をコミットする。
 
 ### Task 4: 自動保存、保存失敗、再起動
 

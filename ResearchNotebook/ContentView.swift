@@ -40,8 +40,10 @@ struct ContentView: View {
       }
     } detail: {
       if let note = selectedNote {
-        NoteEditorView(note: note)
-          .id(note.id)
+        NoteEditorView(note: note) {
+          selectedNoteID = nil
+        }
+        .id(note.id)
       } else {
         ContentUnavailableView {
           Label("Noteを選択", systemImage: "square.and.pencil")
