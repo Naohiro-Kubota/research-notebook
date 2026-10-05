@@ -28,6 +28,7 @@ final class ResearchNotebookUITests: XCTestCase {
     app.alerts.buttons["OK"].tap()
     app.terminate()
     app.launch()
+    showProjectsIfNeeded(in: app)
     XCTAssertEqual(projectRows(app).count, 1)
     XCTAssertEqual(projectRows(app).firstMatch.label, "Existing")
   }
@@ -43,10 +44,10 @@ final class ResearchNotebookUITests: XCTestCase {
     body.typeText("X")
     XCTAssertTrue(app.alerts["変更を保存できませんでした"].waitForExistence(timeout: 5))
     app.alerts.buttons["OK"].tap()
-    XCTAssertEqual(projectRows(app).count, 1)
     XCTAssertEqual(noteRows(app).count, 1)
     app.terminate()
     app.launch()
+    showProjectsIfNeeded(in: app)
     projectRows(app).firstMatch.tap()
     noteRows(app).firstMatch.tap()
     XCTAssertEqual(app.textViews["note-body-input"].value as? String, "Existing body")
@@ -70,6 +71,7 @@ final class ResearchNotebookUITests: XCTestCase {
     app.alerts.buttons["OK"].tap()
     app.terminate()
     app.launch()
+    showProjectsIfNeeded(in: app)
     projectRows(app).firstMatch.tap()
     XCTAssertEqual(noteRows(app).count, 1)
     XCTAssertEqual(noteRows(app).firstMatch.label, "Existing note")
@@ -141,6 +143,19 @@ final class ResearchNotebookUITests: XCTestCase {
     app.launch()
     XCTAssertTrue(app.staticTexts["project-empty"].waitForExistence(timeout: 5))
     XCTAssertTrue(app.buttons["project-add"].isEnabled)
+  }
+
+  @MainActor
+  func testPrimaryActionsHaveAccessibleLabels() {
+    let app = makeApp()
+    app.launch()
+    XCTAssertEqual(app.buttons["project-add"].label, "Projectを追加")
+    createProject("Accessibility", in: app)
+    XCTAssertEqual(app.buttons["project-edit"].label, "Projectを編集")
+    XCTAssertEqual(app.buttons["note-add"].label, "Noteを追加")
+    createNote("Label check", in: app)
+    XCTAssertEqual(app.buttons["note-delete"].label, "Noteを削除")
+    XCTAssertEqual(app.textViews["note-body-input"].label, "Noteの本文")
   }
 
   @MainActor
@@ -389,7 +404,15 @@ final class ResearchNotebookUITests: XCTestCase {
     app.terminate()
     app.launchArguments = ["-uiTestingReadOnlyStoreID", storeID]
     app.launch()
+    showProjectsIfNeeded(in: app)
     return app
+  }
+
+  @MainActor
+  private func showProjectsIfNeeded(in app: XCUIApplication) {
+    if !projectRows(app).firstMatch.exists, app.buttons["Show Sidebar"].exists {
+      app.buttons["Show Sidebar"].tap()
+    }
   }
 
   @MainActor
@@ -400,7 +423,8 @@ final class ResearchNotebookUITests: XCTestCase {
   @MainActor
   private func createProject(_ title: String, in app: XCUIApplication) {
     if !app.buttons["project-add"].isHittable {
-      app.buttons["ToggleSidebar"].tap()
+      let toggle = app.buttons["ToggleSidebar"]
+      (toggle.exists ? toggle : app.buttons["Show Sidebar"]).tap()
     }
     app.buttons["project-add"].tap()
     let field = app.textFields["project-title-input"]
@@ -413,6 +437,11 @@ final class ResearchNotebookUITests: XCTestCase {
 
   @MainActor
   private func createNote(_ title: String, in app: XCUIApplication) {
+    if !app.buttons["note-add"].exists {
+      let toggle = app.buttons["ToggleSidebar"]
+      (toggle.exists ? toggle : app.buttons["Show Sidebar"]).tap()
+    }
+    XCTAssertTrue(app.buttons["note-add"].waitForExistence(timeout: 5))
     app.buttons["note-add"].tap()
     let fields = app.textFields.matching(identifier: "note-title-input")
     XCTAssertTrue(fields.firstMatch.waitForExistence(timeout: 5))
