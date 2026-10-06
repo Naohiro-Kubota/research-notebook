@@ -1,6 +1,6 @@
 # Phase 4: Web API
 
-承認日: 2026-10-06（Asia/Tokyo）。人間は以下の要求と Acceptance Criteria、および検索語の外部送信を承認した。Web API の種類、保存モデル、詳細な UI と重複保存の振る舞いは別途判断する。
+承認日: 2026-10-06（Asia/Tokyo）。人間は以下の要求と Acceptance Criteria、および検索語の外部送信を承認した。同日、Web API と保存モデルの [ADR-0008](../adr/0008-crossref-web-api-and-networking-boundary.md)・[ADR-0009](../adr/0009-web-resource-persistence.md)を承認した。
 
 ## 背景
 
@@ -13,6 +13,8 @@
 - 検索結果を Project 内の Research Item として保存し、再起動後も参照できる。
 - 利用者が入力した検索語を選定する Web API へ送信することを許容する。秘密情報をソースコード・Git に保存しない。
 - 既存の Project・Note・Tag と保存データを失わない。
+- 同じ DOI の文献を同じ Project に再度保存するときは重複を作らず、既存項目を表示する。
+- 保存済み Web Resource は Project 内の Note 一覧の別セクションに表示する。
 
 ## Acceptance Criteria
 
@@ -22,12 +24,10 @@
 - [ ] 選んだ結果を指定 Project に保存でき、再起動後も参照できる。保存失敗を成功として表示しない。既存の Project・Note・Tag を失わない。
 - [ ] 正常応答、HTTP エラー、不正 JSON、通信失敗、キャンセル、保存と再読込を自動テストで確認し、[Definition of Done](../development/definition-of-done.md)を満たす。
 
-## 未決定事項
+## 実装計画で具体化する UI
 
-- Web API と検索対象の分野、保存する項目。候補は [ADR-0008](../adr/0008-crossref-web-api-and-networking-boundary.md)。
-- Research Item の保存モデルと Project 削除時の規則。候補は [ADR-0009](../adr/0009-web-resource-persistence.md)。
-- 同じ外部情報を同じ Project へ再度保存した場合の振る舞い。
-- 外部検索の配置と、保存済み Research Item の一覧・詳細表示。
+- 外部検索は選択中 Project から開く。保存済み Web Resource は Note 一覧内の独立したセクションから参照する。既存の 3 列 Navigation と Note 選択状態は維持する。
+- Web Resource の独立した編集画面や本文は Phase 4 の要求に含めない。
 
 ## 対象外
 
