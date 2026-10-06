@@ -48,7 +48,9 @@ final class ResearchNotebookUITests: XCTestCase {
     XCTAssertEqual(noteRows(app).count, 1)
 
     showProjectsIfNeeded(in: app)
+    XCTAssertEqual(projectRows(app).element(boundBy: 1).label, "Second")
     projectRows(app).element(boundBy: 1).tap()
+    XCTAssertTrue(noteRows(app).firstMatch.waitForExistence(timeout: 5))
     XCTAssertEqual(noteRows(app).count, 1)
     XCTAssertEqual(noteRows(app).firstMatch.label, "Apple second")
     XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
