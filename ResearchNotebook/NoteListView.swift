@@ -1,8 +1,18 @@
 import SwiftData
 import SwiftUI
 
+func matchingNotes(in project: Project, searchText: String) -> [Note] {
+  let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+  guard !query.isEmpty else { return project.notes }
+  return project.notes.filter {
+    $0.title.localizedCaseInsensitiveContains(query)
+      || $0.body.localizedCaseInsensitiveContains(query)
+  }
+}
+
 struct NoteListView: View {
   let project: Project
+  let notes: [Note]
   @Binding var selectedNoteID: UUID?
   @Environment(\.modelContext) private var modelContext
   @State private var showsCreation = false
@@ -12,7 +22,7 @@ struct NoteListView: View {
 
   var body: some View {
     List(selection: $selectedNoteID) {
-      ForEach(project.notes) { note in
+      ForEach(notes) { note in
         NavigationLink(value: note.id) {
           Text(note.title)
         }
@@ -27,6 +37,13 @@ struct NoteListView: View {
             .accessibilityIdentifier("note-empty")
         } description: {
           Text("追加ボタンからNoteを作成しましょう。")
+        }
+      } else if notes.isEmpty {
+        ContentUnavailableView {
+          Label("検索結果がありません", systemImage: "magnifyingglass")
+            .accessibilityIdentifier("note-search-empty")
+        } description: {
+          Text("このProject内に一致するNoteはありません。")
         }
       }
     }

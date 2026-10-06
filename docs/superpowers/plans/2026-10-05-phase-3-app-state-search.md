@@ -46,9 +46,9 @@
 
 **対象:** `ResearchNotebook/ContentView.swift`、`ResearchNotebook/NoteListView.swift`、必要なら一覧の絞り込み関数、`ResearchNotebookTests`、`ResearchNotebookUITests/ResearchNotebookUITests.swift`。
 
-- [ ] `ContentView` が検索語を `@State` で所有し、選択中 Project の Note 一覧に対してタイトル・本文の検索を適用する。検索対象は Project 内と明示する。
-- [ ] タイトル一致、本文一致、不一致、空検索語、他 Project の除外を振る舞いのテストで確認する。入力中に結果が更新され、検索語を消すと全件が戻ることを UI Test で確認する。
-- [ ] Note が 0 件の場合と検索結果が 0 件の場合に別の説明を表示し、両方を UI Test で確認する。
+- [x] `ContentView` が検索語を `@State` で所有し、選択中 Project の Note 一覧に対してタイトル・本文の検索を適用する。検索対象は Project 内と明示する。
+- [x] タイトル一致、本文一致、不一致、空検索語、他 Project の除外を振る舞いのテストで確認する。入力中に結果が更新され、検索語を消すと全件が戻ることを UI Test で確認する。
+- [x] Note が 0 件の場合と検索結果が 0 件の場合に別の説明を表示し、両方を UI Test で確認する。
 - [ ] `searchable` の配置を iPad 全画面と狭いウインドウで確認する。標準の 3 列 Navigation を変更する必要が出た場合は ADR-0004 と照合し、人間の判断を受ける。
 
 ## Task 5: タグフィルタと選択整合

@@ -49,4 +49,16 @@
 - 読み取り専用ストアで Tag 作成と解除の保存失敗を再現し、既存の 2 Note と共有 Tag が残ることを Swift Testing で確認した。UI Test では失敗アラート直後に未保存 Tag が一覧へ現れず、既存 Note 本文が残ることと、再起動後の同じ状態を確認した。
 - 標準 Form、TextField、Button を使用し、色に加えてチェックマークとラベルで付与状態を示す。UI Test で Tag 名と付与状態のアクセシビリティラベルを照合した。VoiceOver の実音声操作、可変ウインドウ幅、Dark Mode、Dynamic Type、外部キーボード操作はこの自動テストでは直接観測しておらず、Phase 3 総合確認で扱う。
 
-Task 4・5 の検索・絞り込み・選択整合は未実装であり、Phase 3 全体の Definition of Done は未達。
+## Task 4: 選択中 Project の検索
+
+確認日: 2026-10-06。
+
+- [Adding a search interface to your app](https://developer.apple.com/documentation/SwiftUI/Adding-a-search-interface-to-your-app) によると、`searchable` は `NavigationSplitView` の列内 View に付けられ、iPadOS での検索欄の位置は修飾子を付ける場所によって変わる。検索語の保存先はアプリ側が用意する。これに従い、Note 一覧の列に検索欄を置き、`ContentView` の `@State` から Binding を渡した。
+- 検索欄の案内文「このProject内のNoteを検索」と、空結果の説明で対象範囲を示す。タイトル・本文の大文字小文字を区別しない部分一致、入力中の更新、空文字への復帰はアプリ固有の実装であり、Apple の資料が検索方式を指定するものではない。
+- 選択 Note が検索結果から外れた場合は詳細選択を解除する。これは ADR-0006 の条件と矛盾させないため、Task 5 の一般的な選択整合に先立って検索部分だけを実装した。タグ条件と Project 切替時の条件保持は Task 5 に残す。
+- 空 Project と検索結果 0 件には別の説明を表示する。検索は画面上の一覧だけを絞り、保存済み Note を変更しない。
+
+- iPadOS 17.2 の iPad Pro (11-inch) Simulator で `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` が成功した。Swift Testing 16 ケースと XCTest UI Test 19 件は逐次実行で失敗 0 件。最初の並列テスト実行では Swift Testing runner が途中で再起動したため、完了結果に数えず、逐次実行で全件を再検証した。新規 Swift コンパイラ警告はなく、AppIntents メタデータ抽出省略の既存ツール警告のみ確認した。
+- iPadOS 27 の iPad Pro 13-inch Simulator で全画面を目視し、検索欄が Note 一覧の列にあり、「このProject内のNoteを検索」が表示されることを確認した。検索欄の Accessibility ラベルは UI Test で照合した。色だけで結果を表さず、空結果にはテキストを表示する。狭いウインドウへの変更は、`ウインドウ表示アプリ` が有効な Simulator で角ドラッグと上端ジェスチャを試したが、画面が消えて実観測できなかった。狭幅表示の確認は未完了であり、Task 4 の当該計画項目と可変幅に関する DoD は満たしていない。
+
+Task 5・6 も残るため、Phase 3 全体の Definition of Done は未達。

@@ -3,6 +3,54 @@ import XCTest
 
 final class ResearchNotebookUITests: XCTestCase {
   @MainActor
+  func testProjectSearchUpdatesResultsAndClearingRestoresNotes() {
+    let app = makeApp()
+    app.launch()
+    createProject("First", in: app)
+    createNote("Apple title", in: app)
+    createNote("Other title", in: app)
+    let body = app.textViews["note-body-input"]
+    body.tap()
+    body.typeText("Apple body")
+    createProject("Second", in: app)
+    createNote("Apple outside", in: app)
+    showProjectsIfNeeded(in: app)
+    projectRows(app).element(boundBy: 0).tap()
+
+    let search = app.searchFields.firstMatch
+    XCTAssertTrue(search.waitForExistence(timeout: 5))
+    XCTAssertTrue(search.label.contains("Project"))
+    search.tap()
+    search.typeText("Apple")
+    XCTAssertEqual(noteRows(app).count, 2)
+    search.typeText(" title")
+    XCTAssertEqual(noteRows(app).count, 1)
+    XCTAssertEqual(noteRows(app).firstMatch.label, "Apple title")
+    noteRows(app).firstMatch.tap()
+    XCTAssertTrue(app.textFields["note-title-input"].waitForExistence(timeout: 5))
+    replaceText(search, with: "body")
+    XCTAssertEqual(noteRows(app).count, 1)
+    XCTAssertEqual(noteRows(app).firstMatch.label, "Other title")
+    XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
+    replaceText(search, with: "")
+    XCTAssertEqual(noteRows(app).count, 2)
+  }
+
+  @MainActor
+  func testEmptyProjectAndNoSearchResultsHaveDifferentMessages() {
+    let app = makeApp()
+    app.launch()
+    createProject("Empty", in: app)
+    XCTAssertTrue(app.staticTexts["note-empty"].waitForExistence(timeout: 5))
+    createNote("Existing", in: app)
+    let search = app.searchFields.firstMatch
+    search.tap()
+    search.typeText("Missing")
+    XCTAssertTrue(app.staticTexts["note-search-empty"].waitForExistence(timeout: 5))
+    XCTAssertFalse(app.staticTexts["note-empty"].exists)
+  }
+
+  @MainActor
   func testUnavailableStoreShowsError() {
     let app = makeApp()
     app.launchArguments += ["-uiTestingStoreFailure"]
