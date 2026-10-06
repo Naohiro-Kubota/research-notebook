@@ -26,6 +26,19 @@ struct CrossrefClient: Sendable {
     guard !trimmed.isEmpty else { throw CrossrefError.emptyQuery }
     do {
       try Task.checkCancellation()
+      #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-uiTestingCrossref") {
+          if trimmed == "slow" { try await Task.sleep(for: .seconds(2)) }
+          try Task.checkCancellation()
+          if trimmed == "empty" { return [] }
+          if trimmed == "error" { throw CrossrefError.httpStatus(500) }
+          return [
+            CrossrefSearchResult(
+              title: "Sample paper", doi: "10.1234/sample",
+              url: URL(string: "https://doi.org/10.1234/sample")!)
+          ]
+        }
+      #endif
       var components = URLComponents()
       components.scheme = "https"
       components.host = "api.crossref.org"
