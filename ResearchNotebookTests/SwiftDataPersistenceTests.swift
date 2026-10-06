@@ -6,6 +6,40 @@ import Testing
 
 @MainActor
 struct SwiftDataPersistenceTests {
+  @Test func filtersSelectedProjectByTagAndSearchWithoutChangingNotes() throws {
+    let container = try ModelContainer(
+      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    let context = ModelContext(container)
+    let first = Project(title: "First")
+    let second = Project(title: "Second")
+    context.insert(first)
+    context.insert(second)
+    let tag = ResearchNotebook.Tag(name: "Shared")
+    context.insert(tag)
+    let titleMatch = Note(project: first, title: "Apple", body: "One")
+    titleMatch.tags = [tag]
+    let bodyMatch = Note(project: first, title: "Other", body: "Apple body")
+    bodyMatch.tags = [tag]
+    _ = Note(project: first, title: "Apple without tag")
+    let outside = Note(project: second, title: "Apple outside")
+    outside.tags = [tag]
+    let originalIDs = Set(first.notes.map(\.id))
+
+    #expect(
+      Set(matchingNotes(in: first, searchText: "", tagID: tag.id).map(\.id))
+        == Set([titleMatch.id, bodyMatch.id]))
+    #expect(
+      Set(matchingNotes(in: first, searchText: "apple", tagID: tag.id).map(\.id))
+        == Set([titleMatch.id, bodyMatch.id]))
+    #expect(matchingNotes(in: first, searchText: "without", tagID: tag.id).isEmpty)
+    #expect(matchingNotes(in: first, searchText: "apple", tagID: nil).count == 3)
+    #expect(matchingNotes(in: first, searchText: "", tagID: nil).count == 3)
+    #expect(Set(matchingNotes(in: second, searchText: "", tagID: tag.id).map(\.id)) == [outside.id])
+    #expect(Set(first.notes.map(\.id)) == originalIDs)
+    #expect(first.notes.count == 3)
+  }
+
   @Test func searchesOnlySelectedProjectsNoteTitlesAndBodies() throws {
     let container = try ModelContainer(
       for: Project.self, Note.self, ResearchNotebook.Tag.self,

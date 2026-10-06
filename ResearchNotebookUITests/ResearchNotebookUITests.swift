@@ -3,6 +3,73 @@ import XCTest
 
 final class ResearchNotebookUITests: XCTestCase {
   @MainActor
+  func testTagFilterCombinesWithSearchAndKeepsConditionsAcrossProjects() {
+    let app = makeApp()
+    app.launch()
+    createProject("First", in: app)
+    createNote("Apple tagged", in: app)
+    let tagInput = app.textFields["tag-name-input"]
+    tagInput.tap()
+    tagInput.typeText("Shared")
+    app.buttons["tag-create"].tap()
+    createNote("Apple plain", in: app)
+    createProject("Second", in: app)
+    createNote("Apple second", in: app)
+    tagButton("Shared", attached: false, in: app).tap()
+    createNote("Other tagged", in: app)
+    tagButton("Shared", attached: false, in: app).tap()
+    let otherTagInput = app.textFields["tag-name-input"]
+    otherTagInput.tap()
+    otherTagInput.typeText("OtherTag")
+    app.buttons["tag-create"].tap()
+    createNote("Apple second plain", in: app)
+    showProjectsIfNeeded(in: app)
+    projectRows(app).element(boundBy: 0).tap()
+
+    app.buttons["tag-filter"].tap()
+    app.buttons["Shared"].tap()
+    XCTAssertEqual(noteRows(app).count, 1)
+    XCTAssertEqual(noteRows(app).firstMatch.label, "Apple tagged")
+    noteRows(app).firstMatch.tap()
+    XCTAssertTrue(app.textFields["note-title-input"].waitForExistence(timeout: 5))
+    if !projectRows(app).firstMatch.isHittable {
+      app.buttons["ToggleSidebar"].tap()
+    }
+    projectRows(app).element(boundBy: 1).tap()
+    XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
+    showProjectsIfNeeded(in: app)
+    projectRows(app).element(boundBy: 0).tap()
+    let search = app.searchFields.firstMatch
+    search.tap()
+    search.typeText("missing")
+    XCTAssertTrue(app.staticTexts["note-search-empty"].waitForExistence(timeout: 5))
+    XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
+    replaceText(search, with: "Apple")
+    XCTAssertEqual(noteRows(app).count, 1)
+
+    showProjectsIfNeeded(in: app)
+    projectRows(app).element(boundBy: 1).tap()
+    XCTAssertEqual(noteRows(app).count, 1)
+    XCTAssertEqual(noteRows(app).firstMatch.label, "Apple second")
+    XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
+    app.buttons["Cancel"].tap()
+    XCTAssertEqual(noteRows(app).count, 2)
+    noteRows(app).matching(NSPredicate(format: "label == %@", "Apple second")).firstMatch.tap()
+    XCTAssertTrue(app.textFields["note-title-input"].waitForExistence(timeout: 5))
+    app.buttons["tag-filter"].tap()
+    app.buttons["OtherTag"].tap()
+    XCTAssertEqual(noteRows(app).count, 1)
+    XCTAssertEqual(noteRows(app).firstMatch.label, "Other tagged")
+    XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)
+    app.buttons["tag-filter"].tap()
+    app.buttons["すべてのタグ"].tap()
+    showProjectsIfNeeded(in: app)
+    projectRows(app).element(boundBy: 0).tap()
+    XCTAssertEqual(noteRows(app).count, 2)
+    XCTAssertFalse(app.textFields["note-title-input"].exists)
+  }
+
+  @MainActor
   func testProjectSearchUpdatesResultsAndClearingRestoresNotes() {
     let app = makeApp()
     app.launch()

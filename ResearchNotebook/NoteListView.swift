@@ -1,12 +1,12 @@
 import SwiftData
 import SwiftUI
 
-func matchingNotes(in project: Project, searchText: String) -> [Note] {
+func matchingNotes(in project: Project, searchText: String, tagID: UUID? = nil) -> [Note] {
   let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-  guard !query.isEmpty else { return project.notes }
   return project.notes.filter {
-    $0.title.localizedCaseInsensitiveContains(query)
-      || $0.body.localizedCaseInsensitiveContains(query)
+    (tagID == nil || $0.tags.contains { $0.id == tagID })
+      && (query.isEmpty || $0.title.localizedCaseInsensitiveContains(query)
+        || $0.body.localizedCaseInsensitiveContains(query))
   }
 }
 
@@ -40,10 +40,10 @@ struct NoteListView: View {
         }
       } else if notes.isEmpty {
         ContentUnavailableView {
-          Label("検索結果がありません", systemImage: "magnifyingglass")
+          Label("条件に一致するNoteがありません", systemImage: "magnifyingglass")
             .accessibilityIdentifier("note-search-empty")
         } description: {
-          Text("このProject内に一致するNoteはありません。")
+          Text("このProject内に検索とタグの条件に一致するNoteはありません。")
         }
       }
     }

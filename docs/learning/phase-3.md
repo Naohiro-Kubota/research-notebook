@@ -59,6 +59,20 @@
 - 空 Project と検索結果 0 件には別の説明を表示する。検索は画面上の一覧だけを絞り、保存済み Note を変更しない。
 
 - iPadOS 17.2 の iPad Pro (11-inch) Simulator で `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` が成功した。Swift Testing 16 ケースと XCTest UI Test 19 件は逐次実行で失敗 0 件。最初の並列テスト実行では Swift Testing runner が途中で再起動したため、完了結果に数えず、逐次実行で全件を再検証した。新規 Swift コンパイラ警告はなく、AppIntents メタデータ抽出省略の既存ツール警告のみ確認した。
-- iPadOS 27 の iPad Pro 13-inch Simulator で全画面を目視し、検索欄が Note 一覧の列にあり、「このProject内のNoteを検索」が表示されることを確認した。検索欄の Accessibility ラベルは UI Test で照合した。色だけで結果を表さず、空結果にはテキストを表示する。狭いウインドウへの変更は、`ウインドウ表示アプリ` が有効な Simulator で角ドラッグと上端ジェスチャを試したが、画面が消えて実観測できなかった。狭幅表示の確認は未完了であり、Task 4 の当該計画項目と可変幅に関する DoD は満たしていない。
+- iPadOS 27 の iPad Pro 13-inch Simulator で全画面を目視し、検索欄が Note 一覧の列にあり、「このProject内のNoteを検索」が表示されることを確認した。検索欄の Accessibility ラベルは UI Test で照合した。色だけで結果を表さず、空結果にはテキストを表示する。狭いウインドウへの変更は、`ウインドウ表示アプリ` が有効な Simulator で角ドラッグと上端ジェスチャを試したが、画面が消えて実観測できなかった。この時点では Task 4 の狭幅確認と可変幅に関する DoD は未達だった。
 
-Task 5・6 も残るため、Phase 3 全体の Definition of Done は未達。
+2026-10-06、人間が狭いウインドウでも検索欄が表示されることを直接確認した。ウインドウ寸法・機種は報告されていない。これにより Task 4 の狭幅表示の確認項目を完了とする。上記の Simulator での未観測という実測はそのまま残す。
+
+Task 4 完了時点では Task 5・6 が残り、Phase 3 全体の Definition of Done は未達だった。
+
+## Task 5: タグフィルタと選択整合
+
+確認日: 2026-10-06。
+
+- Apple 公式の [Model data](https://developer.apple.com/documentation/swiftui/model-data) は View 固有の一時状態に `@State` を使えると説明する。[HIG: Searching](https://developer.apple.com/design/human-interface-guidelines/searching) は検索とフィルタを組み合わせる場面を扱う。これらはタグ条件の所有方式と表示方法の根拠であり、AND 条件や Project 切替時の保持は本プロジェクトの承認済み要求である。
+- `ContentView` が選択タグ ID を一時状態として持つ。選択中 Project の Note にタグ条件と既存のタイトル・本文検索を AND で適用する。タグはメニューで一つ選び、「すべてのタグ」で解除できる。メニューのラベルに選択中のタグ名を含め、色だけに依存しない。
+- 条件と Project が変わって表示対象から外れた Note の詳細選択を解除する。Note・Project の削除時は既存の削除コールバックも選択 ID を解除する。絞り込みでは SwiftData のモデルを変更しない。
+- 空 Project と条件不一致を区別し、後者の説明を検索・タグの両方に使える文言へ変えた。
+- iPadOS 17.2 の iPad Pro (11-inch) Simulator で `scripts/test.sh` を実行した。Swift Testing 17 件と XCTest UI Test 20 件がすべて成功した。新しい UI Test は、タグだけが一致する Note と検索語だけが一致する Note を除外し、Project 切替後も両条件が残ることを確認する。Project 切替とタグ条件変更で隠れた Note の詳細が空になること、条件解除で Note が再表示されることも確認した。
+- `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` は成功した。新規コンパイラ警告はなく、AppIntents のメタデータ抽出を省略した既存のツール警告だけを確認した。
+- 標準の `Menu` を Note 一覧上部に置いた。選択中のタグ名をテキストとアクセシビリティラベルで示す。検索・タグの条件は SwiftData モデルを変更しない。VoiceOver の実音声操作、狭いウインドウでのタグ Menu、Dark Mode、Dynamic Type、外部キーボード操作は今回直接観測していない。Task 6 の総合確認に残すため、Phase 3 全体の Definition of Done は未達。
