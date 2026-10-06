@@ -12,6 +12,8 @@ final class Project {
   var body: String
   @Relationship(deleteRule: .cascade, inverse: \Note.project)
   var notes: [Note] = []
+  @Relationship(deleteRule: .cascade, inverse: \WebResource.project)
+  var webResources: [WebResource] = []
 
   init(id: UUID = UUID(), title: String, body: String = "") {
     self.id = id

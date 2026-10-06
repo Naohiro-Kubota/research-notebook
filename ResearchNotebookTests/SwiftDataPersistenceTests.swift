@@ -6,9 +6,74 @@ import Testing
 
 @MainActor
 struct SwiftDataPersistenceTests {
+  @Test func persistsWebResourceAndCascadesWithProject() throws {
+    let container = try ModelContainer(
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
+      configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    let writer = ModelContext(container)
+    let project = Project(title: "Research")
+    writer.insert(project)
+    let resource = WebResource(
+      project: project, title: "Paper", doi: "10.1234/paper",
+      url: URL(string: "https://doi.org/10.1234/paper")!)
+    writer.insert(resource)
+    try writer.save()
+
+    let reader = ModelContext(container)
+    let saved = try #require(reader.fetch(FetchDescriptor<WebResource>()).first)
+    #expect(saved.project?.id == project.id)
+    #expect(saved.title == "Paper")
+    #expect(saved.doi == "10.1234/paper")
+    #expect(saved.url.absoluteString == "https://doi.org/10.1234/paper")
+    #expect(try #require(reader.fetch(FetchDescriptor<Project>()).first).webResources.count == 1)
+
+    let projectID = project.id
+    try reader.delete(model: Project.self, where: #Predicate { $0.id == projectID })
+    try reader.save()
+    #expect(try ModelContext(container).fetch(FetchDescriptor<WebResource>()).isEmpty)
+  }
+
+  @Test func preservesPhase3StoreCopy() throws {
+    let original = try #require(
+      Bundle(for: Phase2FixtureBundle.self).url(forResource: "phase3", withExtension: "store"))
+    let originalBytes = try Data(contentsOf: original)
+    let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    let copy = directory.appendingPathComponent("copy.store")
+    try FileManager.default.copyItem(at: original, to: copy)
+    let container = try ModelContainer(
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
+      configurations: ModelConfiguration(url: copy))
+    let reader = ModelContext(container)
+    let projects = try reader.fetch(FetchDescriptor<Project>())
+    let notes = try reader.fetch(FetchDescriptor<Note>())
+    let tags = try reader.fetch(FetchDescriptor<ResearchNotebook.Tag>())
+    #expect(projects.count == 2)
+    #expect(notes.count == 2)
+    #expect(tags.count == 1)
+    #expect(try reader.fetch(FetchDescriptor<WebResource>()).isEmpty)
+    let first = try #require(projects.first { $0.title == "Phase 3 project" })
+    #expect(first.id.uuidString == "00000000-0000-0000-0000-000000000031")
+    #expect(first.body == "Existing project body")
+    #expect(first.notes.map(\.title) == ["Existing note"])
+    #expect(first.notes.first?.id.uuidString == "00000000-0000-0000-0000-000000000033")
+    #expect(first.notes.first?.body == "Note body")
+    #expect(first.notes.first?.tags.map(\.name) == ["Shared"])
+    #expect(first.webResources.isEmpty)
+    let other = try #require(projects.first { $0.title == "Other project" })
+    #expect(other.id.uuidString == "00000000-0000-0000-0000-000000000032")
+    #expect(other.body == "Other body")
+    #expect(other.notes.map(\.title) == ["Other note"])
+    #expect(other.notes.first?.id.uuidString == "00000000-0000-0000-0000-000000000034")
+    #expect(other.notes.first?.body == "Other note body")
+    #expect(other.notes.first?.tags.map(\.name) == ["Shared"])
+    #expect(tags.first?.notes?.count == 2)
+    #expect(tags.first?.id.uuidString == "00000000-0000-0000-0000-000000000035")
+    #expect(try Data(contentsOf: original) == originalBytes)
+  }
   @Test func filtersSelectedProjectByTagAndSearchWithoutChangingNotes() throws {
     let container = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
       configurations: ModelConfiguration(isStoredInMemoryOnly: true))
     let context = ModelContext(container)
     let first = Project(title: "First")
@@ -42,7 +107,7 @@ struct SwiftDataPersistenceTests {
 
   @Test func searchesOnlySelectedProjectsNoteTitlesAndBodies() throws {
     let container = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
       configurations: ModelConfiguration(isStoredInMemoryOnly: true))
     let context = ModelContext(container)
     let selected = Project(title: "Selected")
@@ -63,7 +128,7 @@ struct SwiftDataPersistenceTests {
 
   @Test func persistsProjectAndNoteRelationship() throws {
     let container = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
       configurations: ModelConfiguration(isStoredInMemoryOnly: true))
     let writer = ModelContext(container)
     let projectID = UUID()
@@ -92,7 +157,7 @@ struct SwiftDataPersistenceTests {
 
   @Test func allowsDuplicateTitlesWithDistinctIDs() throws {
     let container = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
       configurations: ModelConfiguration(isStoredInMemoryOnly: true))
     let writer = ModelContext(container)
     let first = Project(title: "Same")
@@ -124,7 +189,7 @@ struct SwiftDataPersistenceTests {
       .appendingPathExtension("store")
     do {
       let writable = try ModelContainer(
-        for: Project.self, Note.self, ResearchNotebook.Tag.self,
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
         configurations: ModelConfiguration(url: storeURL))
       let context = ModelContext(writable)
       context.insert(Project(title: "Existing"))
@@ -132,7 +197,8 @@ struct SwiftDataPersistenceTests {
     }
     let readOnly = ModelConfiguration(url: storeURL, allowsSave: false)
     let container = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self, configurations: readOnly)
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
+      configurations: readOnly)
     let context = container.mainContext
     #expect(context.autosaveEnabled)
     #expect(try context.fetch(FetchDescriptor<Project>()).count == 1)
@@ -150,7 +216,7 @@ struct SwiftDataPersistenceTests {
       .appendingPathExtension("store")
     do {
       let writable = try ModelContainer(
-        for: Project.self, Note.self, ResearchNotebook.Tag.self,
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
         configurations: ModelConfiguration(url: storeURL))
       let project = Project(title: "Existing")
       writable.mainContext.insert(project)
@@ -158,7 +224,7 @@ struct SwiftDataPersistenceTests {
       try writable.mainContext.save()
     }
     let readOnly = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
       configurations: ModelConfiguration(url: storeURL, allowsSave: false))
     let context = readOnly.mainContext
     let project = try #require(context.fetch(FetchDescriptor<Project>()).first)
@@ -169,7 +235,7 @@ struct SwiftDataPersistenceTests {
 
   @Test func deletingNoteKeepsOtherNotesAndProjects() throws {
     let container = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
       configurations: ModelConfiguration(isStoredInMemoryOnly: true))
     let context = ModelContext(container)
     let first = Project(title: "First")
@@ -207,7 +273,7 @@ struct SwiftDataPersistenceTests {
     let retainedNoteID = UUID()
     do {
       let container = try ModelContainer(
-        for: Project.self, Note.self, ResearchNotebook.Tag.self,
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
         configurations: ModelConfiguration(url: storeURL))
       let context = ModelContext(container)
       let deleted = Project(id: deletedID, title: "Delete")
@@ -220,14 +286,14 @@ struct SwiftDataPersistenceTests {
     }
     do {
       let container = try ModelContainer(
-        for: Project.self, Note.self, ResearchNotebook.Tag.self,
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
         configurations: ModelConfiguration(url: storeURL))
       let context = ModelContext(container)
       try context.delete(model: Project.self, where: #Predicate { $0.id == deletedID })
       try context.save()
     }
     let container = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
       configurations: ModelConfiguration(url: storeURL))
     let reader = ModelContext(container)
     #expect(try reader.fetch(FetchDescriptor<Project>()).map(\.id) == [retainedID])
@@ -260,7 +326,8 @@ struct SwiftDataPersistenceTests {
       inMemory
       ? container
       : try ModelContainer(
-        for: Project.self, Note.self, ResearchNotebook.Tag.self, configurations: configuration)
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
+        configurations: configuration)
     let reader = ModelContext(reopened)
     let notes = try reader.fetch(FetchDescriptor<Note>())
     let savedFirst = try #require(notes.first { $0.id == firstNote.id })
@@ -301,7 +368,8 @@ struct SwiftDataPersistenceTests {
       inMemory
       ? container
       : try ModelContainer(
-        for: Project.self, Note.self, ResearchNotebook.Tag.self, configurations: configuration)
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
+        configurations: configuration)
     let reader = ModelContext(reopened)
     let notes = try reader.fetch(FetchDescriptor<Note>())
     #expect(notes.map(\.id) == [retainedID])
@@ -345,7 +413,8 @@ struct SwiftDataPersistenceTests {
       inMemory
       ? container
       : try ModelContainer(
-        for: Project.self, Note.self, ResearchNotebook.Tag.self, configurations: configuration)
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
+        configurations: configuration)
     let reader = ModelContext(reopened)
     #expect(try reader.fetch(FetchDescriptor<Project>()).map(\.id) == [retainedID])
     let notes = try reader.fetch(FetchDescriptor<Note>())
@@ -366,7 +435,7 @@ struct SwiftDataPersistenceTests {
       ? ModelConfiguration(isStoredInMemoryOnly: true)
       : ModelConfiguration(url: directory.appendingPathComponent("tags.store"))
     let container = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
       configurations: configuration)
     return (container, configuration)
   }
@@ -399,7 +468,8 @@ struct SwiftDataPersistenceTests {
       inMemory
       ? container
       : try ModelContainer(
-        for: Project.self, Note.self, ResearchNotebook.Tag.self, configurations: configuration)
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
+        configurations: configuration)
     let reader = ModelContext(reopened)
     let tags = try reader.fetch(FetchDescriptor<ResearchNotebook.Tag>())
     #expect(tags.count == 1)
@@ -439,7 +509,7 @@ struct SwiftDataPersistenceTests {
     let url = directory.appendingPathComponent("tags.store")
     do {
       let writable = try ModelContainer(
-        for: Project.self, Note.self, ResearchNotebook.Tag.self,
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
         configurations: ModelConfiguration(url: url))
       let context = ModelContext(writable)
       let project = Project(title: "Existing")
@@ -453,7 +523,7 @@ struct SwiftDataPersistenceTests {
       try attachTag(named: "Shared", to: second, in: context)
     }
     let readOnly = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
       configurations: ModelConfiguration(url: url, allowsSave: false))
     let context = ModelContext(readOnly)
     let notes = try context.fetch(FetchDescriptor<Note>())
@@ -483,7 +553,7 @@ struct SwiftDataPersistenceTests {
     let copy = directory.appendingPathComponent("copy.store")
     try FileManager.default.copyItem(at: original, to: copy)
     let container = try ModelContainer(
-      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
       configurations: ModelConfiguration(url: copy))
     let reader = ModelContext(container)
     let projects = try reader.fetch(FetchDescriptor<Project>())
