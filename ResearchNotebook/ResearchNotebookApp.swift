@@ -28,7 +28,7 @@ struct ResearchNotebookApp: App {
       if arguments.contains("-uiTestingStoreFailure") {
         let url = URL(filePath: "/dev/null/research-notebook.store")
         return try ModelContainer(
-          for: Project.self, Note.self, Tag.self,
+          for: Project.self, Note.self, Tag.self, WebResource.self,
           configurations: ModelConfiguration(url: url, allowsSave: false))
       }
       if let index = arguments.firstIndex(of: "-uiTestingReadOnlyStoreID"),
@@ -39,7 +39,7 @@ struct ResearchNotebookApp: App {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let url = directory.appendingPathComponent("UITest-\(storeID.uuidString).store")
         return try ModelContainer(
-          for: Project.self, Note.self, Tag.self,
+          for: Project.self, Note.self, Tag.self, WebResource.self,
           configurations: ModelConfiguration(url: url, allowsSave: false))
       }
       if let index = arguments.firstIndex(of: "-uiTestingStoreID"),
@@ -51,9 +51,10 @@ struct ResearchNotebookApp: App {
           at: directory, withIntermediateDirectories: true)
         let url = directory.appendingPathComponent("UITest-\(storeID.uuidString).store")
         return try ModelContainer(
-          for: Project.self, Note.self, Tag.self, configurations: ModelConfiguration(url: url))
+          for: Project.self, Note.self, Tag.self, WebResource.self,
+          configurations: ModelConfiguration(url: url))
       }
     #endif
-    return try ModelContainer(for: Project.self, Note.self, Tag.self)
+    return try ModelContainer(for: Project.self, Note.self, Tag.self, WebResource.self)
   }
 }

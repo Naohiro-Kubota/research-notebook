@@ -1,5 +1,23 @@
 # Phase 2 旧ストアの検証用データ
 
+## Phase 3 旧ストアの検証用データ
+
+`phase3.store` は実ユーザーデータを含まない合成データです。2026-10-06、`origin/develop` の Phase 3 モデル（Project・Note・Tag）を Xcode 27 / iPadOS 17.2 Simulator で実行し、一時的な Swift Testing テストで生成しました。新しい Web Resource モデルは生成時に存在しません。生成元は `/private/tmp/phase4-phase3-original/phase3.store` とその WAL / SHM です。SQLite の read-only 接続から `backup` で WAL の保存済みデータを含む単一ファイルのコピーを作りました。生成元は移行・消去していません。
+
+| 種別 | ID末尾 | タイトル・名前 | 本文 | 所属 |
+|---|---|---|---|---|
+| Project | 031 | Phase 3 project | Existing project body | — |
+| Project | 032 | Other project | Other body | — |
+| Note | 033 | Existing note | Note body | Project 031、Tag 035 |
+| Note | 034 | Other note | Other note body | Project 032、Tag 035 |
+| Tag | 035 | Shared | — | Note 033・034で共有 |
+
+ID はすべて `00000000-0000-0000-0000-0000000000xx` です。`preservesPhase3StoreCopy()` は fixture を一意な一時ディレクトリへコピーして新スキーマで開き、ID・値・所属・空の Web Resource と元 fixture のバイト列不変を確認します。この合成ストアの成功は任意の実ユーザーストアの移行を保証しません。
+
+新モデルをそのまま `WebResource` と命名すると、検証した iPadOS 17.2 Simulator では SwiftData が `Class 'nil' for entity 'WebResource'` の内部例外を出しました。モデル実体を `SavedWebResource` とし、コード上の `WebResource` は型別名にすると、同じ関係と属性で保存・連鎖削除・移行テストが通りました。これは検証環境での観測であり、Apple公式資料が名前衝突を説明しているという主張ではありません。
+
+---
+
 `phase2.store` は実ユーザーデータを含まない合成データです。2026-10-05、Phase 2 のモデルを持つコミット `4c8875dcff3b33cfab008356cb49399d0178e70b` のアプリを Xcode 27 / iPadOS 17.2 Simulator で実行して生成しました。新しい Tag モデルや旧モデルの再定義から生成したストアではありません。
 
 一時的な Swift Testing テストから `ModelContainer(for: Project.self, Note.self, configurations: ModelConfiguration(url: ...))` を作り、2 Project と各 2 Note を insert / save しました。生成テストを含む 9 テストが成功しました。
