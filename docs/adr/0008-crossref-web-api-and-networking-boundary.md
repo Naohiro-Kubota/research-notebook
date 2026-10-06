@@ -1,14 +1,14 @@
 # ADR-0008: Phase 4 の Web API 選定と Networking 境界
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-06
 - Decision Owner: Human
 
 ## Context
 
-[Phase 4 の要求](../requirements/phase-4-web-api.md)では、公開 Web API で外部情報を検索し、結果を Research Item として保存する。人間は 2026-10-06 に Phase 4 の要求と Acceptance Criteria、および検索語の外部送信を許容した。API 自体の採用は未承認である。
+[Phase 4 の要求](../requirements/phase-4-web-api.md)では、公開 Web API で外部情報を検索し、結果を Research Item として保存する。人間は 2026-10-06 に Phase 4 の要求と Acceptance Criteria、および検索語の外部送信を許容した。同日、本 ADR の採用案を承認した。
 
-初回の題材は文献メタデータ検索を候補とする。これは API の種類をまだ固定していない[プロダクト要求](../requirements/product-requirements.md)に対する AI の提案であり、一般の Web ページ全体を検索できるという意味ではない。iPadOS 17、Apple 標準 Framework、既存の 3 列 Navigation と SwiftData を前提とする。
+初回の題材は文献メタデータ検索とする。これは API の種類を固定していなかった[プロダクト要求](../requirements/product-requirements.md)に対して承認された選択であり、一般の Web ページ全体を検索できるという意味ではない。iPadOS 17、Apple 標準 Framework、既存の 3 列 Navigation と SwiftData を前提とする。
 
 ## 一次情報
 
@@ -64,7 +64,7 @@ Networking 境界は `URLSession` → Crossref 専用の `Decodable` DTO → 画
 
 ## Human Decision
 
-未決定。人間による API 選定と Networking 境界の最終承認を待つ。
+2026-10-06、人間は Option A と Proposed Decision の Networking 境界を承認した。
 
 ## Consequences and Verification
 

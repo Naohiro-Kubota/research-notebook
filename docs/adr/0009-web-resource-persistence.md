@@ -1,6 +1,6 @@
 # ADR-0009: Phase 4 の Web Resource 保存モデル
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-06
 - Decision Owner: Human
 
@@ -8,7 +8,7 @@
 
 [プロダクト要求](../requirements/product-requirements.md)は Research Item を Project 内の調査情報と定義し、将来 Note、Web Resource、Document、Image を扱う。[Phase 4](../requirements/phase-4-web-api.md)は検索結果を Research Item として保存する。一方、現行の SwiftData スキーマは `Project`、`Note`、`Tag` だけで、共通の Research Item モデルはない。Note は編集可能なタイトルと本文を持ち、Tag との関連がある。
 
-人間は 2026-10-06 に Phase 4 の要求と Acceptance Criteria を承認した。保存モデルは未承認である。既存ストアの Project・Note・Tag を失わず、[ADR-0005](0005-swiftdata-persistence.md)の永続化方針と[ADR-0006](0006-phase-3-tags-and-search-state.md)の Note タグ範囲を守る。
+人間は 2026-10-06 に Phase 4 の要求と Acceptance Criteria、および本 ADR の採用案を承認した。既存ストアの Project・Note・Tag を失わず、[ADR-0005](0005-swiftdata-persistence.md)の永続化方針と[ADR-0006](0006-phase-3-tags-and-search-state.md)の Note タグ範囲を守る。
 
 ## Apple 公式情報・一次情報
 
@@ -62,7 +62,7 @@ Project を削除したときは所属 Web Resource も削除する `.cascade` �
 
 ## Human Decision
 
-未決定。人間によるモデル、所属・削除規則、保存項目の最終承認を待つ。
+2026-10-06、人間は Option A と Proposed Decision のモデル、所属・削除規則、保存項目を承認した。同日、同一 Project・DOI の再保存では重複を防いで既存項目を表示し、保存済み Web Resource を Project 内の Note 一覧の別セクションへ表示することを決定した。
 
 ## Consequences and Verification
 
