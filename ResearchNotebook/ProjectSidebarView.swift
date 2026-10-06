@@ -3,8 +3,7 @@ import SwiftUI
 
 struct ProjectSidebarView: View {
   let projects: [Project]
-  @Binding var selectedProjectID: UUID?
-  @Binding var selectedNoteID: UUID?
+  @Bindable var uiState: NotebookUIState
   @Environment(\.modelContext) private var modelContext
   @State private var showsCreation = false
   @State private var newTitle = ""
@@ -12,13 +11,13 @@ struct ProjectSidebarView: View {
   @State private var saveFailed = false
 
   var body: some View {
-    List(selection: $selectedProjectID) {
+    List(selection: $uiState.selectedProjectID) {
       ForEach(projects) { project in
         NavigationLink(value: project.id) {
           Text(project.title)
         }
         .accessibilityIdentifier("project-row-\(project.id.uuidString)")
-        .accessibilityAddTraits(selectedProjectID == project.id ? .isSelected : [])
+        .accessibilityAddTraits(uiState.selectedProjectID == project.id ? .isSelected : [])
       }
     }
     .overlay {
@@ -69,8 +68,8 @@ struct ProjectSidebarView: View {
               let project = Project(title: newTitle, body: newBody)
               modelContext.insert(project)
               if saveChanges(modelContext) {
-                selectedNoteID = nil
-                selectedProjectID = project.id
+                uiState.selectedNoteID = nil
+                uiState.selectedProjectID = project.id
                 showsCreation = false
               } else {
                 modelContext.delete(project)

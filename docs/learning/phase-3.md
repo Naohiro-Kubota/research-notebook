@@ -125,3 +125,15 @@ Task 4 完了時点では Task 5・6 が残り、Phase 3 全体の Definition of
 - 初期値、表示中・非表示・空集合での選択整合、未選択、Project 切替を模した集合変更、条件保持、二つのインスタンスの独立性を検証した。
 - `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` は成功。新規 Swift コンパイラ警告はなく、既存の AppIntents メタデータ抽出省略のツール警告と、テスト起動時の Xcode debugger version lookup 診断を確認した。
 - Task 1 の状態型・自動検証・資料記録は満たした。Task 2 の View への接続、後続の総合確認、Phase 3 の人間による未報告の画面操作確認が残るため、Observation 対応全体と Phase 3 全体の Definition of Done は未達。Simulator の手動操作は実施していない。
+
+## Observation UI 状態 Task 2: View の所有と Binding
+
+確認日: 2026-10-06。承認済み [ADR-0007](../adr/0007-observation-ui-state.md) に基づく。
+
+- `ContentView` が `@State private var uiState = NotebookUIState()` でウインドウごとの一時状態を所有する。`ProjectSidebarView` と `NoteListView` は同じ参照を `@Bindable` で受け取り、`List(selection:)` へ選択 ID の Binding を渡す。検索欄には `notesColumn(for:)` のローカル `@Bindable` から検索語の Binding を渡す。子 View は状態を複製しない。
+- Apple 公式の [`Bindable`](https://developer.apple.com/documentation/swiftui/bindable) は、Observable オブジェクトの可変プロパティから Binding を作成でき、ローカル変数にも使用できると説明する。上記の所有範囲と四つの状態への限定はアプリ固有の承認済み判断である。
+- 検索結果と選択 Note は引き続き SwiftData モデルから導出する。Project 選択 ID・表示対象 Note ID の変化で `reconcileSelection(visibleNoteIDs:)` に ID 集合を渡す。Project 切替時の検索語・タグ条件の保持、条件で隠れた Note の詳細解除、作成後の選択、削除後の解除、保存失敗時の表示を維持する。
+- 列表示と Project 編集シート、各子 View のフォーム下書き・保存失敗表示は局所 `@State` のままにした。Navigation、SwiftData スキーマ、ラベルや標準コントロールの見た目は変更していない。既存の XCTest UI Test に要求された回帰の不足はなく、テストを追加していない。新しい振る舞いはなく、Task 1 の失敗先行テストで検証済みの状態遷移を接続した。
+- HIG・Accessibility はコード上で既存の標準 UI、アクセシビリティ識別子・ラベル・選択 trait、キーボードショートカットを保持することを確認した。Simulator の手動操作は実施していない。可変幅・Dark Mode・Dynamic Type・VoiceOver 音声・外部キーボードの人間による未報告項目は引き続き未確認であり、Phase 3 全体の Definition of Done は未達。
+- 自動テストは iPadOS 17.2 / iPad Pro (11-inch) (4th generation) で Swift Testing 24 件・XCTest UI Test 20 件、失敗 0。`Test-ResearchNotebook-2026.10.06_16-45-23-+0900.xcresult` の summary と test tree を再確認した（結果 Passed、パラメータ別実行は合計 48 回）。三つの Swift ファイルの最終更新は同テスト開始前であり、その後は資料のみ更新したため再実行していない。
+- 再開時に `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を再実行し、終了コード 0 を確認。新規 Swift コンパイラ警告なし。既存 AppIntents メタデータ抽出省略警告と、sandbox 内の CoreSimulator 接続・FSEvents 診断を確認したが、Build は成功した。Task 2 の接続と自動検証・記録は完了し、後続の総合確認と人間の操作確認は残る。
