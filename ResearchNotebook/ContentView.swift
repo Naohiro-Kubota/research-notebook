@@ -7,6 +7,7 @@ struct ContentView: View {
   @State private var uiState = NotebookUIState()
   @State private var columnVisibility: NavigationSplitViewVisibility = .all
   @State private var editedProject: Project?
+  @State private var showsCrossrefSearch = false
 
   private var selectedProject: Project? {
     projects.first { $0.id == uiState.selectedProjectID }
@@ -70,6 +71,12 @@ struct ContentView: View {
     }
     .toolbar {
       ToolbarItem(placement: .primaryAction) {
+        Button("Webで文献を検索", systemImage: "globe.magnifyingglass") {
+          showsCrossrefSearch = true
+        }
+        .accessibilityIdentifier("crossref-open")
+      }
+      ToolbarItem(placement: .primaryAction) {
         Button("Projectを編集") { editedProject = project }
           .accessibilityIdentifier("project-edit")
       }
@@ -125,6 +132,11 @@ struct ContentView: View {
       ProjectFormView(project: project) {
         uiState.selectedProjectID = nil
         uiState.selectedNoteID = nil
+      }
+    }
+    .sheet(isPresented: $showsCrossrefSearch) {
+      if let selectedProject {
+        CrossrefSearchView(project: selectedProject)
       }
     }
   }

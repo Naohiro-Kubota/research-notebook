@@ -3,6 +3,36 @@ import XCTest
 
 final class ResearchNotebookUITests: XCTestCase {
   @MainActor
+  func testCrossrefSearchStatesAndCancelledResults() {
+    let app = makeApp()
+    app.launchArguments.append("-uiTestingCrossref")
+    app.launch()
+    createProject("Research", in: app)
+    app.buttons["crossref-open"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-destination"].waitForExistence(timeout: 5))
+    let search = app.textFields["crossref-query"]
+    search.tap()
+    search.typeText("Sample")
+    app.buttons["crossref-search"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-result-title"].waitForExistence(timeout: 5))
+    replaceText(search, with: "empty")
+    app.buttons["crossref-search"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-empty"].waitForExistence(timeout: 5))
+    replaceText(search, with: "error")
+    app.buttons["crossref-search"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-error"].waitForExistence(timeout: 5))
+    app.buttons["crossref-retry"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-error"].waitForExistence(timeout: 5))
+    replaceText(search, with: "slow")
+    app.buttons["crossref-search"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-loading"].waitForExistence(timeout: 5))
+    replaceText(search, with: "empty")
+    app.buttons["crossref-search"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-empty"].waitForExistence(timeout: 5))
+    XCTAssertFalse(app.staticTexts["crossref-result-title"].exists)
+  }
+
+  @MainActor
   func testTagFilterCombinesWithSearchAndKeepsConditionsAcrossProjects() {
     let app = makeApp()
     app.launch()
