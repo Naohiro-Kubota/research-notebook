@@ -5,6 +5,7 @@ struct NoteEditorView: View {
   @Bindable var note: Note
   let onDeleted: () -> Void
   @Environment(\.modelContext) private var modelContext
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
   @Query private var availableTags: [Tag]
   @State private var confirmsDeletion = false
   @State private var deletionFailed = false
@@ -13,6 +14,14 @@ struct NoteEditorView: View {
 
   private var trimmedTagName: String {
     newTagName.trimmingCharacters(in: .whitespacesAndNewlines)
+  }
+
+  private var tagEntryLayout: AnyLayout {
+    if dynamicTypeSize.isAccessibilitySize {
+      AnyLayout(VStackLayout(alignment: .leading))
+    } else {
+      AnyLayout(HStackLayout())
+    }
   }
 
   var body: some View {
@@ -49,7 +58,7 @@ struct NoteEditorView: View {
           .accessibilityLabel("タグ \(tag.name)、\(isAttached ? "付与済み" : "未付与")")
           .accessibilityIdentifier("tag-toggle-\(tag.id)")
         }
-        HStack {
+        tagEntryLayout {
           TextField("新しいタグ", text: $newTagName)
             .accessibilityIdentifier("tag-name-input")
           Button("タグを追加") {

@@ -1,6 +1,6 @@
 # Phase 3 学習ログ — アプリ状態と検索
 
-確認日: 2026-10-05。Task 1（Tag スキーマと旧ストアのデータ保持）の結果を記録する。Phase 3 全体は未完了。
+最終確認日: 2026-10-06。Task 1〜6 の結果を記録する。Phase 3 全体の Definition of Done は、Task 6 に残る実操作確認が済むまで未達。
 
 ## Apple 公式資料で確認した事実
 
@@ -76,3 +76,31 @@ Task 4 完了時点では Task 5・6 が残り、Phase 3 全体の Definition of
 - iPadOS 17.2 の iPad Pro (11-inch) Simulator で `scripts/test.sh` を実行した。Swift Testing 17 件と XCTest UI Test 20 件がすべて成功した。新しい UI Test は、タグだけが一致する Note と検索語だけが一致する Note を除外し、Project 切替後も両条件が残ることを確認する。Project 切替とタグ条件変更で隠れた Note の詳細が空になること、条件解除で Note が再表示されることも確認した。
 - `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` は成功した。新規コンパイラ警告はなく、AppIntents のメタデータ抽出を省略した既存のツール警告だけを確認した。
 - 標準の `Menu` を Note 一覧上部に置いた。選択中のタグ名をテキストとアクセシビリティラベルで示す。検索・タグの条件は SwiftData モデルを変更しない。VoiceOver の実音声操作、狭いウインドウでのタグ Menu、Dark Mode、Dynamic Type、外部キーボード操作は今回直接観測していない。Task 6 の総合確認に残すため、Phase 3 全体の Definition of Done は未達。
+
+## Task 6: Phase 3 の総合確認
+
+確認日: 2026-10-06。
+
+### Apple 公式資料と適用
+
+| 資料 | 公式資料で確認した事実 | このアプリでの判断・実測 |
+|---|---|---|
+| [HIG: Layout](https://developer.apple.com/design/human-interface-guidelines/layout) | 異なるウインドウサイズと文字サイズでレイアウトを確認するよう勧める。 | 狭いウインドウと大きい文字でタグ入力欄が詰まる実画面を見つけ、配置を修正した。 |
+| [DynamicTypeSize.isAccessibilitySize](https://developer.apple.com/documentation/swiftui/dynamictypesize/isaccessibilitysize) | 現在の文字サイズがアクセシビリティ用のサイズか判定できる。 | その場合だけ、タグ入力欄と追加ボタンを縦に並べる。 |
+| [SwiftUI Accessibility modifiers](https://developer.apple.com/documentation/SwiftUI/View-Accessibility) | 標準コントロールには基本的なアクセシビリティ情報があり、`accessibilityLabel(_:)` で補足できる。 | タグの名前・付与状態と、選択中のフィルタ名をアクセシビリティツリーで確認した。 |
+| [HIG: VoiceOver](https://developer.apple.com/design/human-interface-guidelines/voiceover) | 主要要素を説明する代替ラベルを VoiceOver が読み上げに使う。 | ラベルの内容は確認した。音声そのものは記録できていない。 |
+
+### 実画面と操作
+
+- iPadOS 27.0 の iPad Pro 13-inch (M5) Simulator、Device Hub の小さいアプリウインドウ（画面キャプチャ上で約 690 px 幅）を使用した。人間は Task 4 で狭いウインドウの検索欄を別途直接確認している。
+- Dark Mode と Light Mode の両方で、Project 内検索欄、タグ Menu、Note 一覧、編集欄と空結果の説明を視認した。色のほかにタグ名、チェックマーク、付与状態のラベルで状態を示す。
+- 隔離した UI 検証ストアで Project と Note を作り、タグを新規付与してフィルタを選択した。検索語を不一致にすると一覧が空になり、詳細選択も解除された。タグ解除後に、アクセシビリティラベルが「付与済み」から「未付与」に変わった。
+- Dynamic Type を `accessibility-extra-large` にすると、当初は Note 編集画面のタグ入力欄と追加ボタンが接していた。`NoteEditorView` でアクセシビリティ文字サイズ時に縦配置へ切り替え、同じ狭幅・文字サイズで両方が別行に表示されることを再確認した。検索欄の案内文は狭幅では画面上で一部省略されるが、Project 内という範囲は表示され、アクセシビリティラベルには全体がある。
+- Device Hub で VoiceOver を有効化し、フォーカス枠が表示されることを確認した。アクセシビリティツリー上のタグボタンは「タグ Shared、付与済み／未付与」、フィルタは「タグで絞り込む、すべてのタグ／Shared」だった。音声の聞き取りはこの環境から直接確認できていない。
+- `Tab` で検索欄とタグ入力欄にフォーカス枠が移ることは観測した。外部キーボードだけで検索語入力、タグ Menu 選択、タグ追加・解除まで完走する操作は確認できていない。
+
+### 自動検証と Definition of Done
+
+- iPadOS 17.2 の iPad Pro (11-inch) Simulator（UDID `33CA3AC8-9A60-42F4-A25A-14DBF86375DA`）で `scripts/build.sh`、`scripts/lint.sh`、`scripts/test.sh`、`git diff --check` が成功した。Swift Testing 17 件と XCTest UI Test 20 件は失敗 0 件。Swift コンパイラ警告は 0 件で、AppIntents メタデータ抽出省略のツール警告だけを確認した。既存テストの `#expect` マクロが出していた 2 件の Swift 警告は、同じ「空」の振る舞いを確認する式に直して解消した。
+- 自動テストは共有 Tag、旧ストアのコピーからのデータ保持、タグ名規則と保存失敗、検索・フィルタ、選択解除を対象にする。Apple 公式資料の事実とアプリ固有の AND 条件・選択解除は上記と ADR-0006 で区別している。
+- VoiceOver 音声と外部キーボードの主要フローが未観測のため、Phase 3 全体の Definition of Done は現時点で未達。これらの確認が済むまで、Acceptance Criteria の最後の DoD 項目は完了としない。

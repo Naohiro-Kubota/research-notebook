@@ -309,7 +309,7 @@ struct SwiftDataPersistenceTests {
     let tags = try reader.fetch(FetchDescriptor<ResearchNotebook.Tag>())
     #expect(Set(tags.map(\.id)) == tagIDs)
     #expect(tags.first { $0.id == sharedID }?.notes?.map(\.id) == [retainedID])
-    #expect((tags.first { $0.id != sharedID }?.notes ?? []).isEmpty)
+    #expect((tags.first { $0.id != sharedID }?.notes ?? []).count == 0)
     #expect(try reader.fetch(FetchDescriptor<Project>()).map(\.id) == [project.id])
   }
 
@@ -355,7 +355,7 @@ struct SwiftDataPersistenceTests {
     let tags = try reader.fetch(FetchDescriptor<ResearchNotebook.Tag>())
     #expect(Set(tags.map(\.id)) == tagIDs)
     #expect(tags.first { $0.id == sharedID }?.notes?.map(\.id) == [retainedNoteID])
-    #expect((tags.first { $0.id != sharedID }?.notes ?? []).isEmpty)
+    #expect((tags.first { $0.id != sharedID }?.notes ?? []).count == 0)
   }
 
   private func tagContainer(inMemory: Bool) throws -> (ModelContainer, ModelConfiguration) {
