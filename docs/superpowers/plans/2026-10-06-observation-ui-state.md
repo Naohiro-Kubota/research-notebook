@@ -78,7 +78,7 @@
 - [x] **Step 1:** ADR-0007 の四状態、ウインドウ単位の所有、SwiftData との分離、既存の検索・タグ・選択動作を差分とテストで照合する。
 - [x] **Step 2:** `scripts/build.sh`、`scripts/lint.sh`、`SIMULATOR_UDID=<UDID> scripts/test.sh`、`git diff --check` を実行する。Swift Testing と XCTest の結果を分けて記録する。
 - [x] **Step 3:** [Definition of Done](../../development/definition-of-done.md)を項目ごとに確認する。可変幅、Dark Mode、Dynamic Type、VoiceOver、キーボードの Simulator 手動操作が必要な項目は人間の報告だけを根拠とし、未報告なら未達と記録する。
-- [ ] **Step 4:** 学習ログと本計画を更新し、必要な場合だけ要求の最後の Acceptance Criteria を更新する。独立レビューを受け、指摘を解決してコミットする。
+- [x] **Step 4:** 学習ログと本計画を更新し、必要な場合だけ要求の最後の Acceptance Criteria を更新する。独立レビューを受け、指摘を解決してコミットする。
 - [ ] **Step 5:** ブランチを push し、日本語タイトル・本文で `develop` 向け PR を作成する。DoD 未達項目があれば PR に明記する。
 
 ## 停止条件
@@ -91,5 +91,5 @@
 - Task 1: `e86982e`。失敗先行テスト、状態型、Build・Lint・全自動テスト、学習ログ、独立レビュー済み。
 - Task 2: `4e13597`。既存 UI Test の回帰範囲を確認し、追加不要と判断。View 接続、Build・Lint・全自動テストの結果確認、学習ログ、独立レビュー済み。
 - Task 3 Step 3 は DoD の照合・未達記録が済んだことを示し、DoD 達成を意味しない。可変幅の検索欄以外の主要 UI、Dark Mode、Dynamic Type、VoiceOver 音声、外部キーボードの人間確認が未報告。Phase 3 要求の最後の Acceptance Criteria は未完のまま維持する。
-- Task 3 Step 4 の独立レビューと Step 5 の push・PR は最終担当者が実施する。
+- Task 3 Step 4: 全体の独立レビューで指摘なし。Step 5 の push・PR は最終担当者が実施する。
 - Task 3 Step 2: Build・Lint・全自動テスト・`git diff --check` 成功。Swift Testing 24 件、XCTest UI Test 20 件、失敗 0。パラメータ展開を含む 48 回。詳細と未達 DoD は [学習ログ](../../learning/phase-3.md)に記録。
