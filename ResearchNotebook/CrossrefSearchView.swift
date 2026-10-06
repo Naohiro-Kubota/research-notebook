@@ -1,12 +1,16 @@
+import SwiftData
 import SwiftUI
 
 struct CrossrefSearchView: View {
   let project: Project
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.modelContext) private var modelContext
   @State private var query = ""
   @State private var state: SearchState = .idle
   @State private var searchTask: Task<Void, Never>?
   @State private var activeSearch = UUID()
+  @State private var saveNotice: SaveNotice?
+  @State private var saveFailed = false
   private let client = CrossrefClient()
 
   private enum SearchState {
@@ -15,6 +19,11 @@ struct CrossrefSearchView: View {
     case results([CrossrefSearchResult])
     case empty
     case error(CrossrefError)
+  }
+
+  private enum SaveNotice {
+    case saved
+    case existing
   }
 
   var body: some View {
@@ -72,12 +81,34 @@ struct CrossrefSearchView: View {
                 Text(result.url.absoluteString)
                   .font(.caption)
                   .foregroundStyle(.secondary)
+                Button("Projectに保存") { save(result) }
+                  .accessibilityIdentifier("crossref-save")
+                if let saved = project.webResources.first(where: {
+                  $0.doi.caseInsensitiveCompare(result.doi) == .orderedSame
+                }) {
+                  Link("保存済みの出典を開く", destination: saved.url)
+                }
               }
               .accessibilityElement(children: .contain)
             }
           }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        if let saveNotice {
+          switch saveNotice {
+          case .saved:
+            Text("このProjectに保存しました")
+              .accessibilityIdentifier("crossref-saved")
+          case .existing:
+            Text("同じDOIの保存済み項目を表示しています")
+              .accessibilityIdentifier("crossref-existing")
+          }
+        }
+        if saveFailed {
+          Label("保存できませんでした", systemImage: "exclamationmark.triangle")
+            .foregroundStyle(.red)
+            .accessibilityIdentifier("crossref-save-error")
+        }
       }
       .padding()
       .navigationTitle("Crossrefで検索")
@@ -90,6 +121,8 @@ struct CrossrefSearchView: View {
     .onChange(of: query) { _, _ in
       cancelSearch()
       state = .idle
+      saveNotice = nil
+      saveFailed = false
     }
     .onDisappear(perform: cancelSearch)
   }
@@ -97,6 +130,7 @@ struct CrossrefSearchView: View {
   private func search() {
     let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !term.isEmpty else { return }
+    saveFailed = false
     cancelSearch()
     let token = activeSearch
     state = .loading
@@ -119,6 +153,21 @@ struct CrossrefSearchView: View {
     searchTask?.cancel()
     searchTask = nil
     activeSearch = UUID()
+  }
+
+  private func save(_ result: CrossrefSearchResult) {
+    let exists = project.webResources.contains {
+      $0.doi.caseInsensitiveCompare(result.doi) == .orderedSame
+    }
+    do {
+      _ = try saveWebResource(
+        title: result.title, doi: result.doi, url: result.url,
+        to: project, in: modelContext)
+      saveNotice = exists ? .existing : .saved
+    } catch {
+      saveNotice = nil
+      saveFailed = true
+    }
   }
 }
 

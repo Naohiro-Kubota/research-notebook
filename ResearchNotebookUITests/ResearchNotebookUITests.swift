@@ -3,6 +3,69 @@ import XCTest
 
 final class ResearchNotebookUITests: XCTestCase {
   @MainActor
+  func testSavesCrossrefResultOnlyInSelectedProjectAndRestoresAfterLaunch() {
+    let app = makeApp()
+    app.launchArguments.append("-uiTestingCrossref")
+    app.launch()
+    createProject("First", in: app)
+    app.buttons["crossref-open"].tap()
+    let query = app.textFields["crossref-query"]
+    query.tap()
+    query.typeText("Sample")
+    app.buttons["crossref-search"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-result-title"].waitForExistence(timeout: 5))
+    app.buttons["crossref-save"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-saved"].waitForExistence(timeout: 5))
+    app.buttons["crossref-save"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-existing"].waitForExistence(timeout: 5))
+    app.buttons["閉じる"].tap()
+    app.activate()
+    showProjectsIfNeeded(in: app)
+    projectRows(app).firstMatch.tap()
+    let link = app.descendants(matching: .any).matching(identifier: "web-resource-link").firstMatch
+    XCTAssertTrue(link.waitForExistence(timeout: 5))
+    XCTAssertTrue(link.label.contains("Sample paper"))
+    XCTAssertEqual(link.value as? String, "https://doi.org/10.1234/sample")
+    createProject("Second", in: app)
+    XCTAssertFalse(link.exists)
+    showProjectsIfNeeded(in: app)
+    projectRows(app).element(boundBy: 0).tap()
+    XCTAssertTrue(link.waitForExistence(timeout: 5))
+    app.terminate()
+    app.launch()
+    showProjectsIfNeeded(in: app)
+    projectRows(app).element(boundBy: 0).tap()
+    XCTAssertTrue(link.waitForExistence(timeout: 5))
+  }
+
+  @MainActor
+  func testCrossrefSaveFailureShowsErrorAndPreservesNotes() {
+    let storeID = UUID().uuidString
+    let app = XCUIApplication()
+    app.launchArguments = ["-uiTestingStoreID", storeID]
+    app.launch()
+    createProject("Existing", in: app)
+    createNote("Existing note", in: app)
+    app.terminate()
+    app.launchArguments = ["-uiTestingReadOnlyStoreID", storeID, "-uiTestingCrossref"]
+    app.launch()
+    showProjectsIfNeeded(in: app)
+    projectRows(app).firstMatch.tap()
+    app.buttons["crossref-open"].tap()
+    let query = app.textFields["crossref-query"]
+    query.tap()
+    query.typeText("Sample")
+    app.buttons["crossref-search"].tap()
+    XCTAssertTrue(app.buttons["crossref-save"].waitForExistence(timeout: 5))
+    app.buttons["crossref-save"].tap()
+    XCTAssertTrue(app.staticTexts["crossref-save-error"].waitForExistence(timeout: 5))
+    app.buttons["閉じる"].tap()
+    XCTAssertTrue(noteRows(app).firstMatch.waitForExistence(timeout: 5))
+    XCTAssertFalse(
+      app.descendants(matching: .any).matching(identifier: "web-resource-link").firstMatch.exists)
+  }
+
+  @MainActor
   func testCrossrefSearchStatesAndCancelledResults() {
     let app = makeApp()
     app.launchArguments.append("-uiTestingCrossref")

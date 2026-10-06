@@ -6,6 +6,61 @@ import Testing
 
 @MainActor
 struct SwiftDataPersistenceTests {
+  @Test func savesWebResourceOncePerProjectAndDOI() throws {
+    let container = try ModelContainer(
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
+      configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    let context = ModelContext(container)
+    let first = Project(title: "First")
+    let second = Project(title: "Second")
+    context.insert(first)
+    context.insert(second)
+    let url = URL(string: "https://doi.org/10.1234/example")!
+    let saved = try saveWebResource(
+      title: "Paper", doi: "10.1234/EXAMPLE", url: url, to: first, in: context)
+    let duplicate = try saveWebResource(
+      title: "Changed", doi: "10.1234/example", url: url, to: first, in: context)
+    let other = try saveWebResource(
+      title: "Paper", doi: "10.1234/example", url: url, to: second, in: context)
+    #expect(saved.id == duplicate.id)
+    #expect(saved.title == "Paper")
+    #expect(other.id != saved.id)
+    let reader = ModelContext(container)
+    #expect(try reader.fetch(FetchDescriptor<WebResource>()).count == 2)
+    #expect(
+      try reader.fetch(FetchDescriptor<Project>()).first { $0.id == first.id }?.webResources.count
+        == 1)
+  }
+
+  @Test func failedWebResourceSaveDoesNotChangeExistingData() throws {
+    let url = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString).appendingPathExtension("store")
+    do {
+      let writable = try ModelContainer(
+        for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
+        configurations: ModelConfiguration(url: url))
+      let context = writable.mainContext
+      let project = Project(title: "Existing")
+      context.insert(project)
+      context.insert(Note(project: project, title: "Existing note"))
+      try context.save()
+    }
+    let readOnly = try ModelContainer(
+      for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
+      configurations: ModelConfiguration(url: url, allowsSave: false))
+    let context = readOnly.mainContext
+    let project = try #require(context.fetch(FetchDescriptor<Project>()).first)
+    #expect(throws: WebResourceSaveError.self) {
+      try saveWebResource(
+        title: "Unsaved", doi: "10.1234/unsaved",
+        url: URL(string: "https://doi.org/10.1234/unsaved")!, to: project, in: context)
+    }
+    let verifier = ModelContext(readOnly)
+    #expect(try verifier.fetch(FetchDescriptor<WebResource>()).isEmpty)
+    #expect(try verifier.fetch(FetchDescriptor<Project>()).map(\.title) == ["Existing"])
+    #expect(try verifier.fetch(FetchDescriptor<Note>()).map(\.title) == ["Existing note"])
+  }
+
   @Test func persistsWebResourceAndCascadesWithProject() throws {
     let container = try ModelContainer(
       for: Project.self, Note.self, ResearchNotebook.Tag.self, WebResource.self,
