@@ -5,6 +5,7 @@ struct ContentView: View {
   @Query private var projects: [Project]
   @State private var selectedProjectID: UUID?
   @State private var selectedNoteID: UUID?
+  @State private var searchText = ""
   @State private var columnVisibility: NavigationSplitViewVisibility = .all
   @State private var editedProject: Project?
 
@@ -13,7 +14,9 @@ struct ContentView: View {
   }
 
   private var selectedNote: Note? {
-    selectedProject?.notes.first { $0.id == selectedNoteID }
+    guard let selectedProject else { return nil }
+    return matchingNotes(in: selectedProject, searchText: searchText)
+      .first { $0.id == selectedNoteID }
   }
 
   var body: some View {
@@ -23,15 +26,20 @@ struct ContentView: View {
         selectedNoteID: $selectedNoteID)
     } content: {
       if let project = selectedProject {
-        NoteListView(project: project, selectedNoteID: $selectedNoteID)
-          .id(project.id)
-          .navigationTitle(project.title)
-          .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-              Button("Projectを編集") { editedProject = project }
-                .accessibilityIdentifier("project-edit")
-            }
+        NoteListView(
+          project: project,
+          notes: matchingNotes(in: project, searchText: searchText),
+          selectedNoteID: $selectedNoteID
+        )
+        .id(project.id)
+        .navigationTitle(project.title)
+        .searchable(text: $searchText, prompt: "このProject内のNoteを検索")
+        .toolbar {
+          ToolbarItem(placement: .primaryAction) {
+            Button("Projectを編集") { editedProject = project }
+              .accessibilityIdentifier("project-edit")
           }
+        }
       } else {
         ContentUnavailableView(
           "Projectを選択", systemImage: "folder", description: Text("Projectを選択すると、所属するNoteを表示します。")
@@ -59,6 +67,11 @@ struct ContentView: View {
       if projects.first(where: { $0.id == projectID })?.notes.contains(where: {
         $0.id == selectedNoteID
       }) != true {
+        selectedNoteID = nil
+      }
+    }
+    .onChange(of: searchText) { _, _ in
+      if selectedNoteID != nil && selectedNote == nil {
         selectedNoteID = nil
       }
     }

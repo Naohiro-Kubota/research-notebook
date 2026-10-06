@@ -6,6 +6,27 @@ import Testing
 
 @MainActor
 struct SwiftDataPersistenceTests {
+  @Test func searchesOnlySelectedProjectsNoteTitlesAndBodies() throws {
+    let container = try ModelContainer(
+      for: Project.self, Note.self, ResearchNotebook.Tag.self,
+      configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    let context = ModelContext(container)
+    let selected = Project(title: "Selected")
+    let other = Project(title: "Other")
+    context.insert(selected)
+    context.insert(other)
+    let titleMatch = Note(project: selected, title: "SwiftUI overview")
+    let bodyMatch = Note(project: selected, title: "Notes", body: "A SwiftUI example")
+    _ = Note(project: selected, title: "Unrelated")
+    _ = Note(project: other, title: "SwiftUI outside")
+
+    #expect(
+      Set(matchingNotes(in: selected, searchText: "swiftui").map(\.id))
+        == Set([titleMatch.id, bodyMatch.id]))
+    #expect(matchingNotes(in: selected, searchText: "missing").isEmpty)
+    #expect(matchingNotes(in: selected, searchText: "  ").count == 3)
+  }
+
   @Test func persistsProjectAndNoteRelationship() throws {
     let container = try ModelContainer(
       for: Project.self, Note.self, ResearchNotebook.Tag.self,
