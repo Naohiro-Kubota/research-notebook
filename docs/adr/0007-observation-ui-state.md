@@ -1,6 +1,6 @@
 # ADR-0007: Observation によるウインドウ単位の UI 状態管理
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-06
 - Decision Owner: Human
 
@@ -75,11 +75,11 @@ Option A を提案する。`@Observable` 型は Phase 3 の四つの一時状態
 
 シート表示、作成フォームの下書き、タグ入力など一つの View に閉じた状態は、その View の `@State` に残す。`NavigationSplitView` の列表示は既存 Navigation の振る舞いとして扱い、今回の四つの状態に機械的に統合しない。Project・Note・Tag は引き続き `@Model`／`@Query` を使用し、別の Observable 型へ複製しない。永続スキーマ、外部依存、非同期処理は変更しない。
 
-本 ADR が承認された場合、ADR-0006 の Option A のうち「`ContentView` が四つの個別の `@State` を所有する」部分だけを本 ADR で置き換える。ADR-0006 のタグ、検索範囲、フィルタ、選択解除に関する判断は維持する。ADR-0001 の SwiftUI 標準データフローと必要最小限の抽象化という原則は維持する。
+ADR-0006 の Option A のうち「`ContentView` が四つの個別の `@State` を所有する」部分だけを本 ADR で置き換える。ADR-0006 のタグ、検索範囲、フィルタ、選択解除に関する判断は維持する。ADR-0001 の SwiftUI 標準データフローと必要最小限の抽象化という原則は維持する。
 
 ## Human Decision
 
-2026-10-06、人間はウインドウ単位の Observable UI 状態という設計提案を承認した。本 ADR の最終承認は未了。
+2026-10-06、人間はウインドウ単位の Observable UI 状態という設計提案を承認した。同日、本 ADR を最終承認した。
 
 ## Consequences
 
