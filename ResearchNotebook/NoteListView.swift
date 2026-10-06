@@ -13,7 +13,7 @@ func matchingNotes(in project: Project, searchText: String, tagID: UUID? = nil) 
 struct NoteListView: View {
   let project: Project
   let notes: [Note]
-  @Binding var selectedNoteID: UUID?
+  @Bindable var uiState: NotebookUIState
   @Environment(\.modelContext) private var modelContext
   @State private var showsCreation = false
   @State private var newTitle = ""
@@ -21,13 +21,13 @@ struct NoteListView: View {
   @State private var saveFailed = false
 
   var body: some View {
-    List(selection: $selectedNoteID) {
+    List(selection: $uiState.selectedNoteID) {
       ForEach(notes) { note in
         NavigationLink(value: note.id) {
           Text(note.title)
         }
         .accessibilityIdentifier("note-row-\(note.id.uuidString)")
-        .accessibilityAddTraits(selectedNoteID == note.id ? .isSelected : [])
+        .accessibilityAddTraits(uiState.selectedNoteID == note.id ? .isSelected : [])
       }
     }
     .overlay {
@@ -84,7 +84,7 @@ struct NoteListView: View {
               let note = Note(project: project, title: newTitle, body: newBody)
               modelContext.insert(note)
               if saveChanges(modelContext) {
-                selectedNoteID = note.id
+                uiState.selectedNoteID = note.id
                 showsCreation = false
               } else {
                 modelContext.delete(note)
