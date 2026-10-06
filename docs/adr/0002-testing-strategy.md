@@ -55,6 +55,8 @@ Option A。Unit / Integration Test は Swift Testing、UI Test は XCTest を使
 
 2026-10-04、CI の Simulator 実行時間と成否が不安定な実測を受け、人間が実行環境の分担を変更した。Swift Testing / XCTest の採用は維持し、Simulator が必要なテストはローカルで実行する。GitHub Actions は Simulator を起動せず、Build と生成アプリの設定検査を実行する。将来 Simulator を必要としないテストが増えた場合は CI に追加できる。
 
+2026-10-06、人間が今後の作業を含む確認担当を決定した。Simulator の画面・設定・入力を手動操作して確認する項目は人間だけが実施する。自動テストの対象は Swift Testing と XCTest に限り、既存の XCTest UI Test を Simulator で自動実行する方針は維持する。AI は手動 Simulator 操作を代行せず、未確認項目を人間が確認済みと記録しない。
+
 ## Consequences
 
 - Xcode Project に必要なテスト Target を設け、Scheme の Test アクションに含める。
