@@ -65,17 +65,15 @@ struct ContentView: View {
       HStack {
         tagFilterMenu
         Spacer()
-      }
-      .padding(.horizontal)
-      .padding(.vertical, 4)
-    }
-    .toolbar {
-      ToolbarItem(placement: .primaryAction) {
         Button("Webで文献を検索", systemImage: "globe.magnifyingglass") {
           showsCrossrefSearch = true
         }
         .accessibilityIdentifier("crossref-open")
       }
+      .padding(.horizontal)
+      .padding(.vertical, 4)
+    }
+    .toolbar {
       ToolbarItem(placement: .primaryAction) {
         Button("Projectを編集") { editedProject = project }
           .accessibilityIdentifier("project-edit")

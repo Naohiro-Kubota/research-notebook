@@ -44,7 +44,7 @@ struct ProjectFormView: View {
             }
           }
         } message: {
-          Text("このProjectと所属するすべてのNoteが削除されます。")
+          Text("このProjectと所属するすべてのNote・Web Resourceが削除されます。")
         }
       }
       .navigationTitle("Projectを編集")
