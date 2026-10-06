@@ -106,3 +106,22 @@ Task 4 完了時点では Task 5・6 が残り、Phase 3 全体の Definition of
 - iPadOS 17.2 の iPad Pro (11-inch) Simulator（UDID `33CA3AC8-9A60-42F4-A25A-14DBF86375DA`）で `scripts/build.sh`、`scripts/lint.sh`、`scripts/test.sh`、`git diff --check` が成功した。Swift Testing 17 件と XCTest UI Test 20 件は失敗 0 件。Swift コンパイラ警告は 0 件で、AppIntents メタデータ抽出省略のツール警告だけを確認した。既存テストの `#expect` マクロが出していた 2 件の Swift 警告は、同じ「空」の振る舞いを確認する式に直して解消した。
 - 自動テストは共有 Tag、旧ストアのコピーからのデータ保持、タグ名規則と保存失敗、検索・フィルタ、選択解除を対象にする。Apple 公式資料の事実とアプリ固有の AND 条件・選択解除は上記と ADR-0006 で区別している。
 - VoiceOver 音声と外部キーボードの主要フローが未観測のため、Phase 3 全体の Definition of Done は現時点で未達。これらの確認が済むまで、Acceptance Criteria の最後の DoD 項目は完了としない。
+
+## Observation UI 状態 Task 1: 一時状態と選択遷移
+
+確認日: 2026-10-06。承認済み [ADR-0007](../adr/0007-observation-ui-state.md) に基づく。
+
+### Apple 公式資料で確認した事実と適用
+
+- [Managing model data in your app](https://developer.apple.com/documentation/swiftui/managing-model-data-in-your-app) は、`@Observable` マクロが変更追跡を追加し、SwiftUI が View 内で読んだプロパティへの依存を追跡すると説明する。`NotebookUIState` を `@MainActor @Observable` にし、四つの一時状態を保持する。
+- 同資料は、Observable インスタンスを View の `@State` に置くと SwiftUI がその保存領域を管理すると説明する。ウインドウのルート View が各インスタンスを所有する方針は本プロジェクトの判断であり、View への接続は Task 2 で行う。
+- [Preserving your app’s model data across launches](https://developer.apple.com/documentation/swiftdata/preserving-your-apps-model-data-across-launches) は、`@Model` が永続化用のスキーマと `PersistentModel` 準拠に加え、`Observable` 準拠による変更追跡を追加すると説明する。Project・Note・Tag は永続モデルのままにし、一時状態へ複製しない。
+
+`reconcileSelection(visibleNoteIDs:)` は View が導出する ID 集合だけを受け取り、表示対象から外れた Note 選択のみ解除する。Project 選択、検索語、タグ条件は維持する。SwiftData 型や Context は保持しない。選択解除と状態の分離は承認済みのアプリ固有の要求である。Task 1 の範囲で公式資料と実装の不明点はない。新規 UI はなく、HIG・Accessibility の画面操作による確認は実施していない。
+
+### Task 1 の自動検証と残課題
+
+- iPadOS 17.2 の iPad Pro (11-inch) (4th generation)、UDID `33CA3AC8-9A60-42F4-A25A-14DBF86375DA` を使用。実装前に `scripts/test.sh` が `NotebookUIState` 未定義で失敗することを確認した（終了コード 65）。実装後の同スクリプトは終了コード 0、Swift Testing 24 件（新規 7 件）、XCTest UI Test 20 件、失敗 0 件。
+- 初期値、表示中・非表示・空集合での選択整合、未選択、Project 切替を模した集合変更、条件保持、二つのインスタンスの独立性を検証した。
+- `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` は成功。新規 Swift コンパイラ警告はなく、既存の AppIntents メタデータ抽出省略のツール警告と、テスト起動時の Xcode debugger version lookup 診断を確認した。
+- Task 1 の状態型・自動検証・資料記録は満たした。Task 2 の View への接続、後続の総合確認、Phase 3 の人間による未報告の画面操作確認が残るため、Observation 対応全体と Phase 3 全体の Definition of Done は未達。Simulator の手動操作は実施していない。
