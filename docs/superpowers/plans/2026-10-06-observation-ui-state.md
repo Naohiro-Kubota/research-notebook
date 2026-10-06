@@ -39,11 +39,11 @@
 - Produces: `@MainActor @Observable final class NotebookUIState`。可変プロパティ `selectedProjectID: UUID?`、`selectedNoteID: UUID?`、`searchText: String`、`selectedTagID: UUID?`。初期値はそれぞれ `nil`、`nil`、`""`、`nil`。
 - Produces: `func reconcileSelection(visibleNoteIDs: Set<UUID>)`。選択 ID が集合にない場合だけ `selectedNoteID` を `nil` にする。他の三つの状態は変更しない。SwiftData 型を引数・保存プロパティにしない。
 
-- [ ] **Step 1:** Swift Testing に、初期値、表示対象に残る／外れる Note、空集合、Project 切替を模した別集合、二つの状態インスタンスの独立性を検証するテストを書く。検索語とタグ ID が `reconcileSelection` で維持されることも確認する。
-- [ ] **Step 2:** 利用可能な iPad Simulator UDID を `xcrun simctl list devices available` で選び、`SIMULATOR_UDID=<UDID> scripts/test.sh` を実行する。新テストが型未定義で失敗することを確認する。Simulator の画面は操作しない。
-- [ ] **Step 3:** `NotebookUIState` と `reconcileSelection(visibleNoteIDs:)` を最小限で実装する。ViewModel、Repository、Protocol、SwiftData モデルの複製は追加しない。
-- [ ] **Step 4:** 同じ `scripts/test.sh` と `scripts/build.sh`、`scripts/lint.sh` を実行し、新テストの成功と既存テストの後退がないことを確認する。
-- [ ] **Step 5:** `docs/learning/phase-3.md` に `@Observable`、`@State`、SwiftData `@Model` の役割と Apple 公式資料を記録し、変更をコミットする。
+- [x] **Step 1:** Swift Testing に、初期値、表示対象に残る／外れる Note、空集合、Project 切替を模した別集合、二つの状態インスタンスの独立性を検証するテストを書く。検索語とタグ ID が `reconcileSelection` で維持されることも確認する。
+- [x] **Step 2:** 利用可能な iPad Simulator UDID を `xcrun simctl list devices available` で選び、`SIMULATOR_UDID=<UDID> scripts/test.sh` を実行する。新テストが型未定義で失敗することを確認する。Simulator の画面は操作しない。
+- [x] **Step 3:** `NotebookUIState` と `reconcileSelection(visibleNoteIDs:)` を最小限で実装する。ViewModel、Repository、Protocol、SwiftData モデルの複製は追加しない。
+- [x] **Step 4:** 同じ `scripts/test.sh` と `scripts/build.sh`、`scripts/lint.sh` を実行し、新テストの成功と既存テストの後退がないことを確認する。
+- [x] **Step 5:** `docs/learning/phase-3.md` に `@Observable`、`@State`、SwiftData `@Model` の役割と Apple 公式資料を記録し、変更をコミットする。
 
 ### Task 2: View と Observable 状態の接続
 
@@ -57,12 +57,12 @@
 - Consumes: Task 1 の `NotebookUIState` と `reconcileSelection(visibleNoteIDs:)`。
 - Produces: `ContentView` が `@State private var uiState = NotebookUIState()` を所有する。子 View は同じ `NotebookUIState` を受け取り、`List(selection:)` と `.searchable(text:)` に必要な Binding を `@Bindable` から作る。
 
-- [ ] **Step 1:** 既存 XCTest UI Test の Project 切替、検索とタグの AND 条件、選択解除、削除、保存失敗を確認し、不足する回帰だけテストを追加する。追加した場合は `SIMULATOR_UDID=<UDID> scripts/test.sh` で変更前に失敗を確認する。
-- [ ] **Step 2:** `ContentView` の四つの個別 `@State` を `uiState` に置き換える。`columnVisibility` と `editedProject` は View 局所の `@State` に残し、検索結果と選択 Note は従来どおり SwiftData モデルから導出する。
-- [ ] **Step 3:** `ProjectSidebarView` と `NoteListView` に同じ `uiState` を渡し、選択・作成・削除の読み書きを接続する。Binding が必要な位置で `@Bindable` を使用し、両 View に状態のコピーを作らない。
-- [ ] **Step 4:** Project 選択 ID と表示対象 Note ID の変化を受け、`ContentView` から `uiState.reconcileSelection(visibleNoteIDs:)` を呼ぶ。列表示、詳細の空状態、検索語・タグ条件の保持を維持する。
-- [ ] **Step 5:** `scripts/build.sh`、`scripts/lint.sh`、`SIMULATOR_UDID=<UDID> scripts/test.sh` を実行し、Swift Testing と XCTest の件数・失敗数・新規警告を記録する。Simulator の手動操作はしない。
-- [ ] **Step 6:** `docs/learning/phase-3.md` に所有者と Binding 経路、状態移行前後で維持した動作を記録し、変更をコミットする。
+- [x] **Step 1:** 既存 XCTest UI Test の Project 切替、検索とタグの AND 条件、選択解除、削除、保存失敗を確認し、不足する回帰だけテストを追加する。追加した場合は `SIMULATOR_UDID=<UDID> scripts/test.sh` で変更前に失敗を確認する。
+- [x] **Step 2:** `ContentView` の四つの個別 `@State` を `uiState` に置き換える。`columnVisibility` と `editedProject` は View 局所の `@State` に残し、検索結果と選択 Note は従来どおり SwiftData モデルから導出する。
+- [x] **Step 3:** `ProjectSidebarView` と `NoteListView` に同じ `uiState` を渡し、選択・作成・削除の読み書きを接続する。Binding が必要な位置で `@Bindable` を使用し、両 View に状態のコピーを作らない。
+- [x] **Step 4:** Project 選択 ID と表示対象 Note ID の変化を受け、`ContentView` から `uiState.reconcileSelection(visibleNoteIDs:)` を呼ぶ。列表示、詳細の空状態、検索語・タグ条件の保持を維持する。
+- [x] **Step 5:** `scripts/build.sh`、`scripts/lint.sh`、`SIMULATOR_UDID=<UDID> scripts/test.sh` を実行し、Swift Testing と XCTest の件数・失敗数・新規警告を記録する。Simulator の手動操作はしない。
+- [x] **Step 6:** `docs/learning/phase-3.md` に所有者と Binding 経路、状態移行前後で維持した動作を記録し、変更をコミットする。
 
 ### Task 3: 全体照合と完了記録
 
@@ -75,9 +75,9 @@
 - Consumes: Task 1・2 の実装とテスト結果。
 - Produces: ADR-0007、要求、DoD に対する結果と未確認項目の記録。
 
-- [ ] **Step 1:** ADR-0007 の四状態、ウインドウ単位の所有、SwiftData との分離、既存の検索・タグ・選択動作を差分とテストで照合する。
-- [ ] **Step 2:** `scripts/build.sh`、`scripts/lint.sh`、`SIMULATOR_UDID=<UDID> scripts/test.sh`、`git diff --check` を実行する。Swift Testing と XCTest の結果を分けて記録する。
-- [ ] **Step 3:** [Definition of Done](../../development/definition-of-done.md)を項目ごとに確認する。可変幅、Dark Mode、Dynamic Type、VoiceOver、キーボードの Simulator 手動操作が必要な項目は人間の報告だけを根拠とし、未報告なら未達と記録する。
+- [x] **Step 1:** ADR-0007 の四状態、ウインドウ単位の所有、SwiftData との分離、既存の検索・タグ・選択動作を差分とテストで照合する。
+- [x] **Step 2:** `scripts/build.sh`、`scripts/lint.sh`、`SIMULATOR_UDID=<UDID> scripts/test.sh`、`git diff --check` を実行する。Swift Testing と XCTest の結果を分けて記録する。
+- [x] **Step 3:** [Definition of Done](../../development/definition-of-done.md)を項目ごとに確認する。可変幅、Dark Mode、Dynamic Type、VoiceOver、キーボードの Simulator 手動操作が必要な項目は人間の報告だけを根拠とし、未報告なら未達と記録する。
 - [ ] **Step 4:** 学習ログと本計画を更新し、必要な場合だけ要求の最後の Acceptance Criteria を更新する。独立レビューを受け、指摘を解決してコミットする。
 - [ ] **Step 5:** ブランチを push し、日本語タイトル・本文で `develop` 向け PR を作成する。DoD 未達項目があれば PR に明記する。
 
@@ -85,3 +85,11 @@
 
 - ADR-0007 の四状態以外へ所有変更を広げる、Project・Note・Tag のスキーマを変更する、Navigation 構造を変更する、または承認済み要求の動作を変える必要が出た場合は実装を止め、人間の判断を受ける。
 - Simulator の手動確認結果が得られない場合は、自動テスト成功と区別し、Phase 3 の DoD を完了と報告しない。
+
+## 実行状況（2026-10-06）
+
+- Task 1: `e86982e`。失敗先行テスト、状態型、Build・Lint・全自動テスト、学習ログ、独立レビュー済み。
+- Task 2: `4e13597`。既存 UI Test の回帰範囲を確認し、追加不要と判断。View 接続、Build・Lint・全自動テストの結果確認、学習ログ、独立レビュー済み。
+- Task 3 Step 3 は DoD の照合・未達記録が済んだことを示し、DoD 達成を意味しない。可変幅の検索欄以外の主要 UI、Dark Mode、Dynamic Type、VoiceOver 音声、外部キーボードの人間確認が未報告。Phase 3 要求の最後の Acceptance Criteria は未完のまま維持する。
+- Task 3 Step 4 の独立レビューと Step 5 の push・PR は最終担当者が実施する。
+- Task 3 Step 2: Build・Lint・全自動テスト・`git diff --check` 成功。Swift Testing 24 件、XCTest UI Test 20 件、失敗 0。パラメータ展開を含む 48 回。詳細と未達 DoD は [学習ログ](../../learning/phase-3.md)に記録。

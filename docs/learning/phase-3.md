@@ -137,3 +137,49 @@ Task 4 完了時点では Task 5・6 が残り、Phase 3 全体の Definition of
 - HIG・Accessibility はコード上で既存の標準 UI、アクセシビリティ識別子・ラベル・選択 trait、キーボードショートカットを保持することを確認した。Simulator の手動操作は実施していない。可変幅・Dark Mode・Dynamic Type・VoiceOver 音声・外部キーボードの人間による未報告項目は引き続き未確認であり、Phase 3 全体の Definition of Done は未達。
 - 自動テストは iPadOS 17.2 / iPad Pro (11-inch) (4th generation) で Swift Testing 24 件・XCTest UI Test 20 件、失敗 0。`Test-ResearchNotebook-2026.10.06_16-45-23-+0900.xcresult` の summary と test tree を再確認した（結果 Passed、パラメータ別実行は合計 48 回）。三つの Swift ファイルの最終更新は同テスト開始前であり、その後は資料のみ更新したため再実行していない。
 - 再開時に `scripts/build.sh`、`scripts/lint.sh`、`git diff --check` を再実行し、終了コード 0 を確認。新規 Swift コンパイラ警告なし。既存 AppIntents メタデータ抽出省略警告と、sandbox 内の CoreSimulator 接続・FSEvents 診断を確認したが、Build は成功した。Task 2 の接続と自動検証・記録は完了し、後続の総合確認と人間の操作確認は残る。
+
+## Observation UI 状態 Task 3: 全体照合と DoD
+
+確認日: 2026-10-06。`origin/develop` からの実装差分を [ADR-0007](../adr/0007-observation-ui-state.md)、[Phase 3 要求](../requirements/phase-3-app-state-and-search.md)、[Definition of Done](../development/definition-of-done.md) と照合した。矛盾や追加承認が必要な変更はない。
+
+### ADR と振る舞いの照合
+
+- `NotebookUIState` が検索語、選択タグ ID、選択 Project ID、選択 Note ID の四状態だけを所有する。`WindowGroup` 内の `ContentView` が `@State` でインスタンスを所有し、子 View は同じ参照の `@Bindable` を使用する。独立インスタンスは Swift Testing で検証した。複数ウインドウの実画面確認までは実施していない。
+- 状態型は Foundation・Observation のみを参照し、SwiftData モデル、Context、検索結果を保持しない。Project・Note・Tag、ModelContainer、`matchingNotes` の検索・AND 条件、Navigation 構造は差分に含まれない。列表示・シート・下書きは従来の局所 `@State` に残る。
+- Project 切替時の条件保持、検索・タグで隠れた Note の詳細解除、作成後の選択、Note・Project 削除後の解除、保存失敗、タグ再利用と再起動後の復元、旧ストアのデータ保持は既存テストの検証対象である。選択整合関数は ID 集合に含まれない Note 選択だけを解除する。
+- HIG の根拠は既存の ADR-0004・ADR-0006 と本ログの Apple 公式資料。コードでは標準 NavigationSplitView・List・Menu・searchable、ラベル、選択 trait、ショートカットを維持した。公式資料の事実と、四状態の所有・AND 条件・選択解除というアプリ固有の判断を区別している。
+
+### Task 3 の自動検証
+
+- `scripts/build.sh` は終了コード 0、`BUILD SUCCEEDED`。`scripts/lint.sh` は終了コード 0、診断なし。最終文書変更後の `git diff --check` も終了コード 0。
+- `SIMULATOR_UDID=33CA3AC8-9A60-42F4-A25A-14DBF86375DA scripts/test.sh` を全件実行し、終了コード 0、`TEST SUCCEEDED`。iPadOS 17.2 / iPad Pro (11-inch) (4th generation) 上で Swift Testing 24 件（状態型 7 件を含む）と XCTest UI Test 20 件が成功、失敗 0 件。
+- `Test-ResearchNotebook-2026.10.06_20-16-16-+0900.xcresult` の summary は Passed、44 テスト、パラメータ展開を含む 48 回、失敗・skip・runtime warning は 0。ログは `/private/tmp/observation-task3-build.log`、`/private/tmp/observation-task3-lint.log`、`/private/tmp/observation-task3-test.log`。
+- Swift コンパイラ警告は 0。Build で 1 件、test のビルドで 3 件の既存 AppIntents メタデータ抽出省略のツール警告がある。sandbox 内の Build は CoreSimulator 接続・FSEvents 診断を出したが成功した。テスト起動時の既存 Xcode debugger version lookup 診断も確認した。Simulator discovery と自動テストは許可済みの escalation で実行し、手動 UI 操作は行っていない。
+
+### Definition of Done の項目別確認
+
+| 項目 | 結果と根拠 |
+|---|---|
+| Acceptance Criteria を満たす | 未達。正常系・主要異常系の自動検証と、人間による UI 確認を区別する。最後の DoD 条件は未完のまま。 |
+| スコープ外変更なし | 確認済み。四状態と View 接続・そのテスト・記録のみ。 |
+| Apple 公式ドキュメント/HIG | 確認済み。ADR-0007 の Observation・Model data、ADR-0004・0006 と本ログの HIG に照合。 |
+| 公式情報と独自判断を区別 | 確認済み。上記 ADR と各 Task の記録で区別。 |
+| 可変ウインドウ幅の主要 UI | 未達。Task 4 の狭幅検索欄の人間確認はあるが、タグ操作を含む主要 UI 全体は未報告。 |
+| Dark Mode | 未達。人間確認が未報告。過去の AI 観測は代替しない。 |
+| Dynamic Type | 未達。人間確認が未報告。 |
+| VoiceOver の主要要素 | 未達。自動テストのラベル確認と音声・操作の人間確認は別で、後者は未報告。 |
+| 色だけに意味を依存しない | コードと既存ラベル検証で確認済み。タグ名・チェックマーク・付与状態ラベル・選択 trait を保持。 |
+| 対象 Phase の Keyboard 操作 | 未達。検索・タグ操作を含む主要フローの人間確認が未報告。 |
+| Build 成功 | 確認済み。Task 3 の `scripts/build.sh` 終了コード 0。 |
+| Lint 成功 | 確認済み。`scripts/lint.sh` 終了コード 0。 |
+| 新規コンパイラ警告なし | 確認済み。Swift コンパイラ警告 0、既存ツール警告のみ。 |
+| 不要な抽象化なし | 確認済み。承認済み状態型のみ追加。ViewModel・Repository・Protocol なし。 |
+| エラー処理 | 確認済み。保存失敗とストア読込失敗の既存経路を保持し、自動テストの対象に含む。 |
+| 追加・変更テスト成功 | 確認済み。Swift Testing 24 件と XCTest UI Test 20 件、失敗 0。 |
+| 重要な正常系 | 自動テスト成功。状態遷移、検索・タグ・Project 切替、永続化、作成・編集・削除。 |
+| 重要な異常系 | 自動テスト成功。空条件・空一覧、非表示選択、空白タグ、保存・読込失敗、旧ストア移行。 |
+| 必要な ADR | Accepted ADR-0007 に適合。追加判断・ADR 修正は不要。 |
+| 要求との不一致なし | 差分照合で確認済み。Phase 3 の製品動作を維持。 |
+| 学習ログ | 本節を更新。 |
+
+Simulator の画面・設定・入力の手動操作は実施していない。人間の未報告項目が残るため、Observation 対応後も Phase 3 全体の DoD は未達である。
