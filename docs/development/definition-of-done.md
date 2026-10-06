@@ -2,6 +2,8 @@
 
 機能は以下を満たして初めてDoneとする。
 
+Simulator の手動操作が必要な Apple Platform / Accessibility の確認は人間が行う。自動テストは Swift Testing と XCTest のみを対象とし、XCTest UI Test の自動実行は含む。人間の確認結果と自動テスト結果を区別して記録し、未確認項目を完了扱いにしない。
+
 ## 要求
 
 - [ ] Acceptance Criteriaを満たしている。

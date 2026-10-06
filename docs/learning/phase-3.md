@@ -92,6 +92,8 @@ Task 4 完了時点では Task 5・6 が残り、Phase 3 全体の Definition of
 
 ### 実画面と操作
 
+以下の Task 6 の画面・操作記録は方針変更前に AI が観測した履歴であり、人間の確認結果ではない。2026-10-06 に人間が、今後の Simulator 手動操作による確認は人間のみが行い、自動テストは Swift Testing と XCTest に限ると決定した。既存の XCTest UI Test の自動実行は継続する。Task 6 の可変幅・Dark Mode・Dynamic Type・VoiceOver・キーボードの人間による確認は、Task 4 の狭幅検索欄を除き未報告である。
+
 - iPadOS 27.0 の iPad Pro 13-inch (M5) Simulator、Device Hub の小さいアプリウインドウ（画面キャプチャ上で約 690 px 幅）を使用した。人間は Task 4 で狭いウインドウの検索欄を別途直接確認している。
 - Dark Mode と Light Mode の両方で、Project 内検索欄、タグ Menu、Note 一覧、編集欄と空結果の説明を視認した。色のほかにタグ名、チェックマーク、付与状態のラベルで状態を示す。
 - 隔離した UI 検証ストアで Project と Note を作り、タグを新規付与してフィルタを選択した。検索語を不一致にすると一覧が空になり、詳細選択も解除された。タグ解除後に、アクセシビリティラベルが「付与済み」から「未付与」に変わった。

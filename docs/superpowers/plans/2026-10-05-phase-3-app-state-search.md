@@ -66,7 +66,7 @@
 
 - [x] `scripts/build.sh` と `scripts/lint.sh` を実行し、新規コンパイラ警告を残さない。AppIntents メタデータ抽出省略のツール警告のみ確認した。
 - [x] 利用可能な iPad Simulator の UDID を指定して `scripts/test.sh` を実行する。Swift Testing と XCTest UI Test の結果を区別して記録する。CI の Build 成功を Simulator テスト成功と扱わない。iPadOS 17.2 で Swift Testing 17 件、XCTest UI Test 20 件が成功した。
-- [ ] 可変ウインドウ幅、Dark Mode、Dynamic Type、VoiceOver、キーボードでタグ操作と検索を確認する。確認環境と直接観測できなかった項目を学習ログに記録する。狭幅・両外観・大きい文字・アクセシビリティラベルは確認済み。VoiceOver 音声と外部キーボードの主要フローは未観測。
+- [ ] 可変ウインドウ幅、Dark Mode、Dynamic Type、VoiceOver、キーボードでタグ操作と検索を人間が確認する。2026-10-06 以降、AI は Simulator の手動操作を行わない。確認環境と人間が確認した項目・未確認項目を学習ログに記録する。人間が確認したのは Task 4 の狭幅検索欄のみ。Task 6 の AI による画面観測は履歴として学習ログに残すが、人間の確認として数えない。VoiceOver 音声と外部キーボードの主要フローは未観測。
 - [ ] Acceptance Criteria と Definition of Done を照合する。`git diff --check` を実行し、作業ブランチを push して `develop` 向けの日本語タイトル・本文の PR を作成する。
 
 ## 停止条件
