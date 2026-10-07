@@ -2,6 +2,8 @@
 
 記録日: 2026-10-07。承認済みの[要求](../requirements/phase-4-web-api.md)、[ADR-0008](../adr/0008-crossref-web-api-and-networking-boundary.md)、[ADR-0009](../adr/0009-web-resource-persistence.md)に基づく。人間による画面操作の確認が残っているため、Phase 4 全体の Definition of Done は未達。
 
+人間による確認は[Phase 4 実操作テスト](../testing/phase-4-manual-test.md)の M-01〜M-07 と結果記録欄を使用する。現時点で実施結果は受け取っていない。
+
 ## Apple 公式資料で確認した事実と適用
 
 確認日: 2026-10-07。下表の中央列は公式資料の事実、右列はこのアプリでの判断である。
