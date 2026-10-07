@@ -92,7 +92,8 @@ final class ResearchNotebookUITests: XCTestCase {
     replaceText(search, with: "empty")
     app.buttons["crossref-search"].tap()
     XCTAssertTrue(app.staticTexts["crossref-empty"].waitForExistence(timeout: 5))
-    XCTAssertFalse(app.staticTexts["crossref-result-title"].exists)
+    XCTAssertFalse(app.staticTexts["crossref-result-title"].waitForExistence(timeout: 3))
+    XCTAssertTrue(app.staticTexts["crossref-empty"].exists)
   }
 
   @MainActor
@@ -143,7 +144,9 @@ final class ResearchNotebookUITests: XCTestCase {
     showProjectsIfNeeded(in: app)
     XCTAssertEqual(projectRows(app).element(boundBy: 1).label, "Second")
     projectRows(app).element(boundBy: 1).tap()
-    XCTAssertTrue(noteRows(app).firstMatch.waitForExistence(timeout: 5))
+    XCTAssertTrue(
+      noteRows(app).matching(NSPredicate(format: "label == %@", "Apple second"))
+        .firstMatch.waitForExistence(timeout: 10))
     XCTAssertEqual(noteRows(app).count, 1)
     XCTAssertEqual(noteRows(app).firstMatch.label, "Apple second")
     XCTAssertTrue(app.staticTexts["note-selection-empty"].exists)

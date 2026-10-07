@@ -60,6 +60,7 @@ struct CrossrefClient: Sendable {
       } catch {
         throw CrossrefError.decoding
       }
+      var seenDOIs = Set<String>()
       return envelope.message.items.compactMap { item in
         guard let title = item.title?.first?.trimmingCharacters(in: .whitespacesAndNewlines),
           !title.isEmpty,
@@ -68,6 +69,7 @@ struct CrossrefClient: Sendable {
           let rawURL = item.url, !rawURL.contains(where: \.isWhitespace),
           let url = URL(string: rawURL), url.scheme == "https", url.host != nil
         else { return nil }
+        guard seenDOIs.insert(doi.lowercased()).inserted else { return nil }
         return CrossrefSearchResult(title: title, doi: doi, url: url)
       }
     } catch is CancellationError {

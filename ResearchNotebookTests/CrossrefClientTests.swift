@@ -46,7 +46,7 @@ struct CrossrefClientTests {
       (
         Self.http(200),
         Data(
-          #"{"message":{"items":[{"title":[],"DOI":"10.1/a","URL":"https://doi.org/10.1/a"},{"title":["Valid"],"DOI":"10.1/b","URL":"http://example.com"},{"title":["Good"],"DOI":"10.1/c","URL":"https://doi.org/10.1/c"},{"title":["No DOI"],"DOI":" ","URL":"https://doi.org/x"}]}}"#
+          #"{"message":{"items":[{"title":[],"DOI":"10.1/a","URL":"https://doi.org/10.1/a"},{"title":["Valid"],"DOI":"10.1/b","URL":"http://example.com"},{"title":["Good"],"DOI":"10.1/c","URL":"https://doi.org/10.1/c"},{"title":["Duplicate"],"DOI":"10.1/C","URL":"https://doi.org/10.1/C"},{"title":["No DOI"],"DOI":" ","URL":"https://doi.org/x"}]}}"#
             .utf8)
       )
     }
