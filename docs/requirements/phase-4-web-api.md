@@ -24,6 +24,8 @@
 - [ ] 選んだ結果を指定 Project に保存でき、再起動後も参照できる。保存失敗を成功として表示しない。既存の Project・Note・Tag を失わない。
 - [ ] 正常応答、HTTP エラー、不正 JSON、通信失敗、キャンセル、保存と再読込を自動テストで確認し、[Definition of Done](../development/definition-of-done.md)を満たす。
 
+2026-10-07 時点で実装・Build・Lint・全自動テストは完了した。検証結果と、人間による可変ウインドウ幅・Dark Mode・Dynamic Type・VoiceOver・外部キーボードの確認状況は[Phase 4 学習ログ](../learning/phase-4.md)に記録する。手動確認が終わるまで、上記の Definition of Done を含む最終項目は未完了とする。
+
 ## 実装計画で具体化する UI
 
 - 外部検索は選択中 Project から開く。保存済み Web Resource は Note 一覧内の独立したセクションから参照する。既存の 3 列 Navigation と Note 選択状態は維持する。

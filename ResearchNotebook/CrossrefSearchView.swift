@@ -163,6 +163,7 @@ struct CrossrefSearchView: View {
       _ = try saveWebResource(
         title: result.title, doi: result.doi, url: result.url,
         to: project, in: modelContext)
+      saveFailed = false
       saveNotice = exists ? .existing : .saved
     } catch {
       saveNotice = nil
